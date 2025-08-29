@@ -10,7 +10,7 @@ export default function App() {
       <CardContent>
         <p>Main</p>
       </CardContent>
-      <CardFooter className="bg-black">
+      <CardFooter>
         <button className="px-3 py-1 bg-blue-500 text-white rounded">
          Some button
         </button>    
