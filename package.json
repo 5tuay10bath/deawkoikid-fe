@@ -10,12 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
     "pnpm": "^10.15.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^3.1.0",
     "twin.macro": "^3.4.1"
   },
   "devDependencies": {

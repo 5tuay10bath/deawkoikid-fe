@@ -1,6 +1,5 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { cn as tvCN, type CnOptions, type CnReturn} from 'tailwind-variants'
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+export const cn: (...classes: CnOptions) => CnReturn = (...classes: CnOptions) => {
+  return tvCN(classes)({ twMerge: true })
 }
