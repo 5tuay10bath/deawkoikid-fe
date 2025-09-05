@@ -6,24 +6,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@client/ui/components/mock/card";
-
+// import { useState } from "react";
+import { Routes, Route } from 'react-router-dom';
+import Sidebar from "@client/ui/components/mock/sidebar";
+import Dashboard from "@client/ui/pages/dashboard";
 export default function App() {
   return (
-    <>
-      <Card className="w-1/5">
-        <CardHeader>
-          <CardTitle>Title</CardTitle>
-          <CardDescription>Description</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Main</p>
-        </CardContent>
-        <CardFooter>
-          <button className="px-3 py-1 bg-blue-500 text-white rounded">
-            Some button
-          </button>
-        </CardFooter>
-      </Card>
-    </>
+    <div className="flex min-h-screen">
+      <Sidebar collapsed={false} />
+      <main className="flex-1 p-4 md:p-6 pt-16 md:pt-6">
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle>Title</CardTitle>
+                <CardDescription>Description</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Content</p>
+              </CardContent>
+              <CardFooter>
+                <button className="px-3 py-1 bg-blue-500 text-white rounded">
+                  Some button
+                </button>
+              </CardFooter>
+            </Card>
+          } />
+        </Routes>
+      </main>
+    </div>
   );
 }
