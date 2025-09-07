@@ -1,7 +1,29 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@client/ui/components/mock/card";
+
 export default function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      test
-    </h1>
-  )
+    <>
+      <Card className="w-1/5">
+        <CardHeader>
+          <CardTitle>Title</CardTitle>
+          <CardDescription>Description</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Main</p>
+        </CardContent>
+        <CardFooter>
+          <button className="px-3 py-1 bg-blue-500 text-white rounded">
+            Some button
+          </button>
+        </CardFooter>
+      </Card>
+    </>
+  );
 }
