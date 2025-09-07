@@ -8,19 +8,20 @@ type TableProps<TData> = {
   columns: ColumnDef<TData>[];//Specify type(can't any)
   data: TData[];
 };
+
 //รับparamsสองตัว คือdataกับ columns
 export default function TableCom<TData>({
   data,
   columns
-}: TableProps<TData>){
+}: TableProps<TData>) {
 
-//   const [data] = React.useState(() => [...mockData]);
+  //   const [data] = React.useState(() => [...mockData]);
   //make mock data depends on constant
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
 
   const table = useReactTable({
-    data ,
+    data,
     columns,///##### 
     state: {
       sorting,
