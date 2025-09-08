@@ -1,28 +1,12 @@
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/table/Table"
-import { Search, Edit, Building } from "lucide-react"
+import { Search, Building } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
-import { Button } from "../components/Button"
 import { Input } from "../components/Input"
-import { Badge } from "../components/Badge"
 import { useUnitStore } from "@core/application/libs/store/units.store"
 import DialogUnits from "../components/unitsCom/Dialog"
+import TableUnits from "../components/unitsCom/Table"
 
 export default function Units() {
-  const { units } = useUnitStore()
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const filteredUnits = units.filter(unit =>
-    unit.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    unit.type.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const statusConfig = {
-    available: { color: "bg-green-500 text-white", label: "Available" },
-    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    maintenance: { color: "bg-orange-500 text-white", label: "Maintenance" },
-    "checkout-pending": { color: "bg-muted text-white", label: "Checkout Pending" }
-  }
+  const { searchTerm, setSearchTerm } = useUnitStore()
 
   return (
     <div className="space-y-6">
@@ -55,38 +39,7 @@ export default function Units() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Unit Number</TableHead>
-                <TableHead>Floor</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUnits.map((unit) => (
-                <TableRow key={unit.id}>
-                  <TableCell className="font-medium">{unit.number}</TableCell>
-                  <TableCell>{unit.floor}</TableCell>
-                  <TableCell>{unit.type}</TableCell>
-                  <TableCell>{unit.size}</TableCell>
-                  <TableCell>
-                    <Badge className={statusConfig[unit.status].color}>
-                      {statusConfig[unit.status].label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <TableUnits />
         </CardContent>
       </Card>
     </div>
