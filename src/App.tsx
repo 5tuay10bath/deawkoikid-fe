@@ -10,6 +10,7 @@ import {
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from "@client/ui/components/Sidebar";
 import Dashboard from "@client/ui/pages/dashboard";
+import Units from "@client/ui/pages/units";
 export default function App() {
   return (
     <div className="flex min-h-screen">
@@ -17,6 +18,7 @@ export default function App() {
       <main className="flex-1 p-4 md:p-6 pt-16 md:pt-6">
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/units" element={<Units />} />
           <Route path="/" element={
             <Card className="w-1/3">
               <CardHeader>
