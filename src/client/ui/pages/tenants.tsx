@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/car
 import { Button } from "../components/Button"
 import { Input } from "../components/Input"
 import { Search, Users} from "lucide-react"
-import { StatsCard } from "../components/tenantsCom/StatsCard"
+import { StatsCard } from "../components/common/StatsCard"
 import { useTenantStore } from "@core/application/libs/store/tenants.store"
 import TableTenants from "../components/tenantsCom/Table"
 
@@ -37,19 +37,19 @@ export default function Tenants() {
         <StatsCard
           label="Active"
           value={tenants.filter(t => t.status === 'active').length}
-          valueColor="text-green-500"
+          color={{ valueColor: "text-green-500" }}
         />
         
         <StatsCard
           label="Overdue"
           value={tenants.filter(t => t.status === 'overdue').length}
-          valueColor="text-red-500"
+          color={{ valueColor: "text-red-500" }}
         />
         
         <StatsCard
           label="Check-out Pending"
           value={tenants.filter(t => t.status === 'checkout-pending').length}
-          valueColor="text-blue-500"
+          color={{ valueColor: "text-blue-500" }}   
         />
       </div>
 

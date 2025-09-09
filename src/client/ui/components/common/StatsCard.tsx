@@ -5,10 +5,15 @@ interface StatsCardProps {
   label: string
   value: number
   icon?: LucideIcon
-  valueColor?: string
+  prefix ?: string
+  color ?: {
+    valueColor?: string
+    iconColor?: string
+}
 }
 
-export function StatsCard({ label, value, icon: Icon, valueColor = "text-gray-900" }: StatsCardProps) {
+export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: StatsCardProps) {
+  const { valueColor = "text-gray-900", iconColor = "text-blue-500" } = color;
   return (
     <Card>
       <CardContent className="p-4">
@@ -16,10 +21,10 @@ export function StatsCard({ label, value, icon: Icon, valueColor = "text-gray-90
           <div>
             <p className="text-sm text-muted-foreground">{label}</p>
             <p className={`text-2xl font-bold ${valueColor}`}>
-              {value}
+              {prefix}{value}
             </p>
           </div>
-          {Icon && <Icon className="h-8 w-8 text-blue-500" />}
+          {Icon && <Icon className={`h-8 w-8 ${iconColor}`} />}
         </div>
       </CardContent>
     </Card>
