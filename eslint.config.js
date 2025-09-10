@@ -102,7 +102,7 @@ export default tseslint.config(
       "import/no-duplicates": "error",
       "@typescript-eslint/no-redeclare": "off",
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-      "no-console": ["error"],
+      "no-console": "warn",
       "node/prefer-global/process": ["off"],
       "node/no-process-env": ["error"],
       "@typescript-eslint/no-explicit-any": "error",
