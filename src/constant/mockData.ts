@@ -1,5 +1,5 @@
 // Centralized Mock Database
-export interface Tenant {
+export type Tenant = {
   id: string
   name: string
   email: string
@@ -15,7 +15,7 @@ export interface Tenant {
   status: "active" | "checkout-pending" | "overdue"
 }
 
-export interface Room {
+export type Room = {
   id: string
   number: string
   floor: number
@@ -25,7 +25,7 @@ export interface Room {
   tenant?: Tenant
 }
 
-export interface Payment {
+export type Payment = {
   id: string
   tenantId: string
   tenantName: string
@@ -38,7 +38,7 @@ export interface Payment {
   paidDate?: Date
 }
 
-export interface Contract {
+export type Contract = {
   id: string
   tenantId: string
   tenantName: string
@@ -50,7 +50,7 @@ export interface Contract {
   type: "standard" | "custom"
 }
 
-export interface MaintenanceTask {
+export type MaintenanceTask = {
   id: string
   title: string
   description: string
@@ -63,7 +63,7 @@ export interface MaintenanceTask {
   type: "plumbing" | "electrical" | "hvac" | "general" | "cleaning"
 }
 
-export interface Supply {
+export type Supply = {
   id: string
   name: string
   category: string
@@ -102,7 +102,7 @@ class MockDatabase {
         rentAmount: 1200,
         billingCycle: "monthly",
         securityDeposit: 1200,
-        status: "active"
+        status: "active",
       },
       {
         id: "t2",
@@ -117,7 +117,7 @@ class MockDatabase {
         rentAmount: 1100,
         billingCycle: "monthly",
         securityDeposit: 1100,
-        status: "overdue"
+        status: "overdue",
       },
       {
         id: "t3",
@@ -132,7 +132,7 @@ class MockDatabase {
         rentAmount: 950,
         billingCycle: "monthly",
         securityDeposit: 950,
-        status: "checkout-pending"
+        status: "checkout-pending",
       },
       {
         id: "t4",
@@ -147,7 +147,7 @@ class MockDatabase {
         rentAmount: 1300,
         billingCycle: "monthly",
         securityDeposit: 1300,
-        status: "active"
+        status: "active",
       },
       {
         id: "t5",
@@ -162,8 +162,8 @@ class MockDatabase {
         rentAmount: 1150,
         billingCycle: "monthly",
         securityDeposit: 1150,
-        status: "active"
-      }
+        status: "active",
+      },
     ]
 
     // Initialize Rooms (24 total - 12 per floor, 2 floors)
@@ -171,23 +171,23 @@ class MockDatabase {
     const occupiedUnits = ["101", "203", "105", "207", "112"]
     const maintenanceUnits = ["103", "209"]
     const checkoutPendingUnits = ["105"]
-    
+
     for (let floor = 1; floor <= 2; floor++) {
       for (let roomNum = 1; roomNum <= 12; roomNum++) {
-        const roomNumber = `${floor}${roomNum.toString().padStart(2, '0')}`
-        
-        let status: Room['status'] = 'available'
+        const roomNumber = `${floor}${roomNum.toString().padStart(2, "0")}`
+
+        let status: Room["status"] = "available"
         let tenant: Tenant | undefined = undefined
-        
+
         if (occupiedUnits.includes(roomNumber)) {
-          status = 'occupied'
-          tenant = this.tenants.find(t => t.unitNumber === roomNumber)
+          status = "occupied"
+          tenant = this.tenants.find((t) => t.unitNumber === roomNumber)
         } else if (maintenanceUnits.includes(roomNumber)) {
-          status = 'maintenance'
+          status = "maintenance"
         } else if (checkoutPendingUnits.includes(roomNumber)) {
-          status = 'checkout-pending'
+          status = "checkout-pending"
         }
-        
+
         this.rooms.push({
           id: roomNumber,
           number: roomNumber,
@@ -195,7 +195,7 @@ class MockDatabase {
           type: "Studio",
           size: "400 sq ft",
           status,
-          tenant
+          tenant,
         })
       }
     }
@@ -211,7 +211,7 @@ class MockDatabase {
         type: "rent",
         status: "paid",
         dueDate: new Date(2024, 7, 1),
-        paidDate: new Date(2024, 7, 1)
+        paidDate: new Date(2024, 7, 1),
       },
       {
         id: "p2",
@@ -222,7 +222,7 @@ class MockDatabase {
         type: "utilities",
         status: "overdue",
         dueDate: new Date(2024, 6, 15),
-        description: "Electricity bill"
+        description: "Electricity bill",
       },
       {
         id: "p3",
@@ -233,7 +233,7 @@ class MockDatabase {
         type: "rent",
         status: "paid",
         dueDate: new Date(2024, 7, 20),
-        paidDate: new Date(2024, 7, 18)
+        paidDate: new Date(2024, 7, 18),
       },
       {
         id: "p4",
@@ -244,8 +244,8 @@ class MockDatabase {
         type: "utilities",
         status: "pending",
         dueDate: new Date(2024, 7, 25),
-        description: "Water bill"
-      }
+        description: "Water bill",
+      },
     ]
 
     // Initialize Contracts
@@ -259,7 +259,7 @@ class MockDatabase {
         endDate: new Date(2024, 11, 15),
         rentAmount: 1200,
         status: "active",
-        type: "standard"
+        type: "standard",
       },
       {
         id: "c2",
@@ -270,7 +270,7 @@ class MockDatabase {
         endDate: new Date(2025, 0, 31),
         rentAmount: 1100,
         status: "active",
-        type: "custom"
+        type: "custom",
       },
       {
         id: "c3",
@@ -281,8 +281,8 @@ class MockDatabase {
         endDate: new Date(2025, 3, 20),
         rentAmount: 1300,
         status: "active",
-        type: "standard"
-      }
+        type: "standard",
+      },
     ]
 
     // Initialize Maintenance Tasks
@@ -297,7 +297,7 @@ class MockDatabase {
         assignedTo: "John Maintenance",
         dueDate: new Date(2024, 7, 25),
         createdDate: new Date(2024, 7, 20),
-        type: "plumbing"
+        type: "plumbing",
       },
       {
         id: "m2",
@@ -309,7 +309,7 @@ class MockDatabase {
         assignedTo: "Mike HVAC",
         dueDate: new Date(2024, 7, 22),
         createdDate: new Date(2024, 7, 21),
-        type: "hvac"
+        type: "hvac",
       },
       {
         id: "m3",
@@ -321,8 +321,8 @@ class MockDatabase {
         assignedTo: "Bob Repair",
         dueDate: new Date(2024, 7, 28),
         createdDate: new Date(2024, 7, 22),
-        type: "general"
-      }
+        type: "general",
+      },
     ]
 
     // Initialize Supplies
@@ -334,7 +334,7 @@ class MockDatabase {
         quantity: 25,
         unit: "pieces",
         minStock: 10,
-        cost: 8.99
+        cost: 8.99,
       },
       {
         id: "s2",
@@ -343,7 +343,7 @@ class MockDatabase {
         quantity: 5,
         unit: "rolls",
         minStock: 20,
-        cost: 12.99
+        cost: 12.99,
       },
       {
         id: "s3",
@@ -352,7 +352,7 @@ class MockDatabase {
         quantity: 15,
         unit: "pieces",
         minStock: 8,
-        cost: 24.50
+        cost: 24.5,
       },
       {
         id: "s4",
@@ -361,126 +361,141 @@ class MockDatabase {
         quantity: 3,
         unit: "rolls",
         minStock: 5,
-        cost: 6.75
-      }
+        cost: 6.75,
+      },
     ]
   }
 
   // Getter methods
-  getTenants(): Tenant[] { return [...this.tenants] }
-  getRooms(): Room[] { return [...this.rooms] }
-  getPayments(): Payment[] { return [...this.payments] }
-  getContracts(): Contract[] { return [...this.contracts] }
-  getMaintenanceTasks(): MaintenanceTask[] { return [...this.maintenanceTasks] }
-  getSupplies(): Supply[] { return [...this.supplies] }
+  getTenants(): Tenant[] {
+    return [...this.tenants]
+  }
+  getRooms(): Room[] {
+    return [...this.rooms]
+  }
+  getPayments(): Payment[] {
+    return [...this.payments]
+  }
+  getContracts(): Contract[] {
+    return [...this.contracts]
+  }
+  getMaintenanceTasks(): MaintenanceTask[] {
+    return [...this.maintenanceTasks]
+  }
+  getSupplies(): Supply[] {
+    return [...this.supplies]
+  }
 
   // Individual getters
   getTenant(id: string): Tenant | undefined {
-    return this.tenants.find(t => t.id === id)
+    return this.tenants.find((t) => t.id === id)
   }
 
   getRoom(id: string): Room | undefined {
-    return this.rooms.find(r => r.id === id)
+    return this.rooms.find((r) => r.id === id)
   }
 
   getRoomByNumber(number: string): Room | undefined {
-    return this.rooms.find(r => r.number === number)
+    return this.rooms.find((r) => r.number === number)
   }
 
   // CRUD operations
-  addTenant(tenant: Omit<Tenant, 'id'>): Tenant {
+  addTenant(tenant: Omit<Tenant, "id">): Tenant {
     const newTenant: Tenant = {
       id: `t${Date.now()}`,
-      ...tenant
+      ...tenant,
     }
     this.tenants.push(newTenant)
     return newTenant
   }
 
   updateTenant(id: string, updates: Partial<Tenant>): Tenant | null {
-    const index = this.tenants.findIndex(t => t.id === id)
+    const index = this.tenants.findIndex((t) => t.id === id)
     if (index === -1) return null
-    
+
     this.tenants[index] = { ...this.tenants[index], ...updates }
     return this.tenants[index]
   }
 
-  addPayment(payment: Omit<Payment, 'id'>): Payment {
+  addPayment(payment: Omit<Payment, "id">): Payment {
     const newPayment: Payment = {
       id: `p${Date.now()}`,
-      ...payment
+      ...payment,
     }
     this.payments.push(newPayment)
     return newPayment
   }
 
-  addMaintenanceTask(task: Omit<MaintenanceTask, 'id' | 'createdDate'>): MaintenanceTask {
+  addMaintenanceTask(task: Omit<MaintenanceTask, "id" | "createdDate">): MaintenanceTask {
     const newTask: MaintenanceTask = {
       id: `m${Date.now()}`,
       createdDate: new Date(),
-      ...task
+      ...task,
     }
     this.maintenanceTasks.push(newTask)
     return newTask
   }
 
-  addSupply(supply: Omit<Supply, 'id'>): Supply {
+  addSupply(supply: Omit<Supply, "id">): Supply {
     const newSupply: Supply = {
       id: `s${Date.now()}`,
-      ...supply
+      ...supply,
     }
     this.supplies.push(newSupply)
     return newSupply
   }
 
   updateRoom(id: string, updates: Partial<Room>): Room | null {
-    const index = this.rooms.findIndex(r => r.id === id)
+    const index = this.rooms.findIndex((r) => r.id === id)
     if (index === -1) return null
-    
+
     this.rooms[index] = { ...this.rooms[index], ...updates }
     return this.rooms[index]
   }
 
   // Business logic methods
-  checkInTenant(roomId: string, tenant: Omit<Tenant, 'id' | 'unitNumber'>): { success: boolean; message: string } {
+  checkInTenant(roomId: string, tenant: Omit<Tenant, "id" | "unitNumber">): { success: boolean; message: string } {
     const room = this.getRoom(roomId)
     if (!room) {
       return { success: false, message: "Room not found" }
     }
-    
-    if (room.status !== 'available') {
+
+    if (room.status !== "available") {
       return { success: false, message: "Room is not available for check-in" }
     }
 
     // Add tenant
     const newTenant = this.addTenant({
       ...tenant,
-      unitNumber: room.number
+      unitNumber: room.number,
     })
 
     // Update room
     this.updateRoom(roomId, {
-      status: 'occupied',
-      tenant: newTenant
+      status: "occupied",
+      tenant: newTenant,
     })
 
     // Create contract
-    const contract: Omit<Contract, 'id'> = {
+    const contract: Omit<Contract, "id"> = {
       tenantId: newTenant.id,
       tenantName: newTenant.name,
       unitNumber: newTenant.unitNumber,
       startDate: newTenant.checkIn,
       endDate: newTenant.checkOut,
       rentAmount: newTenant.rentAmount,
-      status: 'active',
-      type: 'standard'
+      status: "active",
+      type: "standard",
     }
     this.contracts.push({
       id: `c${Date.now()}`,
-      ...contract
+      ...contract,
     })
 
-    return { success: true, message: `Successfully checked in ${newTenant.name} to room ${room.number}` }
+    return {
+      success: true,
+      message: `Successfully checked in ${newTenant.name} to room ${room.number}`,
+    }
   }
 
   checkOutTenant(roomId: string): { success: boolean; message: string } {
@@ -491,16 +506,19 @@ class MockDatabase {
 
     // Update room
     this.updateRoom(roomId, {
-      status: 'available',
-      tenant: undefined
+      status: "available",
+      tenant: undefined,
     })
 
     // Update tenant status
     this.updateTenant(room.tenant.id, {
-      status: 'checkout-pending'
+      status: "checkout-pending",
     })
 
-    return { success: true, message: `Successfully checked out ${room.tenant.name} from room ${room.number}` }
+    return {
+      success: true,
+      message: `Successfully checked out ${room.tenant.name} from room ${room.number}`,
+    }
   }
 }
 
