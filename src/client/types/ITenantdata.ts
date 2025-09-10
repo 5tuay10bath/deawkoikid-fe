@@ -1,5 +1,5 @@
-export interface Tenant {
-  name: string;
-  email: string;
-  phone: string;
+export type Tenant = {
+  name: string
+  email: string
+  phone: string
 }

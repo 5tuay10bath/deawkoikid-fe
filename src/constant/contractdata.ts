@@ -1,4 +1,4 @@
-import type { Contract } from "@client/types/IContractdata";
+import type { Contract } from "@client/types/IContractdata"
 
 export const contractData: Contract[] = [
   {
@@ -21,6 +21,6 @@ export const contractData: Contract[] = [
     start_date: "2025-01-01",
     end_date: "2025-12-31",
     status: "Active",
-  }
+  },
 ]
-export default contractData ;
+export default contractData

@@ -1,4 +1,4 @@
-import type { Tenant } from "@client/types/ITenantdata";
+import type { Tenant } from "@client/types/ITenantdata"
 
 export const tenantData: Tenant[] = [
   {
@@ -16,6 +16,6 @@ export const tenantData: Tenant[] = [
     name: "Tenant 3",
     email: "tenant3@gmail.com",
     phone: "08123456789",
-  }
+  },
 ]
-export default tenantData;
+export default tenantData
