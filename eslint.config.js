@@ -108,7 +108,7 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-empty-function": "warn",
       "no-alert": "error",
-      "no-magic-numbers": "warn",
+      "no-magic-numbers": "off",
       "prefer-const": "error",
       "@typescript-eslint/no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^_" }],
 
