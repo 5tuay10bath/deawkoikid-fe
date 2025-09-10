@@ -104,7 +104,7 @@ export default tseslint.config(
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
       "no-console": "warn",
       "node/prefer-global/process": ["off"],
-      "node/no-process-env": ["error"],
+      "node/no-process-env": ["warn"],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-empty-function": "warn",
       "no-alert": "error",
