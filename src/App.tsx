@@ -13,6 +13,7 @@ import Units from "@client/ui/pages/units";
 import { useState } from "react";
 import { Separator } from "@client/ui/components/Separator";
 import { PanelsTopLeft } from "lucide-react";
+import Tenants from "@client/ui/pages/tenants";
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -30,6 +31,7 @@ export default function App() {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/units" element={<Units />} />
+          <Route path="/tenants" element={<Tenants />} />
           <Route path="/" element={
             <Card className="w-1/3">
               <CardHeader>
