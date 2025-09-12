@@ -4,6 +4,7 @@ import { Input } from "../components/Input"
 import { useUnitStore } from "@core/application/libs/store/units.store"
 import DialogUnits from "../components/unitsCom/Dialog"
 import TableUnits from "../components/unitsCom/Table"
+import TableCompo from "../components/unitsCom/tablecompo"
 
 export default function Units() {
   const { searchTerm, setSearchTerm } = useUnitStore()
@@ -39,7 +40,7 @@ export default function Units() {
           </div>
         </CardHeader>
         <CardContent>
-          <TableUnits />
+          <TableCompo />
         </CardContent>
       </Card>
     </div>
