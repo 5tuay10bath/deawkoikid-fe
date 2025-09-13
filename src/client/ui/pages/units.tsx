@@ -1,9 +1,10 @@
 import { Search, Building } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
-import { Input } from "../components/Input"
+
 import { useUnitStore } from "@core/application/libs/store/units.store"
+
+import { Input } from "../components/Input"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
 import DialogUnits from "../components/unitsCom/Dialog"
-import TableUnits from "../components/unitsCom/Table"
 import TableCompo from "../components/unitsCom/tablecompo"
 
 export default function Units() {
@@ -28,12 +29,12 @@ export default function Units() {
             </CardTitle>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
                 <Input
                   placeholder="Search units..."
                   value={searchTerm}
-                  onChange={(e : React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                  className="pl-9 w-64"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                  className="w-64 pl-9"
                 />
               </div>
             </div>
