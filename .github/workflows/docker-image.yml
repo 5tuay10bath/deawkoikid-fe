@@ -14,15 +14,10 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: docker build . --file Dockerfile --t iamyasuomain/deawkoikid_frontend:latest .
-    list-images:
-      runs-on: ubuntu-latest
-      steps: 
-      -  name: List images
-         run: docker images
-    push:
-      runs-on: ubuntu-latest
-      -  name: login
-         run: docker login -u iamyasuomain -p dckr_pat_XQrX6P-88IRVSCrCGnOA3x2ThAw
-      -  name: push docker
-         run: docker push iamyasuomain/deawkoikid_frontend:latest
+    - name: List images
+      run: docker images
+    - name: login
+      run: docker login -u iamyasuomain -p dckr_pat_XQrX6P-88IRVSCrCGnOA3x2ThAw
+    - name: push docker
+      run: docker push iamyasuomain/deawkoikid_frontend:latest
       
