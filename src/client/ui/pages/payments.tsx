@@ -1,6 +1,6 @@
 import { Search, Receipt, Plus, DollarSign } from "lucide-react"
 
-import { usePaymentStore } from "@core/application/libs/store/payments.store"
+import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
 import { Button } from "../components/Button"
 import { StatsCard } from "../components/common/StatsCard"

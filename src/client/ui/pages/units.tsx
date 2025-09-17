@@ -1,6 +1,6 @@
 import { Search, Building } from "lucide-react"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Input } from "../components/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"

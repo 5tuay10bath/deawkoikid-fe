@@ -2,7 +2,7 @@ import { LayoutDashboard, Building2, Users, CreditCard, FileText, Wrench, Menu, 
 import React, { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 
-import { cn } from "@core/application/libs/cn/cn"
+import { cn } from "src/infrastructure/libs/cn/cn"
 
 type Props = {
   collapsed?: boolean

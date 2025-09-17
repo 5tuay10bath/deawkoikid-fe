@@ -1,6 +1,6 @@
 import { create } from "zustand/react"
 
-import { mockDB, type Room } from "src/constant/mockData"
+import { mockDB, type Room } from "src/infrastructure/mockData/mockData"
 
 type UnitState = {
   units: Room[]

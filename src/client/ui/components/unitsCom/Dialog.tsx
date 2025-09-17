@@ -1,9 +1,9 @@
 import { Plus } from "lucide-react"
 import React, { useState } from "react"
 
-import type { Room } from "src/constant/mockData"
+import type { Room } from "src/infrastructure/mockData/mockData"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Button } from "../Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Dialog"
