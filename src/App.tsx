@@ -2,13 +2,14 @@ import { PanelsTopLeft } from "lucide-react"
 import { useState } from "react"
 import { Routes, Route } from "react-router-dom"
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@client/ui/components/mock/card"
 import { Separator } from "@client/ui/components/Separator"
 import Sidebar from "@client/ui/components/Sidebar"
 import Dashboard from "@client/ui/pages/dashboard"
 import Payments from "@client/ui/pages/payments"
 import Tenants from "@client/ui/pages/tenants"
 import Units from "@client/ui/pages/units"
+import Contracts from "@client/ui/pages/contracts"
+import NotFound from "@client/ui/pages/notFound"
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -25,23 +26,14 @@ export default function App() {
           <Route path="/units" element={<Units />} />
           <Route path="/tenants" element={<Tenants />} />
           <Route path="/payments" element={<Payments />} />
+          <Route path="/contracts" element={<Contracts />} />
           <Route
             path="/"
             element={
-              <Card className="w-1/3">
-                <CardHeader>
-                  <CardTitle>Title</CardTitle>
-                  <CardDescription>Description</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Content</p>
-                </CardContent>
-                <CardFooter>
-                  <button className="rounded bg-blue-500 px-3 py-1 text-white">Some button</button>
-                </CardFooter>
-              </Card>
+              <h1 className="text-[20px] font-bold">welcome</h1>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
