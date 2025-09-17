@@ -1,9 +1,9 @@
 import { format } from "date-fns"
 import { Eye, Edit, Trash2 } from "lucide-react"
 
-import type { Tenant } from "src/constant/mockData"
+import type { Tenant } from "src/infrastructure/mockData/mockData"
 
-import { useTenantStore } from "@core/application/libs/store/tenants.store"
+import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
 
 import { Avatar, AvatarFallback } from "../Avatar"
 import { Badge } from "../Badge"

@@ -1,9 +1,9 @@
 import { format } from "date-fns"
 import { Download, Receipt, Send } from "lucide-react"
 
-import type { Payment } from "src/constant/mockData"
+import type { Payment } from "src/infrastructure/mockData/mockData"
 
-import { usePaymentStore } from "@core/application/libs/store/payments.store"
+import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
 import { Badge } from "../Badge"
 import { Button } from "../Button"

@@ -1,7 +1,7 @@
 import { format } from "date-fns"
 import { Download, Send } from "lucide-react"
 
-import { usePaymentStore } from "@core/application/libs/store/payments.store"
+import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
 import { Button } from "../Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../Dialog"

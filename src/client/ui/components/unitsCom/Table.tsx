@@ -1,6 +1,6 @@
 import { Edit } from "lucide-react"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Badge } from "../Badge"
 import { Button } from "../Button"

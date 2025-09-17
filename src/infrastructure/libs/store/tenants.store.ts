@@ -1,6 +1,6 @@
 import { create } from "zustand/react"
 
-import { mockDB, type Tenant } from "src/constant/mockData"
+import { mockDB, type Tenant } from "src/infrastructure/mockData/mockData"
 
 type TenantState = {
   tenants: Tenant[]
