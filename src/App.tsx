@@ -10,6 +10,7 @@ import Tenants from "@client/ui/pages/tenants"
 import Units from "@client/ui/pages/units"
 import Contracts from "@client/ui/pages/contracts"
 import NotFound from "@client/ui/pages/notFound"
+import Maintenance from "@client/ui/pages/maintenance"
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/tenants" element={<Tenants />} />
           <Route path="/payments" element={<Payments />} />
           <Route path="/contracts" element={<Contracts />} />
+          <Route path="/maintenance" element={<Maintenance />} />
           <Route
             path="/"
             element={
