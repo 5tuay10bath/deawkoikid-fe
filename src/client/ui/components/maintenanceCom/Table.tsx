@@ -1,7 +1,7 @@
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table/Table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 import { format } from "date-fns"
-import { Badge } from "../Badge"
+import { Badge } from "../common/Badge"
 const MaintainTable = () => {
   const { tasks, searchTerm } = useMaintenanceStore()
 

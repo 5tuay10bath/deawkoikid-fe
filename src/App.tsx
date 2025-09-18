@@ -2,8 +2,8 @@ import { PanelsTopLeft } from "lucide-react"
 import { useState } from "react"
 import { Routes, Route } from "react-router-dom"
 
-import { Separator } from "@client/ui/components/Separator"
-import Sidebar from "@client/ui/components/Sidebar"
+import { Separator } from "@client/ui/components/common/Separator"
+import Sidebar from "@client/ui/components/common/Sidebar"
 import Dashboard from "@client/ui/pages/dashboard"
 import Payments from "@client/ui/pages/payments"
 import Tenants from "@client/ui/pages/tenants"
@@ -11,6 +11,8 @@ import Units from "@client/ui/pages/units"
 import Contracts from "@client/ui/pages/contracts"
 import NotFound from "@client/ui/pages/notFound"
 import Maintenance from "@client/ui/pages/maintenance"
+import CheckIn from "@client/ui/pages/checkIn"
+import RoomDetails from "@client/ui/pages/roomDetail"
 
 export default function App() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -29,12 +31,9 @@ export default function App() {
           <Route path="/payments" element={<Payments />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/maintenance" element={<Maintenance />} />
-          <Route
-            path="/"
-            element={
-              <h1 className="text-[20px] font-bold">welcome</h1>
-            }
-          />
+          <Route path="/check-in/:roomId" element={<CheckIn />} />
+          <Route path="/room/:roomId" element={<RoomDetails />} />
+          <Route path="/" element={<h1 className="text-[20px] font-bold">welcome</h1>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

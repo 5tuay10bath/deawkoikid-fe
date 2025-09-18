@@ -1,9 +1,9 @@
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/Tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/common/Tabs"
 import { AlertTriangle, Clock, Package, Search, Wrench } from "lucide-react"
-import { Input } from "../components/Input"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
-import { StatsCard } from "../components/common/StatsCard"
+import { Input } from "../components/common/Input"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
+import { StatsCard } from "../components/central/StatsCard"
 import NewTaskDialog, { NewSupplyDialog } from "../components/maintenanceCom/Dialog"
 import MaintainTable, { SupplyTable } from "../components/maintenanceCom/Table"
 

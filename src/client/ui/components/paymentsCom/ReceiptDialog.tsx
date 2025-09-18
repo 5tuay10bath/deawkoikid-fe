@@ -3,8 +3,8 @@ import { Download, Send } from "lucide-react"
 
 import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
-import { Button } from "../Button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../Dialog"
+import { Button } from "../common/Button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
 import { useToast } from "../hooks/useToast"
 
 const ReceiptDialog = () => {

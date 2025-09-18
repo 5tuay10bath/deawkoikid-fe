@@ -2,9 +2,9 @@ import { Edit } from "lucide-react"
 
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
-import { Badge } from "../Badge"
-import { Button } from "../Button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table/Table"
+import { Badge } from "../common/Badge"
+import { Button } from "../common/Button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 
 const TableUnits = () => {
   const { units, searchTerm } = useUnitStore()
