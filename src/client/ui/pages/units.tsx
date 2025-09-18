@@ -2,8 +2,8 @@ import { Search, Building } from "lucide-react"
 
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
-import { Input } from "../components/Input"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
+import { Input } from "../components/common/Input"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import DialogUnits from "../components/unitsCom/Dialog"
 import TableUnits from "../components/unitsCom/Table"
 

@@ -1,19 +1,15 @@
 import { FileText, Plus, Search } from "lucide-react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
-import { Button } from "../components/Button"
-import { Input } from "../components/Input"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
-import { StatsCard } from "../components/common/StatsCard"
+import { Button } from "../components/common/Button"
+import { Input } from "../components/common/Input"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
+import { StatsCard } from "../components/central/StatsCard"
 import ContractsTable from "../components/contractsCom/Table"
 import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
 
 export default function Contracts() {
-  const { 
-    contracts, 
-    searchTerm, 
-    setSearchTerm,
-  } = useContractStore()
+  const { contracts, searchTerm, setSearchTerm } = useContractStore()
 
   return (
     <div className="space-y-6">
@@ -22,10 +18,10 @@ export default function Contracts() {
           <h1 className="text-3xl font-bold">Contract Management</h1>
           <p className="text-muted-foreground">Manage lease contracts and templates</p>
         </div>
-        
+
         <div className="flex gap-2">
           <EditTemplateDialog />
-          
+
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             New Contract
@@ -37,31 +33,31 @@ export default function Contracts() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
           label="Active Contracts"
-          value={contracts.filter(c => c.status === 'active').length}
+          value={contracts.filter((c) => c.status === "active").length}
           icon={FileText}
           color={{
             valueColor: "text-emerald-500",
-            iconColor: "text-emerald-500"
+            iconColor: "text-emerald-500",
           }}
         />
-        
+
         <StatsCard
           label="Expiring Soon"
           value={2}
           icon={FileText}
           color={{
             valueColor: "text-amber-500",
-            iconColor: "text-amber-500"
+            iconColor: "text-amber-500",
           }}
         />
-        
+
         <StatsCard
           label="Draft Contracts"
-          value={contracts.filter(c => c.status === 'draft').length}
+          value={contracts.filter((c) => c.status === "draft").length}
           icon={FileText}
           color={{
             valueColor: "text-blue-500",
-            iconColor: "text-blue-500"
+            iconColor: "text-blue-500",
           }}
         />
       </div>

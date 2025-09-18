@@ -5,11 +5,11 @@ import type { Room } from "src/infrastructure/mockData/mockData"
 
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
-import { Button } from "../Button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Dialog"
-import { Input } from "../Input"
-import { Label } from "../Label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Select"
+import { Button } from "../common/Button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
+import { Input } from "../common/Input"
+import { Label } from "../common/Label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../common/Select"
 
 const DialogUnits = () => {
   const { units, setUnits } = useUnitStore()

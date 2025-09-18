@@ -5,9 +5,9 @@ import type { Payment } from "src/infrastructure/mockData/mockData"
 
 import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
-import { Badge } from "../Badge"
-import { Button } from "../Button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table/Table"
+import { Badge } from "../common/Badge"
+import { Button } from "../common/Button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 
 const TablePayments = () => {
   const { payments, searchTerm, setSelectedPayment, setIsReceiptOpen } = usePaymentStore()

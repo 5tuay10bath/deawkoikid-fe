@@ -5,10 +5,10 @@ import type { Tenant } from "src/infrastructure/mockData/mockData"
 
 import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
 
-import { Avatar, AvatarFallback } from "../Avatar"
-import { Badge } from "../Badge"
-import { Button } from "../Button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table/Table"
+import { Avatar, AvatarFallback } from "../common/Avatar"
+import { Badge } from "../common/Badge"
+import { Button } from "../common/Button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 
 const TableTenants = () => {
   const { tenants, searchTerm } = useTenantStore()

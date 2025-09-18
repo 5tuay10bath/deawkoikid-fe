@@ -2,10 +2,10 @@ import { Search, Users } from "lucide-react"
 
 import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
 
-import { Button } from "../components/Button"
-import { StatsCard } from "../components/common/StatsCard"
-import { Input } from "../components/Input"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
+import { Button } from "../components/common/Button"
+import { StatsCard } from "../components/central/StatsCard"
+import { Input } from "../components/common/Input"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import TableTenants from "../components/tenantsCom/Table"
 
 export default function Tenants() {
