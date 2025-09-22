@@ -1,6 +1,8 @@
 import { Plus } from "lucide-react"
 import React, { useState } from "react"
 
+import type { Room } from "src/constant/mockData"
+
 import { useUnitStore } from "@core/application/libs/store/units.store"
 
 import { Button } from "../Button"
@@ -9,54 +11,32 @@ import { Input } from "../Input"
 import { Label } from "../Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Select"
 
-const DialogUnits = () => {
-  const { addUnit } = useUnitStore()
-  const [isAddUnitOpen, setIsAddUnitOpen] = useState(false) //button
+const DialogEditUnits = () => {
+  const { units, setUnits } = useUnitStore()
+  const [isAddUnitOpen, setIsAddUnitOpen] = useState(false)
   const [newUnit, setNewUnit] = useState({
-    //Latest aircon add 6 month after create new room using timestamps by default
-    unitNumber: "",
-    status: "",
+    number: "",
     floor: "",
     type: "",
     size: "",
   })
-  const handleAddUnit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newUnit.unitNumber || !newUnit.floor || !newUnit.type) {
+  const handleAddUnit = () => {
+    if (!newUnit.number || !newUnit.floor || !newUnit.type) {
       return
     }
-    const latestAirconService = new Date()
-    latestAirconService.setMonth(latestAirconService.getMonth() + 6)
-    await addUnit({
-      ...newUnit,
-      lastestAirconService: latestAirconService.toISOString,
-    })
-    setNewUnit({
-      //Reset form
-      unitNumber: "",
+
+    const unit: Room = {
+      id: newUnit.number,
+      number: newUnit.number,
+      floor: parseInt(newUnit.floor),
+      type: newUnit.type,
+      size: newUnit.size || "400 sq ft",
       status: "available",
-      floor: "",
-      type: "",
-      size: "",
-    })
+    }
+
+    setUnits([...units, unit])
+    setNewUnit({ number: "", floor: "", type: "", size: "" })
     setIsAddUnitOpen(false)
-    // const unit: Room = {
-    //   id: newUnit.number,
-    //   number: newUnit.number,
-    //   floor: parseInt(newUnit.floor),
-    //   type: newUnit.type,
-    //   size: newUnit.size || "400 sq ft",
-    //   status: "available",
-    // }
-    // try {
-    //   const response = await axiosInstance.post("/units", unit)
-    //   const savedUnit: Room = response.data
-    //   setUnits([...units, savedUnit])
-    //   setNewUnit({ number: "", floor: "", type: "", size: "" })
-    //   setIsAddUnitOpen(false)
-    // } catch (err) {
-    //   console.log(err)
-    // }
   }
   return (
     <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
@@ -75,7 +55,7 @@ const DialogUnits = () => {
             <div className="space-y-2">
               <Label>Unit Number</Label>
               <Input
-                value={newUnit.unitNumber}
+                value={newUnit.number}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setNewUnit((prev) => ({ ...prev, number: e.target.value }))
                 }
@@ -136,4 +116,4 @@ const DialogUnits = () => {
   )
 }
 
-export default DialogUnits
+export default DialogEditUnits
