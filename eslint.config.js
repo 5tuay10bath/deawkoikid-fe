@@ -1,20 +1,20 @@
-import js from "@eslint/js"
-import globals from "globals"
-import reactHooks from "eslint-plugin-react-hooks"
-import reactRefresh from "eslint-plugin-react-refresh"
-import tseslint from "typescript-eslint"
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
 
-import prettierPlugin from "eslint-plugin-prettier"
-import prettierConfig from "eslint-config-prettier"
+import prettierPlugin from "eslint-plugin-prettier";
+import prettierConfig from "eslint-config-prettier";
 
-import importPlugin from "eslint-plugin-import"
-import unusedImports from "eslint-plugin-unused-imports"
-import jsxA11y from "eslint-plugin-jsx-a11y"
-import sonarjs from "eslint-plugin-sonarjs"
-import promise from "eslint-plugin-promise"
-import node from "eslint-plugin-node"
-import unicorn from "eslint-plugin-unicorn"
-import perfectionist from "eslint-plugin-perfectionist"
+import importPlugin from "eslint-plugin-import";
+import unusedImports from "eslint-plugin-unused-imports";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import sonarjs from "eslint-plugin-sonarjs";
+import promise from "eslint-plugin-promise";
+import node from "eslint-plugin-node";
+import unicorn from "eslint-plugin-unicorn";
+import perfectionist from "eslint-plugin-perfectionist";
 
 export default tseslint.config(
   { ignores: ["dist"] },
@@ -45,35 +45,34 @@ export default tseslint.config(
       perfectionist: perfectionist,
     },
     rules: {
+      // Keep react-hooks checks
       ...reactHooks.configs.recommended.rules,
+
+      /*** 🔕 Turn off the noisy stuff ***/
+      // Don’t force `type` over `interface`
+      "@typescript-eslint/consistent-type-definitions": "off",
+
+      // Don’t force import ordering/group spacing
+      "import/order": "off",
+
+      // Don’t auto-sort imports
+      "perfectionist/sort-imports": "off",
+
+      // Prettier: accept both LF/CRLF, and (importantly) remove Tailwind sorting
+      // NOTE: removing the prettier-plugin-tailwindcss stops “bg-white p-3” reordering
       "prettier/prettier": [
         "error",
         {
-          plugins: ["prettier-plugin-tailwindcss"],
-          tailwindStylesheet: "./src/index.css",
-          tailwindFunctions: ["tv"],
+          endOfLine: "auto",
+          // ⛔️ intentionally NOT including `plugins: ["prettier-plugin-tailwindcss"]`
+          // to prevent Tailwind class reordering suggestions
         },
       ],
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      // 📦 Organize imports by group
-      // "import/order": [
-      //   "error",
-      //   {
-      //     groups: ["builtin", "external", "internal"],
-      //     pathGroups: [
-      //       {
-      //         pattern: "@/**",
-      //         group: "internal",
-      //         position: "after",
-      //       },
-      //     ],
-      //     alphabetize: { order: "asc", caseInsensitive: true },
-      //     "newlines-between": "always",
-      //   },
-      // ],
-      "import/no-unresolved": "off",
 
-      // 🧹 Clean up unused imports and vars
+      // Optional: keep react-refresh warning
+      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+
+      /*** ✅ Useful cleanups ***/
       "unused-imports/no-unused-imports": "warn",
       "unused-imports/no-unused-vars": [
         "warn",
@@ -84,50 +83,39 @@ export default tseslint.config(
         },
       ],
 
-      // ♿ JSX accessibility
+      /*** Accessibility / quality ***/
       "jsx-a11y/alt-text": "warn",
       "jsx-a11y/anchor-is-valid": "warn",
-
-      // 🧠 SonarJS — cognitive complexity & duplication
       "sonarjs/no-duplicate-string": "warn",
       "sonarjs/no-identical-functions": "warn",
-
-      // ⏳ Promise handling best practices
       "promise/always-return": "warn",
       "promise/no-return-wrap": "warn",
 
-      // 📘 General JS/TS rules
+      /*** General TS/JS ***/
       "import/first": "error",
       "import/newline-after-import": "error",
       "import/no-duplicates": "error",
+      "import/no-unresolved": "off",
       "@typescript-eslint/no-redeclare": "off",
-      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-      "no-console": "warn",
-      "node/prefer-global/process": ["off"],
-      "node/no-process-env": ["warn"],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-empty-function": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^_" }],
+      "no-console": "warn",
       "no-alert": "error",
       "no-magic-numbers": "off",
       "prefer-const": "error",
-      "@typescript-eslint/no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^_" }],
+      "node/prefer-global/process": "off",
+      "node/no-process-env": "warn",
+      "semi": false,
 
-      // 🧠 Sort imports for readability
-      "perfectionist/sort-imports": ["error", { tsconfigRootDir: "." }],
-
-      // 📁 Enforce consistent file naming
+      /*** File naming ***/
       "unicorn/filename-case": [
         "error",
         {
-          cases: {
-            kebabCase: false,
-            camelCase: true,
-            pascalCase: true,
-            snakeCase: false,
-          },
+          cases: { kebabCase: false, camelCase: true, pascalCase: true, snakeCase: false },
           ignore: ["README.md", "vite-env.d.ts"],
         },
       ],
     },
-  },
-)
+  }
+);
