@@ -6,9 +6,14 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import DialogUnits from "../components/unitsCom/Dialog"
 import TableUnits from "../components/unitsCom/Table"
+import { useEffect } from "react"
 
 export default function Units() {
-  const { searchTerm, setSearchTerm } = useUnitStore()
+  const { searchTerm, unitsTest, setSearchTerm, getUnits } = useUnitStore()
+  console.log("unitsTest", unitsTest)
+  useEffect(() => {
+    getUnits()
+  }, [])
 
   return (
     <div className="space-y-6">

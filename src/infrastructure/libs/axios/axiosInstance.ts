@@ -1,24 +1,29 @@
-// import axios, { AxiosRequestConfig } from 'axios'
-// import { cloneDeep } from 'lodash'
+import axios, { type AxiosRequestConfig } from 'axios'
+import { cloneDeep } from 'lodash'
 
-// import { AxiosRequestHeaders } from './types'
+import type { AxiosRequestHeaders } from './types'
 
-// const axiosInstance = axios.create({
-//     baseURL: process.env.PUBLIC_API_ENDPOINT,
-// })
+const axiosInstance = axios.create({
+    baseURL: import.meta.env.VITE_PUBLIC_API_ENDPOINT,
+})
 
-// axiosInstance.interceptors.request.use(
-//     async (config: AxiosRequestConfig): Promise<any> => {
-//         const newConfig = cloneDeep(config)
+axiosInstance.interceptors.request.use(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (config: AxiosRequestConfig): Promise<any> => {
+        const newConfig = cloneDeep(config)
 
-//         newConfig.headers = {
-//             ...newConfig.headers,
-//             'x-api-key': process.env.PUBLIC_X_API_KEY,
-//         } as AxiosRequestHeaders
+        newConfig.headers = {
+            ...newConfig.headers,
+        } as AxiosRequestHeaders
 
-//         return newConfig
-//     },
-//     (error) => error,
-// )
+        // Only add API key if it exists
+        if (import.meta.env.VITE_PUBLIC_X_API_KEY) {
+            newConfig.headers['x-api-key'] = import.meta.env.VITE_PUBLIC_X_API_KEY
+        }
 
-// export { axiosInstance }
+        return newConfig
+    },
+    (error) => error,
+)
+
+export { axiosInstance }
