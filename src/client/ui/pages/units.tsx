@@ -1,6 +1,6 @@
 import { Search, Building } from "lucide-react"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import { useUnitStore } from "@core/application/libs/store/useUnitStore"
 
 import { Input } from "../components/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/mock/card"
@@ -9,7 +9,6 @@ import TableCompo from "../components/unitsCom/TableCompo"
 
 export default function Units() {
   const { searchTerm, setSearchTerm } = useUnitStore()
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

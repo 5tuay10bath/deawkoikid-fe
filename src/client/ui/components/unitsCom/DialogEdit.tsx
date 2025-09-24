@@ -1,9 +1,10 @@
-import { Plus } from "lucide-react"
-import React, { useState } from "react"
+import { Edit } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
-import type { Room } from "src/constant/mockData"
+import type { Unit, UnitStatus, UnitType } from "@client/types/IUnitData"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import { useUnitStore } from "@core/application/libs/store/useUnitStore"
 
 import { Button } from "../Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Dialog"
@@ -11,105 +12,123 @@ import { Input } from "../Input"
 import { Label } from "../Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Select"
 
-const DialogEditUnits = () => {
-  const { units, setUnits } = useUnitStore()
-  const [isAddUnitOpen, setIsAddUnitOpen] = useState(false)
-  const [newUnit, setNewUnit] = useState({
-    number: "",
-    floor: "",
-    type: "",
-    size: "",
-  })
-  const handleAddUnit = () => {
-    if (!newUnit.number || !newUnit.floor || !newUnit.type) {
-      return
-    }
+const DialogEditUnits = ({ editingUnit }: { editingUnit: Unit }) => {
+  const { updateUnit, loadUnits } = useUnitStore()
+  const [isEditUnitOpen, setisEditUnitOpen] = useState(false) //button
+  const [formData, setFormData] = useState<Partial<Unit>>({})
 
-    const unit: Room = {
-      id: newUnit.number,
-      number: newUnit.number,
-      floor: parseInt(newUnit.floor),
-      type: newUnit.type,
-      size: newUnit.size || "400 sq ft",
-      status: "available",
+  useEffect(() => {
+    if (editingUnit) {
+      setFormData({ ...editingUnit })
+      setisEditUnitOpen(false)
     }
+  }, [editingUnit])
+  const navigate = useNavigate()
 
-    setUnits([...units, unit])
-    setNewUnit({ number: "", floor: "", type: "", size: "" })
-    setIsAddUnitOpen(false)
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingUnit) return
+    try {
+      await updateUnit(editingUnit.id, formData)
+      setisEditUnitOpen(false)
+      await loadUnits()
+      navigate("/units")
+    } catch (error) {
+      console.error("Failed to update unit:", error)
+    }
   }
   return (
-    <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
+    <Dialog open={isEditUnitOpen} onOpenChange={setisEditUnitOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Unit
+        <Button variant="ghost" size="sm">
+          <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Add New Unit</DialogTitle>
+          <DialogTitle>Edit Unit</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Unit Number</Label>
-              <Input
-                value={newUnit.number}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewUnit((prev) => ({ ...prev, number: e.target.value }))
-                }
-                placeholder="101"
-              />
+          <form onSubmit={handleSaveEdit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Unit Number</Label>
+                <Input
+                  value={formData.unitNumber || ""}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, unitNumber: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Floor</Label>
+                <Select
+                  value={formData.floor?.toString() ?? ""}
+                  onValueChange={(value: string) => setFormData((prev) => ({ ...prev, floor: value }))} //potentially conflict int w string
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select floor" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="1">Floor 1</SelectItem>
+                    <SelectItem value="2">Floor 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
-              <Label>Floor</Label>
+              <Label>Unit Type</Label>
               <Select
-                value={newUnit.floor}
-                onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, floor: value }))}
+                value={formData.unitType ?? ""}
+                onValueChange={(value: UnitType) => setFormData((prev) => ({ ...prev, unitType: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select floor" />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="1">Floor 1</SelectItem>
-                  <SelectItem value="2">Floor 2</SelectItem>
+                  <SelectItem value="A">Studio</SelectItem>
+                  <SelectItem value="B">1 Bedroom</SelectItem>
+                  <SelectItem value="C">2 Bedroom</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Unit Type</Label>
-            <Select
-              value={newUnit.type}
-              onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, type: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="Studio">Studio</SelectItem>
-                <SelectItem value="1BR">1 Bedroom</SelectItem>
-                <SelectItem value="2BR">2 Bedroom</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Size</Label>
+            <div className="space-y-2">
+              <Label>Size</Label>
+              <Input
+                value={formData.unitSize ?? ""}
+                onChange={(e) => setFormData((prev) => ({ ...prev, unitSize: Number(e.target.value) }))}
+                placeholder="400 sq ft"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={formData.status ?? ""}
+                onValueChange={(value: UnitStatus) => setFormData((prev) => ({ ...prev, status: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="occupied">Occupied</SelectItem>
+                  <SelectItem value="maintenance">Maintenance</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* <div className="space-y-2">
+              <Label>Latest Aircon Service</Label>
             <Input
-              value={newUnit.size}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, size: e.target.value }))
-              }
-              placeholder="400 sq ft"
-            />
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsAddUnitOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddUnit}>Add Unit</Button>
-          </div>
+              type="date"
+              value={formData.latestAirconService ?? ""}
+                onChange={(e) => setFormData((prev) => ({ ...prev, latestAirconService: e.target.value }))}
+              />
+            </div> */}
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setisEditUnitOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save Edit Unit</Button>
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

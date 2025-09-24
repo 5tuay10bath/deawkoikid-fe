@@ -1,7 +1,10 @@
 import { Plus } from "lucide-react"
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
-import { useUnitStore } from "@core/application/libs/store/units.store"
+import type { Unit, UnitStatus, UnitType } from "@client/types/IUnitData"
+
+import { useUnitStore } from "@core/application/libs/store/useUnitStore"
 
 import { Button } from "../Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../Dialog"
@@ -10,53 +13,37 @@ import { Label } from "../Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../Select"
 
 const DialogUnits = () => {
-  const { addUnit } = useUnitStore()
+  const { addUnit, loadUnits } = useUnitStore()
   const [isAddUnitOpen, setIsAddUnitOpen] = useState(false) //button
   const [newUnit, setNewUnit] = useState({
-    //Latest aircon add 6 month after create new room using timestamps by default
     unitNumber: "",
-    status: "",
+    unitType: "A" as Unit["unitType"],
+    unitSize: "",
+    status: "available" as Unit["status"],
     floor: "",
-    type: "",
-    size: "",
+    latestAirconService: "",
   })
+  const navigate = useNavigate()
   const handleAddUnit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newUnit.unitNumber || !newUnit.floor || !newUnit.type) {
+    if (!newUnit.unitNumber || !newUnit.unitType || !newUnit.unitSize || !newUnit.floor) {
       return
     }
-    const latestAirconService = new Date()
-    latestAirconService.setMonth(latestAirconService.getMonth() + 6)
     await addUnit({
       ...newUnit,
-      lastestAirconService: latestAirconService.toISOString,
+      unitSize: Number(newUnit.unitSize),
     })
     setNewUnit({
-      //Reset form
       unitNumber: "",
+      unitType: "A",
+      unitSize: "",
       status: "available",
       floor: "",
-      type: "",
-      size: "",
+      latestAirconService: "",
     })
     setIsAddUnitOpen(false)
-    // const unit: Room = {
-    //   id: newUnit.number,
-    //   number: newUnit.number,
-    //   floor: parseInt(newUnit.floor),
-    //   type: newUnit.type,
-    //   size: newUnit.size || "400 sq ft",
-    //   status: "available",
-    // }
-    // try {
-    //   const response = await axiosInstance.post("/units", unit)
-    //   const savedUnit: Room = response.data
-    //   setUnits([...units, savedUnit])
-    //   setNewUnit({ number: "", floor: "", type: "", size: "" })
-    //   setIsAddUnitOpen(false)
-    // } catch (err) {
-    //   console.log(err)
-    // }
+    await loadUnits()
+    navigate("/units")
   }
   return (
     <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
@@ -77,7 +64,7 @@ const DialogUnits = () => {
               <Input
                 value={newUnit.unitNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewUnit((prev) => ({ ...prev, number: e.target.value }))
+                  setNewUnit((prev) => ({ ...prev, unitNumber: e.target.value }))
                 }
                 placeholder="101"
               />
@@ -101,27 +88,54 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Unit Type</Label>
             <Select
-              value={newUnit.type}
-              onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, type: value }))}
+              value={newUnit.unitType}
+              onValueChange={(value: UnitType) => setNewUnit((prev) => ({ ...prev, unitType: value as UnitType }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="Studio">Studio</SelectItem>
-                <SelectItem value="1BR">1 Bedroom</SelectItem>
-                <SelectItem value="2BR">2 Bedroom</SelectItem>
+                <SelectItem value="A">Studio</SelectItem>
+                <SelectItem value="B">1 Bedroom</SelectItem>
+                <SelectItem value="C">2 Bedroom</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <Label>Size</Label>
             <Input
-              value={newUnit.size}
+              value={newUnit.unitSize}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, size: e.target.value }))
+                setNewUnit((prev) => ({ ...prev, unitSize: e.target.value }))
               }
               placeholder="400 sq ft"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select
+              value={newUnit.status}
+              onValueChange={(value: UnitStatus) => setNewUnit((prev) => ({ ...prev, status: value as UnitStatus }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="occupied">Occupied</SelectItem>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Latest Aircon Service</Label>
+            <Input
+              type="date"
+              //type="datetime-local" if want time
+              value={newUnit.latestAirconService}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewUnit((prev) => ({ ...prev, latestAirconService: e.target.value }))
+              }
             />
           </div>
           <div className="flex gap-3">

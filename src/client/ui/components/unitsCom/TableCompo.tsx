@@ -1,30 +1,31 @@
-import { Badge, Edit } from "lucide-react"
 import { useEffect } from "react"
 
-import type { Unit } from "@client/types/IUnitData"
+import type { Unit, UnitStatus } from "@client/types/IUnitData"
 
 import { useUnitStore } from "@core/application/libs/store/useUnitStore"
 
-import { Button } from "../Button"
+import { Badge } from "../Badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table/Table"
-
-//Filterunit(Searchbar) and status color
+import DialogEdit from "./DialogEdit"
 
 const TableCompo = () => {
-  const { units, loadUnits } = useUnitStore()
+  const { units, loadUnits, searchTerm } = useUnitStore()
 
   useEffect(() => {
     loadUnits()
   }, [loadUnits])
 
-  const statusConfig = {
+  const filteredUnits = units.filter(
+    (unit) =>
+      // Add more for search
+      String(unit.unitNumber).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      unit.status.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+  const statusConfig: Record<UnitStatus, { color: string; label: string }> = {
     available: { color: "bg-green-500 text-white", label: "Available" },
     occupied: { color: "bg-red-500 text-white", label: "Occupied" },
     maintenance: { color: "bg-orange-500 text-white", label: "Maintenance" },
-    "checkout-pending": {
-      color: "bg-muted text-white",
-      label: "Checkout Pending",
-    },
+    // checkout-pending: { color: "bg-muted text-white",label: "Checkout Pending"},
   }
 
   return (
@@ -32,26 +33,33 @@ const TableCompo = () => {
       <TableHeader>
         <TableRow>
           <TableHead>Unit Number</TableHead>
-          <TableHead>IsActive</TableHead>
+          <TableHead>Unit Type</TableHead>
+          <TableHead>Unit Size</TableHead>
+          <TableHead>Floor</TableHead>
+          <TableHead>Status</TableHead>
           <TableHead>Aircon</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {units.map((unit: Unit) => (
+        {filteredUnits.map((unit: Unit) => (
           <TableRow key={unit.id}>
             <TableCell className="font-medium">{unit.unitNumber}</TableCell>
-            {/* <TableCell>{unit.isActive ? "Active" : "Inactive"}</TableCell> */}
+            <TableCell className="font-medium">{unit.unitType}</TableCell>
+            <TableCell className="font-medium">{unit.unitSize + " sqrt."}</TableCell>
+            <TableCell className="font-medium">{unit.floor}</TableCell>
+
             <TableCell>
-              <Badge className={statusConfig[unit.isActive ? "available" : "occupied"].color}>
-                {statusConfig[unit.isActive ? "available" : "occupied"].label}
+              {/* import as //badge not lucide */}
+
+              <Badge className={statusConfig[unit.status]?.color}>
+                {statusConfig[unit.status]?.label ?? unit.status}
               </Badge>
             </TableCell>
+
             <TableCell>{unit.latestAirconService}</TableCell>
             <TableCell>
-              <Button variant="ghost" size="sm">
-                <Edit className="h-4 w-4" />
-              </Button>
+              <DialogEdit editingUnit={unit} />
             </TableCell>
           </TableRow>
         ))}
