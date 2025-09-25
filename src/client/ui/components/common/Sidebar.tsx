@@ -60,6 +60,7 @@ const NavItem = ({
     <li>
       <Link
         to={to}
+        data-cy={`nav-${label.toLowerCase()}`}
         className={cn(
           "flex items-center gap-3 rounded-lg px-4 py-2 transition-colors",
           active ? "bg-white ring-2 ring-indigo-300" : "hover:bg-gray-300",

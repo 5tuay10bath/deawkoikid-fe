@@ -26,7 +26,7 @@ const TableUnits = () => {
   }
 
   return (
-    <Table>
+    <Table data-cy="units-table">
       <TableHeader>
         <TableRow>
           <TableHead>Unit Number</TableHead>
@@ -39,16 +39,16 @@ const TableUnits = () => {
       </TableHeader>
       <TableBody>
         {filteredUnits.map((unit) => (
-          <TableRow key={unit.id}>
-            <TableCell className="font-medium">{unit.number}</TableCell>
-            <TableCell>{unit.floor}</TableCell>
-            <TableCell>{unit.type}</TableCell>
-            <TableCell>{unit.size}</TableCell>
+          <TableRow key={unit.id} data-cy={`unit-row-${unit.number}`}>
+            <TableCell className="font-medium" data-cy="unit-number">{unit.number}</TableCell>
+            <TableCell data-cy="unit-floor">{unit.floor}</TableCell>
+            <TableCell data-cy="unit-type">{unit.type}</TableCell>
+            <TableCell data-cy="unit-size">{unit.size}</TableCell>
             <TableCell>
-              <Badge className={statusConfig[unit.status].color}>{statusConfig[unit.status].label}</Badge>
+              <Badge className={statusConfig[unit.status].color} data-cy={`unit-status-${unit.status}`}>{statusConfig[unit.status].label}</Badge>
             </TableCell>
             <TableCell>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" data-cy="edit-unit-button">
                 <Edit className="h-4 w-4" />
               </Button>
             </TableCell>

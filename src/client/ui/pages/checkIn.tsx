@@ -67,6 +67,7 @@ export default function CheckIn() {
                 <Label htmlFor="tenantName">Full Name *</Label>
                 <Input
                   id="tenantName"
+                  data-cy="tenant-name"
                   value={formData.tenantName}
                   onChange={(e) => handleInputChange("tenantName", e.target.value)}
                   placeholder="Enter tenant's full name"
@@ -78,6 +79,7 @@ export default function CheckIn() {
                 <Input
                   id="email"
                   type="email"
+                  data-cy="tenant-email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="tenant@example.com"
@@ -88,6 +90,7 @@ export default function CheckIn() {
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
+                  data-cy="tenant-phone"
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   placeholder="+1 (555) 123-4567"
@@ -98,6 +101,7 @@ export default function CheckIn() {
                 <Label htmlFor="emergencyContact">Emergency Contact</Label>
                 <Input
                   id="emergencyContact"
+                  data-cy="emergency-contact"
                   value={formData.emergencyContact}
                   onChange={(e) => handleInputChange("emergencyContact", e.target.value)}
                   placeholder="Emergency contact name"
@@ -113,7 +117,11 @@ export default function CheckIn() {
                   <Label>Check-in Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start text-left font-normal"
+                        data-cy="check-in-date"
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {formData.checkInDate ? format(formData.checkInDate, "PPP") : "Pick a date"}
                       </Button>
@@ -133,7 +141,11 @@ export default function CheckIn() {
                   <Label>Check-out Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start text-left font-normal"
+                        data-cy="check-out-date"
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {formData.checkOutDate ? format(formData.checkOutDate, "PPP") : "Pick a date"}
                       </Button>
@@ -155,6 +167,7 @@ export default function CheckIn() {
                   <Input
                     id="rentAmount"
                     type="number"
+                    data-cy="rent-amount"
                     value={formData.rentAmount}
                     onChange={(e) => handleInputChange("rentAmount", e.target.value)}
                     placeholder="1200"
@@ -167,7 +180,7 @@ export default function CheckIn() {
                     value={formData.billingCycle}
                     onValueChange={(value) => handleInputChange("billingCycle", value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger data-cy="billing-cycle">
                       <SelectValue placeholder="Select billing cycle" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -182,6 +195,7 @@ export default function CheckIn() {
                   <Input
                     id="securityDeposit"
                     type="number"
+                    data-cy="security-deposit"
                     value={formData.securityDeposit}
                     onChange={(e) => handleInputChange("securityDeposit", e.target.value)}
                     placeholder="1200"
@@ -201,7 +215,7 @@ export default function CheckIn() {
               >
                 Cancel
               </Button>
-              <Button type="submit">Complete Check-in</Button>
+              <Button type="submit" data-cy="complete-check-in">Complete Check-in</Button>
             </div>
           </form>
         </CardContent>

@@ -1,0 +1,35 @@
+{
+  "validTenant": {
+    "fullName": "John Smith",
+    "email": "john.smith@email.com",
+    "phone": "+1 (555) 123-4567",
+    "emergencyContact": "Jane Smith",
+    "checkInDate": "2024-01-15",
+    "checkOutDate": "2024-12-31",
+    "rentAmount": "1200",
+    "billingCycle": "monthly",
+    "securityDeposit": "1200"
+  },
+  "tenantWithoutDeposit": {
+    "fullName": "Alice Johnson",
+    "email": "alice.johnson@email.com",
+    "phone": "+1 (555) 987-6543",
+    "emergencyContact": "Bob Johnson",
+    "checkInDate": "2024-02-01",
+    "checkOutDate": "2024-11-30",
+    "rentAmount": "1500",
+    "billingCycle": "monthly",
+    "securityDeposit": ""
+  },
+  "yearlyTenant": {
+    "fullName": "Michael Brown",
+    "email": "michael.brown@email.com",
+    "phone": "+1 (555) 456-7890",
+    "emergencyContact": "Sarah Brown",
+    "checkInDate": "2024-03-01",
+    "checkOutDate": "2025-02-28",
+    "rentAmount": "15000",
+    "billingCycle": "yearly",
+    "securityDeposit": "2000"
+  }
+}

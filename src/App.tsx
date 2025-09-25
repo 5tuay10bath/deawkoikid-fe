@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom"
 
 import { Separator } from "@client/ui/components/common/Separator"
 import Sidebar from "@client/ui/components/common/Sidebar"
+import { Toaster } from "@client/ui/components/common/Toaster"
 import Dashboard from "@client/ui/pages/dashboard"
 import Payments from "@client/ui/pages/payments"
 import Tenants from "@client/ui/pages/tenants"
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <Toaster />
     </div>
   )
 }

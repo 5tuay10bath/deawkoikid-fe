@@ -40,6 +40,7 @@ interface DashboardStatCardProps {
   icon: LucideIcon
   valueColor?: string
   iconColor?: string
+  "data-cy"?: string
 }
 
 export function DashboardStatCard({
@@ -49,9 +50,10 @@ export function DashboardStatCard({
   icon: Icon,
   valueColor = "text-foreground",
   iconColor = "text-gray-500",
+  "data-cy": dataCy,
 }: DashboardStatCardProps) {
   return (
-    <Card>
+    <Card data-cy={dataCy}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className={`h-4 w-4 ${iconColor}`} />

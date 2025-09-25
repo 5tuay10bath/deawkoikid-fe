@@ -1,0 +1,44 @@
+{
+  "rooms": [
+    {
+      "id": 1,
+      "number": "101",
+      "floor": 1,
+      "status": "available",
+      "type": "standard"
+    },
+    {
+      "id": 2,
+      "number": "102",
+      "floor": 1,
+      "status": "occupied",
+      "type": "standard",
+      "tenant": "John Smith",
+      "checkInDate": "2024-01-15",
+      "checkOutDate": "2024-12-31"
+    },
+    {
+      "id": 13,
+      "number": "201",
+      "floor": 2,
+      "status": "maintenance",
+      "type": "standard"
+    }
+  ],
+  "floors": [
+    {
+      "number": 1,
+      "totalRooms": 12,
+      "availableRooms": 8,
+      "occupiedRooms": 3,
+      "maintenanceRooms": 1
+    },
+    {
+      "number": 2,
+      "totalRooms": 12,
+      "availableRooms": 9,
+      "occupiedRooms": 2,
+      "maintenanceRooms": 1
+    }
+  ]
+}
