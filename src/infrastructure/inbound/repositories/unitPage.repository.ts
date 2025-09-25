@@ -1,5 +1,5 @@
 import type { IUnitPageRepository } from "@application/ports/unitPage.repository.port";
-import type { GetUnitDto } from "../dtos/unitPage.dto";
+import type { DefaultDto } from "../dtos/default.dto";
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance";
 import type { UnitPageEntity } from "@client/entities/unitPage.entity";
 import type { UnitPageModel } from "@domain/models/unitPage.model";
@@ -15,7 +15,7 @@ export class UnitPageRepository implements IUnitPageRepository {
         return UnitPageRepository.instance;
     }
 
-    async getUnitPage(dto: GetUnitDto): Promise<IUnitPageRepository.getUnitPage> {
+    async getUnitPage(dto: DefaultDto): Promise<IUnitPageRepository.getUnitPage> {
         const {} = dto;
 
         try {
