@@ -14,7 +14,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_DB: app_test
           POSTGRES_USER: app
@@ -67,6 +67,7 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
