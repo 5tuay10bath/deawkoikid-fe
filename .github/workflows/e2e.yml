@@ -33,9 +33,9 @@ jobs:
       DB_USERNAME: app
       DB_PASSWORD: password
       # Base64-encoded HMAC secret (>= 256-bit when decoded). Replace this value.
-      JWT_SECRET_BASE64: REPLACE_WITH_BASE64_SECRET
+      JWT_SECRET_BASE64: pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc=
       # Your Docker Hub image (public or private)
-      BE_IMAGE: docker.io/REPLACE_DOCKERHUB_USERNAME/deawkoikid-be:latest
+      BE_IMAGE: docker.io/iamyasuomain/deawkoikid-be:latest
       BE_PORT: 8080
 
       # ----- Cypress / FE -----
