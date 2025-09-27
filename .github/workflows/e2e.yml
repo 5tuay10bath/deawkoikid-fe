@@ -1,0 +1,10 @@
+jobs:
+  e2e:
+    steps:
+      - name: Start server
+        run: |
+          npm run start &  # or your server start command
+          npx wait-on http://localhost:YOUR_PORT  # replace YOUR_PORT with actual port
+
+      - name: Run Cypress tests
+        run: npx cypress run
