@@ -66,15 +66,23 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
-          cache-dependency-path: pnpm-lock.yaml
+      
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9      
+          version: 9
+      
+      - name: Enable pnpm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
 
+
       - name: Run Cypress E2E
-        run: npx cypress run --config baseUrl=${CYPRESS_BASE_URL}
+        run: pnpm cypress run --config baseUrl=${CYPRESS_BASE_URL}
