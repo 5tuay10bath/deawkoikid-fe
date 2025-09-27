@@ -66,17 +66,6 @@ jobs:
             --env SPRING_DATASOURCE_PASSWORD=password \
             --env JWT_SECRET_BASE64=pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc= \
             "$BE_IMAGE"
-      - name: Wait for backend healthy
-        run: |
-          echo "Waiting for BE http://localhost:${BE_PORT}/actuator/health ..."
-          for i in {1..90}; do
-            if curl -fsS "http://localhost:${BE_PORT}/actuator/health" >/dev/null 2>&1; then
-              echo "BE is up!"; exit 0; fi
-            sleep 2
-          done
-          echo "BE failed to become healthy. Tail logs:"
-          docker logs be --tail=200 || true
-          exit 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
