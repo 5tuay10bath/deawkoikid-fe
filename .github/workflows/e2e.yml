@@ -1,0 +1,91 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app_test
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U app -d app_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    env:
+      # ----- Backend envs passed into the container -----
+      DB_URL: jdbc:postgresql://localhost:5432/app_test
+      DB_USERNAME: app
+      DB_PASSWORD: password
+      # Base64-encoded HMAC secret (>= 256-bit when decoded). Replace this value.
+      JWT_SECRET_BASE64: REPLACE_WITH_BASE64_SECRET
+      # Your Docker Hub image (public or private)
+      BE_IMAGE: docker.io/REPLACE_DOCKERHUB_USERNAME/deawkoikid-be:latest
+      BE_PORT: 8080
+
+      # ----- Cypress / FE -----
+      CYPRESS_BASE_URL: http://localhost:3000
+      CI: "true"
+
+    steps:
+      - name: Checkout FE
+        uses: actions/checkout@v4
+
+      # Hardcoded Docker Hub login (works for public/private images).
+      # ⚠️ SECURITY: Your credentials are visible to anyone with repo access.
+      - name: Docker Hub login
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: iamyasuomain
+          password: dckr_pat_XQrX6P-88IRVSCrCGnOA3x2ThAw
+
+      - name: Pull & run backend container
+        run: |
+          docker pull "$BE_IMAGE"
+          docker run -d --name be \
+            -p ${BE_PORT}:8080 \
+            --env SPRING_PROFILES_ACTIVE=test \
+            --env SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/app_test \
+            --env SPRING_DATASOURCE_USERNAME=app \
+            --env SPRING_DATASOURCE_PASSWORD=password \
+            --env JWT_SECRET_BASE64=pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc= \
+            "$BE_IMAGE"
+      - name: Wait for backend healthy
+        run: |
+          echo "Waiting for BE http://localhost:${BE_PORT}/actuator/health ..."
+          for i in {1..90}; do
+            if curl -fsS "http://localhost:${BE_PORT}/actuator/health" >/dev/null 2>&1; then
+              echo "BE is up!"; exit 0; fi
+            sleep 2
+          done
+          echo "BE failed to become healthy. Tail logs:"
+          docker logs be --tail=200 || true
+          exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run Cypress E2E
+        run: npx cypress run --config baseUrl=${CYPRESS_BASE_URL}
