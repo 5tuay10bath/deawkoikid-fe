@@ -85,4 +85,4 @@ jobs:
 
 
       - name: Run Cypress E2E
-        run: pnpm cypress run --config baseUrl=${CYPRESS_BASE_URL}
+        run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
