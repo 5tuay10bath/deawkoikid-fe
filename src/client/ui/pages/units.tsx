@@ -40,6 +40,7 @@ export default function Units() {
                   value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                   className="w-64 pl-9"
+                  data-cy="search-input"
                 />
               </div>
             </div>

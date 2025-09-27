@@ -1,0 +1,65 @@
+{
+  "maintenanceTasks": [
+    {
+      "id": 1,
+      "type": "Air-con Service",
+      "unit": "Room 101",
+      "description": "Regular air-con maintenance and cleaning",
+      "priority": "medium",
+      "status": "pending",
+      "scheduledDate": "2024-10-15",
+      "estimatedCost": "150"
+    },
+    {
+      "id": 2,
+      "type": "Light Bulb Replacement",
+      "unit": "Room 205",
+      "description": "Replace burnt out LED bulbs in bedroom",
+      "priority": "low",
+      "status": "completed",
+      "scheduledDate": "2024-09-20",
+      "completedDate": "2024-09-21",
+      "actualCost": "25"
+    },
+    {
+      "id": 3,
+      "type": "Plumbing Repair",
+      "unit": "Room 112",
+      "description": "Fix leaking faucet in bathroom",
+      "priority": "high",
+      "status": "in-progress",
+      "scheduledDate": "2024-09-25",
+      "estimatedCost": "200"
+    }
+  ],
+  "supplies": [
+    {
+      "id": 1,
+      "name": "LED Bulbs (10W)",
+      "category": "Electrical",
+      "currentStock": 45,
+      "minimumStock": 20,
+      "unitCost": "8.50",
+      "supplier": "ElectricCorp"
+    },
+    {
+      "id": 2,
+      "name": "Air-con Filters",
+      "category": "HVAC",
+      "currentStock": 12,
+      "minimumStock": 10,
+      "unitCost": "25.00",
+      "supplier": "CoolTech"
+    },
+    {
+      "id": 3,
+      "name": "Toilet Paper (12-pack)",
+      "category": "Cleaning",
+      "currentStock": 5,
+      "minimumStock": 15,
+      "unitCost": "12.00",
+      "supplier": "CleanSupply",
+      "status": "low-stock"
+    }
+  ]
+}

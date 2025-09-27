@@ -34,8 +34,8 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <DashboardStatCard title="Total Units" value="24" description="Across 2 floors" icon={Building} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-cy="dashboard-stats">
+        <DashboardStatCard title="Total Units" value="24" description="Across 2 floors" icon={Building} data-cy="total-units-stat" />
 
         <DashboardStatCard
           title="Occupied"
@@ -43,6 +43,7 @@ export default function Dashboard() {
           description={`${availableRooms} available`}
           icon={Users}
           valueColor="text-red-500"
+          data-cy="occupied-units-stat"
         />
 
         <DashboardStatCard
@@ -51,6 +52,7 @@ export default function Dashboard() {
           description="From occupied units"
           icon={DollarSign}
           valueColor="text-green-500"
+          data-cy="revenue-stat"
         />
 
         <DashboardStatCard
@@ -59,12 +61,13 @@ export default function Dashboard() {
           description="Units under maintenance"
           icon={Wrench}
           valueColor="text-orange-500"
+          data-cy="maintenance-stat"
         />
       </div>
 
       {/* Room Grid by Floor */}
       {[1, 2].map((floor) => (
-        <div key={floor} className="space-y-4">
+        <div key={floor} className="space-y-4" data-cy={`floor-${floor}`}>
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-semibold">Floor {floor}</h2>
             <Badge variant="outline">

@@ -11,13 +11,18 @@ import { Button } from "../common/Button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 
 const TableTenants = () => {
-  const { tenants, searchTerm } = useTenantStore()
+  const { tenants, searchTerm, statusFilter } = useTenantStore()
 
   const filteredTenants = tenants.filter(
-    (tenant) =>
-      tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.unitNumber.includes(searchTerm),
+    (tenant) => {
+      const matchesSearch = tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tenant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tenant.unitNumber.includes(searchTerm)
+      
+      const matchesStatus = statusFilter === "all" || tenant.status === statusFilter
+      
+      return matchesSearch && matchesStatus
+    }
   )
 
   const statusConfig: Record<Tenant["status"], { color: string; label: string }> = {
@@ -37,7 +42,7 @@ const TableTenants = () => {
       .toUpperCase()
   }
   return (
-    <Table>
+    <Table data-cy="tenants-table">
       <TableHeader>
         <TableRow>
           <TableHead>Tenant</TableHead>
@@ -51,39 +56,39 @@ const TableTenants = () => {
       </TableHeader>
       <TableBody>
         {filteredTenants.map((tenant) => (
-          <TableRow key={tenant.id}>
+          <TableRow key={tenant.id} data-cy={`tenant-row-${tenant.id}`}>
             <TableCell>
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarFallback>{getInitials(tenant.name)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{tenant.name}</p>
-                  <p className="text-muted-foreground text-sm">{tenant.email}</p>
+                  <p className="font-medium" data-cy="tenant-name">{tenant.name}</p>
+                  <p className="text-muted-foreground text-sm" data-cy="tenant-email">{tenant.email}</p>
                 </div>
               </div>
             </TableCell>
-            <TableCell className="font-medium">{tenant.unitNumber}</TableCell>
-            <TableCell>{tenant.phone}</TableCell>
+            <TableCell className="font-medium" data-cy="tenant-unit">{tenant.unitNumber}</TableCell>
+            <TableCell data-cy="tenant-phone">{tenant.phone}</TableCell>
             <TableCell>
               <div className="text-sm">
-                <p>{format(tenant.checkIn, "MMM dd, yyyy")}</p>
-                <p className="text-muted-foreground">to {format(tenant.checkOut, "MMM dd, yyyy")}</p>
+                <p data-cy="lease-start">{format(tenant.checkIn, "MMM dd, yyyy")}</p>
+                <p className="text-muted-foreground" data-cy="lease-end">to {format(tenant.checkOut, "MMM dd, yyyy")}</p>
               </div>
             </TableCell>
-            <TableCell>${tenant.rentAmount}/mo</TableCell>
+            <TableCell data-cy="tenant-rent">${tenant.rentAmount}/mo</TableCell>
             <TableCell>
-              <Badge className={statusConfig[tenant.status].color}>{statusConfig[tenant.status].label}</Badge>
+              <Badge className={statusConfig[tenant.status].color} data-cy={`tenant-status-${tenant.status}`}>{statusConfig[tenant.status].label}</Badge>
             </TableCell>
             <TableCell>
               <div className="flex gap-1">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" data-cy="view-tenant-button">
                   <Eye className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" data-cy="edit-tenant-button">
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" data-cy="delete-tenant-button">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

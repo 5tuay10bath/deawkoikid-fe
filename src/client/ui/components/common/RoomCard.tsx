@@ -34,7 +34,10 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
   const config = statusConfig[room.status]
 
   return (
-    <Card className="transition-shadow hover:shadow-md cursor-pointer">
+    <Card 
+      className={`transition-shadow hover:shadow-md cursor-pointer room-card room-card-${room.status}`}
+      data-cy={`room-card room-card-${room.status}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Room {room.number}</CardTitle>
@@ -47,10 +50,10 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
           <p className="text-sm text-muted-foreground">Floor {room.floor}</p>
 
           {room.tenant && (
-            <div className="space-y-2 text-sm">
+            <div className="space-y-2 text-sm" data-cy="current-tenant-info">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                <span>{room.tenant.name}</span>
+                <span data-cy="tenant-name-display">{room.tenant.name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
@@ -69,13 +72,24 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
 
           <div className="pt-2">
             {room.status === "available" && (
-              <Button size="sm" className="w-full" onClick={() => onCheckIn?.(room.id)}>
+              <Button 
+                size="sm" 
+                className="w-full" 
+                onClick={() => onCheckIn?.(room.id)}
+                data-cy="check-in-button"
+              >
                 Check In
               </Button>
             )}
 
             {room.status !== "available" && (
-              <Button size="sm" variant="outline" className="w-full" onClick={() => onViewDetails?.(room.id)}>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full" 
+                onClick={() => onViewDetails?.(room.id)}
+                data-cy="view-details-button"
+              >
                 View Details
               </Button>
             )}
