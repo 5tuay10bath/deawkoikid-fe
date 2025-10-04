@@ -92,3 +92,7 @@ jobs:
 
       - name: Run Cypress E2E
         run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
+      - name: Build the Docker image
+        run: docker build --file Dockerfile -t iamyasuomain/deawkoikid_frontend:latest .
+      - name: push docker
+        run: docker push iamyasuomain/deawkoikid_frontend:latest
