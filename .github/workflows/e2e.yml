@@ -1,4 +1,4 @@
-name: E2E
+name: E2E,Docker Image CI - develop
 
 on:
   pull_request:
