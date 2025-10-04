@@ -80,8 +80,12 @@ jobs:
       
       - name: Install deps
         run: pnpm install --frozen-lockfile
-      - name: Run Frontend
-        run: pnpm dev
+      - name: Start frontend
+        run: pnpm dev &
+        env:
+          NODE_ENV: test
+      - name: Wait for frontend
+        run: npx wait-on http://localhost:3000
       - name: Run Cypress E2E
         run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
       - name: Build the Docker image
