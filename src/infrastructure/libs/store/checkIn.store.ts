@@ -16,7 +16,7 @@ interface CheckInFormData {
 interface CheckInState {
   // Data
   formData: CheckInFormData
-  
+
   // Actions
   updateFormData: (updates: Partial<CheckInFormData>) => void
   resetFormData: () => void
@@ -39,17 +39,17 @@ const initialFormData: CheckInFormData = {
 export const useCheckInStore = create<CheckInState>((set) => ({
   // Initial state
   formData: initialFormData,
-  
+
   // Actions
   updateFormData: (updates) =>
     set((state) => ({
-      formData: { ...state.formData, ...updates }
+      formData: { ...state.formData, ...updates },
     })),
-  
+
   resetFormData: () => set({ formData: initialFormData }),
-  
+
   setFormField: (field, value) =>
     set((state) => ({
-      formData: { ...state.formData, [field]: value }
+      formData: { ...state.formData, [field]: value },
     })),
 }))

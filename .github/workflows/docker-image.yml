@@ -2,23 +2,22 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "develop"]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop"]
+    branches: ["main", "develop"]
 
 jobs:
   build:
-    runs-on: ubuntu-24.04 
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build --file Dockerfile -t iamyasuomain/deawkoikid_frontend:latest .
-    - name: List images
-      run: docker images
-    - name: login
-      run: docker login -u iamyasuomain -p dckr_pat_XQrX6P-88IRVSCrCGnOA3x2ThAw
-    - name: push docker
-      run: docker push iamyasuomain/deawkoikid_frontend:latest
-
+      - uses: actions/checkout@v4
+      - name: Build the Docker image
+        run: docker build --file Dockerfile -t iamyasuomain/deawkoikid_frontend:latest .
+      - name: List images
+        run: docker images
+      - name: login
+        run: docker login -u iamyasuomain -p dckr_pat_XQrX6P-88IRVSCrCGnOA3x2ThAw
+      - name: push docker
+        run: docker push iamyasuomain/deawkoikid_frontend:latest

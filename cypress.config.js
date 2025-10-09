@@ -1,8 +1,8 @@
-import { defineConfig } from 'cypress'
+import { defineConfig } from "cypress"
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3000',
+    baseUrl: "http://localhost:3000",
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
@@ -12,22 +12,22 @@ export default defineConfig({
     },
     env: {
       // Add any environment variables your tests need
-      api_base_url: 'http://localhost:8088'
+      api_base_url: "http://localhost:8088",
     },
     // Retry configuration
     retries: {
       runMode: 2,
-      openMode: 0
+      openMode: 0,
     },
     // Test file patterns
-    specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+    specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
     // Support file
-    supportFile: 'cypress/support/e2e.js',
+    supportFile: "cypress/support/e2e.js",
     // Fixture folder
-    fixturesFolder: 'cypress/fixtures',
+    fixturesFolder: "cypress/fixtures",
     // Screenshots and videos
-    screenshotsFolder: 'cypress/screenshots',
-    videosFolder: 'cypress/videos',
+    screenshotsFolder: "cypress/screenshots",
+    videosFolder: "cypress/videos",
     // Test execution settings
     defaultCommandTimeout: 10000,
     requestTimeout: 10000,
@@ -35,18 +35,18 @@ export default defineConfig({
     pageLoadTimeout: 30000,
     // Browser settings
     chromeWebSecurity: false,
-    experimentalStudio: true
+    experimentalStudio: true,
   },
   component: {
     devServer: {
-      framework: 'vite',
-      bundler: 'vite',
+      framework: "vite",
+      bundler: "vite",
     },
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
     screenshotOnRunFailure: true,
-    specPattern: 'src/**/*.cy.{js,jsx,ts,tsx}',
-    supportFile: 'cypress/support/component.js'
+    specPattern: "src/**/*.cy.{js,jsx,ts,tsx}",
+    supportFile: "cypress/support/component.js",
   },
 })

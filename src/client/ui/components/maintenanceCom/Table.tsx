@@ -2,6 +2,7 @@ import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.stor
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 import { format } from "date-fns"
 import { Badge } from "../common/Badge"
+
 const MaintainTable = () => {
   const { tasks, searchTerm } = useMaintenanceStore()
 

@@ -21,7 +21,9 @@ export default function Tenants() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" data-cy="export-tenants">Export Data</Button>
+          <Button variant="outline" data-cy="export-tenants">
+            Export Data
+          </Button>
           <Button data-cy="add-tenant">Add Tenant</Button>
         </div>
       </div>

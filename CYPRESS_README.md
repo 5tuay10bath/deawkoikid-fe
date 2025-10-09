@@ -52,6 +52,7 @@ pnpm install mochawesome mochawesome-merge mochawesome-report-generator --save-d
 ### Running Tests
 
 #### Interactive Mode (Cypress Test Runner)
+
 ```bash
 # Open Cypress Test Runner
 pnpm cypress open
@@ -63,6 +64,7 @@ pnpm run test:maintenance:open
 ```
 
 #### Headless Mode (CI/CD)
+
 ```bash
 # Run all E2E tests
 pnpm cypress run
@@ -79,6 +81,7 @@ pnpm run cy:run:firefox
 ```
 
 #### Different Viewports
+
 ```bash
 # Mobile testing
 pnpm run test:mobile
@@ -93,11 +96,13 @@ pnpm run test:desktop
 ## 📋 Test Coverage
 
 ### 1. Tenant Management Tests
+
 - **assign-tenants.cy.js**: Tenant assignment workflows
 - **double-booking-prevention.cy.js**: Conflict prevention and validation
 - **room-availability.cy.js**: Room availability checking and filtering
 
 #### Key Test Scenarios:
+
 - ✅ Create new tenants with complete information
 - ✅ Assign tenants to available rooms
 - ✅ Prevent double-booking conflicts
@@ -106,9 +111,11 @@ pnpm run test:desktop
 - ✅ Test emergency contact management
 
 ### 2. Dashboard Tests
+
 - **data-tables.cy.js**: Data display, filtering, sorting, and export functionality
 
 #### Key Test Scenarios:
+
 - ✅ Display tenants, rooms, and maintenance data
 - ✅ Search and filter capabilities
 - ✅ Sorting by different columns
@@ -117,9 +124,11 @@ pnpm run test:desktop
 - ✅ Responsive table behavior
 
 ### 3. Receipts & Contracts Tests
+
 - **receipts-generation.cy.js**: Receipt generation, contract management
 
 #### Key Test Scenarios:
+
 - ✅ Generate receipts for rent payments
 - ✅ Create and manage lease contracts
 - ✅ Handle payment history tracking
@@ -128,10 +137,12 @@ pnpm run test:desktop
 - ✅ Contract renewal workflows
 
 ### 4. Maintenance Tests
+
 - **maintenance-tracking.cy.js**: Task management, scheduling, history
 - **supply-management.cy.js**: Inventory, purchasing, usage tracking
 
 #### Key Test Scenarios:
+
 - ✅ Create and track maintenance tasks
 - ✅ Schedule recurring maintenance
 - ✅ Manage supply inventory
@@ -144,43 +155,50 @@ pnpm run test:desktop
 The test suite includes comprehensive custom commands for common operations:
 
 ### Authentication
+
 ```javascript
-cy.login(username, password)  // Login with credentials
+cy.login(username, password) // Login with credentials
 ```
 
 ### Navigation
+
 ```javascript
-cy.navigateTo('tenants')      // Navigate to specific page
-cy.waitForTableData()         // Wait for data to load
+cy.navigateTo("tenants") // Navigate to specific page
+cy.waitForTableData() // Wait for data to load
 ```
 
 ### Tenant Management
+
 ```javascript
-cy.createTenant(tenantData)   // Create new tenant
+cy.createTenant(tenantData) // Create new tenant
 cy.assignTenantToRoom(tenant, room, startDate, endDate)
 ```
 
 ### Maintenance
+
 ```javascript
-cy.createMaintenanceTask(taskData)  // Create maintenance task
+cy.createMaintenanceTask(taskData) // Create maintenance task
 ```
 
 ### Utilities
+
 ```javascript
-cy.verifyToast(message, type)       // Verify notifications
-cy.searchTable(searchTerm)          // Search in tables
-cy.exportData(format, options)      // Export functionality
-cy.setDateRange(start, end)         // Date filtering
+cy.verifyToast(message, type) // Verify notifications
+cy.searchTable(searchTerm) // Search in tables
+cy.exportData(format, options) // Export functionality
+cy.setDateRange(start, end) // Date filtering
 ```
 
 ## 📊 Test Data & Fixtures
 
 ### Fixtures Overview
+
 - **tenants.json**: Sample tenant data for testing
 - **rooms.json**: Room information and availability
 - **maintenance.json**: Maintenance tasks and supply data
 
 ### Sample Tenant Data
+
 ```json
 {
   "validTenant": {
@@ -197,6 +215,7 @@ cy.setDateRange(start, end)         // Date filtering
 ## 🔧 Configuration
 
 ### Cypress Configuration (`cypress.config.js`)
+
 ```javascript
 {
   baseUrl: 'http://localhost:5173',
@@ -210,6 +229,7 @@ cy.setDateRange(start, end)         // Date filtering
 ```
 
 ### Environment Variables
+
 ```bash
 # Set API base URL
 CYPRESS_api_base_url=http://localhost:8000
@@ -221,6 +241,7 @@ CYPRESS_RECORD_KEY=your-record-key
 ## 📈 Reporting
 
 ### Generate Test Reports
+
 ```bash
 # Generate Mochawesome HTML report
 pnpm run report:generate
@@ -233,6 +254,7 @@ pnpm run report:html
 ```
 
 ### Report Locations
+
 - **Screenshots**: `cypress/screenshots/`
 - **Videos**: `cypress/videos/`
 - **HTML Reports**: `cypress/reports/`
@@ -240,6 +262,7 @@ pnpm run report:html
 ## 🔍 Debugging
 
 ### Debug Mode
+
 ```bash
 # Open Cypress with file watching
 pnpm run test:debug
@@ -249,6 +272,7 @@ cypress run --spec "cypress/e2e/path/to/test.cy.js" --headed
 ```
 
 ### Common Debugging Tips
+
 1. **Use `cy.pause()`** to pause test execution
 2. **Add `cy.screenshot()`** for visual debugging
 3. **Check browser console** in Cypress Test Runner
@@ -258,12 +282,14 @@ cypress run --spec "cypress/e2e/path/to/test.cy.js" --headed
 ## 🚨 Test Data Management
 
 ### Before Running Tests
+
 1. **Ensure clean database state** (if using real backend)
 2. **Seed test data** as needed
 3. **Check API endpoints** are accessible
 4. **Verify authentication setup**
 
 ### After Tests
+
 1. **Clean up test data** to avoid conflicts
 2. **Reset application state** for consistency
 3. **Archive test artifacts** (videos, screenshots)
@@ -271,6 +297,7 @@ cypress run --spec "cypress/e2e/path/to/test.cy.js" --headed
 ## 🏗 CI/CD Integration
 
 ### GitHub Actions Example
+
 ```yaml
 name: Cypress Tests
 on: [push, pull_request]
@@ -280,13 +307,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
+
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
           build: pnpm install
           start: pnpm dev
-          wait-on: 'http://localhost:5173'
+          wait-on: "http://localhost:5173"
           record: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}

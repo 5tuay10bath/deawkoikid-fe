@@ -117,8 +117,8 @@ export default function CheckIn() {
                   <Label>Check-in Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full justify-start text-left font-normal"
                         data-cy="check-in-date"
                       >
@@ -141,8 +141,8 @@ export default function CheckIn() {
                   <Label>Check-out Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="w-full justify-start text-left font-normal"
                         data-cy="check-out-date"
                       >
@@ -215,7 +215,9 @@ export default function CheckIn() {
               >
                 Cancel
               </Button>
-              <Button type="submit" data-cy="complete-check-in">Complete Check-in</Button>
+              <Button type="submit" data-cy="complete-check-in">
+                Complete Check-in
+              </Button>
             </div>
           </form>
         </CardContent>

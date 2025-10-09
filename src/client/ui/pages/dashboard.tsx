@@ -35,7 +35,13 @@ export default function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-cy="dashboard-stats">
-        <DashboardStatCard title="Total Units" value="24" description="Across 2 floors" icon={Building} data-cy="total-units-stat" />
+        <DashboardStatCard
+          title="Total Units"
+          value="24"
+          description="Across 2 floors"
+          icon={Building}
+          data-cy="total-units-stat"
+        />
 
         <DashboardStatCard
           title="Occupied"
