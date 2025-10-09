@@ -1,6 +1,8 @@
 import { create } from "zustand/react"
 
 import { mockDB, type Contract } from "src/infrastructure/mockData/mockData"
+import type { ContractsModel } from "@domain/models/contracts.model"
+import { GetContractsFactory } from "@infrastructure/inbound/factories/getContracts.factory"
 
 type ContractTemplate = {
   name: string
@@ -9,11 +11,13 @@ type ContractTemplate = {
 
 type ContractState = {
   contracts: Contract[]
+  contractsTest: ContractsModel[]
   searchTerm: string
   isTemplateOpen: boolean
   isViewOpen: boolean
   selectedContract: Contract | null
   template: ContractTemplate
+  setContractsTest: (contracts: ContractsModel[]) => void
   setContracts: (contracts: Contract[]) => void
   setSearchTerm: (term: string) => void
   setIsTemplateOpen: (isOpen: boolean) => void
@@ -23,8 +27,15 @@ type ContractState = {
   updateTemplate: (updates: Partial<ContractTemplate>) => void
 }
 
-export const useContractStore = create<ContractState>((set, get) => ({
+interface ContractAction {
+  getContracts: () => Promise<void>
+}
+
+type ContractStore = ContractState & ContractAction
+
+export const useContractStore = create<ContractStore>((set, get) => ({
   contracts: mockDB.getContracts(),
+  contractsTest: [],
   searchTerm: "",
   isTemplateOpen: false,
   isViewOpen: false,
@@ -60,8 +71,9 @@ LANDLORD RESPONSIBILITIES:
 This agreement is governed by local rental laws.
 
 Landlord Signature: ___________________ Date: ___________
-Tenant Signature: ____________________ Date: ___________`
+Tenant Signature: ____________________ Date: ___________`,
   },
+  setContractsTest: (contracts) => set({ contractsTest: contracts }),
   setContracts: (contracts) => set({ contracts }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setIsTemplateOpen: (isOpen) => set({ isTemplateOpen: isOpen }),
@@ -69,4 +81,17 @@ Tenant Signature: ____________________ Date: ___________`
   setSelectedContract: (contract) => set({ selectedContract: contract }),
   setTemplate: (template) => set({ template }),
   updateTemplate: (updates) => set({ template: { ...get().template, ...updates } }),
+
+  getContracts: async () => {
+    try {
+      const result = await GetContractsFactory().handler({})
+      if (result.isRight()) {
+        set({ contractsTest: result.value })
+      } else if (result.isLeft()) {
+        console.error(result.value)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  },
 }))

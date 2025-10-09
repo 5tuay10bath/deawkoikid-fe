@@ -1,20 +1,20 @@
-import js from "@eslint/js";
-import globals from "globals";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js"
+import globals from "globals"
+import reactHooks from "eslint-plugin-react-hooks"
+import reactRefresh from "eslint-plugin-react-refresh"
+import tseslint from "typescript-eslint"
 
-import prettierPlugin from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier"
+import prettierConfig from "eslint-config-prettier"
 
-import importPlugin from "eslint-plugin-import";
-import unusedImports from "eslint-plugin-unused-imports";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import sonarjs from "eslint-plugin-sonarjs";
-import promise from "eslint-plugin-promise";
-import node from "eslint-plugin-node";
-import unicorn from "eslint-plugin-unicorn";
-import perfectionist from "eslint-plugin-perfectionist";
+import importPlugin from "eslint-plugin-import"
+import unusedImports from "eslint-plugin-unused-imports"
+import jsxA11y from "eslint-plugin-jsx-a11y"
+import sonarjs from "eslint-plugin-sonarjs"
+import promise from "eslint-plugin-promise"
+import node from "eslint-plugin-node"
+import unicorn from "eslint-plugin-unicorn"
+import perfectionist from "eslint-plugin-perfectionist"
 
 export default tseslint.config(
   { ignores: ["dist"] },
@@ -97,16 +97,19 @@ export default tseslint.config(
       "import/no-duplicates": "error",
       "import/no-unresolved": "off",
       "@typescript-eslint/no-redeclare": "off",
-      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-empty-function": "warn",
       "@typescript-eslint/no-unused-vars": ["error", { args: "none", varsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
       "no-console": "warn",
       "no-alert": "error",
       "no-magic-numbers": "off",
+      "no-empty-pattern": "off",
       "prefer-const": "error",
       "node/prefer-global/process": "off",
       "node/no-process-env": "warn",
-      "semi": false,
+      semi: ["error", "never"],
 
       /*** File naming ***/
       "unicorn/filename-case": [
@@ -117,5 +120,5 @@ export default tseslint.config(
         },
       ],
     },
-  }
-);
+  },
+)
