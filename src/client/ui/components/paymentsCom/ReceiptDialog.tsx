@@ -58,8 +58,7 @@ const ReceiptDialog = () => {
         title: "Receipt Generated",
         description: "Receipt has been downloaded successfully",
       })
-    } catch (error) {
-      console.error("Error generating PDF:", error)
+    } catch {
       toast({
         title: "Error",
         description: "Failed to generate receipt. Please try again.",
