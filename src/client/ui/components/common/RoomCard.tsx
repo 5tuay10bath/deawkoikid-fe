@@ -34,7 +34,7 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
   const config = statusConfig[room.status]
 
   return (
-    <Card 
+    <Card
       className={`transition-shadow hover:shadow-md cursor-pointer room-card room-card-${room.status}`}
       data-cy={`room-card room-card-${room.status}`}
     >
@@ -72,21 +72,16 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
 
           <div className="pt-2">
             {room.status === "available" && (
-              <Button 
-                size="sm" 
-                className="w-full" 
-                onClick={() => onCheckIn?.(room.id)}
-                data-cy="check-in-button"
-              >
+              <Button size="sm" className="w-full" onClick={() => onCheckIn?.(room.id)} data-cy="check-in-button">
                 Check In
               </Button>
             )}
 
             {room.status !== "available" && (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="w-full" 
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full"
                 onClick={() => onViewDetails?.(room.id)}
                 data-cy="view-details-button"
               >

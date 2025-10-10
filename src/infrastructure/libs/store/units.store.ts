@@ -19,7 +19,6 @@ interface UnitAction {
 
 type UnitStore = UnitState & UnitAction
 
-
 export const useUnitStore = create<UnitStore>((set) => ({
   units: mockDB.getRooms(),
   searchTerm: "",
@@ -33,11 +32,11 @@ export const useUnitStore = create<UnitStore>((set) => ({
       const result = await GetUnitPageFactory().handler({})
       if (result.isRight()) {
         set({ unitsTest: result.value })
-      }else if (result.isLeft()){
+      } else if (result.isLeft()) {
         console.error(result.value)
       }
-    }catch (error) {
+    } catch (error) {
       console.error(error)
     }
-  }
+  },
 }))

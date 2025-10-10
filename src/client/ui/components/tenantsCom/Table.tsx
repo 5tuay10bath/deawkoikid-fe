@@ -13,17 +13,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 const TableTenants = () => {
   const { tenants, searchTerm, statusFilter } = useTenantStore()
 
-  const filteredTenants = tenants.filter(
-    (tenant) => {
-      const matchesSearch = tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenant.unitNumber.includes(searchTerm)
-      
-      const matchesStatus = statusFilter === "all" || tenant.status === statusFilter
-      
-      return matchesSearch && matchesStatus
-    }
-  )
+  const filteredTenants = tenants.filter((tenant) => {
+    const matchesSearch =
+      tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.unitNumber.includes(searchTerm)
+
+    const matchesStatus = statusFilter === "all" || tenant.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
 
   const statusConfig: Record<Tenant["status"], { color: string; label: string }> = {
     active: { color: "bg-green-400 text-white", label: "Active" },
@@ -63,22 +62,32 @@ const TableTenants = () => {
                   <AvatarFallback>{getInitials(tenant.name)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium" data-cy="tenant-name">{tenant.name}</p>
-                  <p className="text-muted-foreground text-sm" data-cy="tenant-email">{tenant.email}</p>
+                  <p className="font-medium" data-cy="tenant-name">
+                    {tenant.name}
+                  </p>
+                  <p className="text-muted-foreground text-sm" data-cy="tenant-email">
+                    {tenant.email}
+                  </p>
                 </div>
               </div>
             </TableCell>
-            <TableCell className="font-medium" data-cy="tenant-unit">{tenant.unitNumber}</TableCell>
+            <TableCell className="font-medium" data-cy="tenant-unit">
+              {tenant.unitNumber}
+            </TableCell>
             <TableCell data-cy="tenant-phone">{tenant.phone}</TableCell>
             <TableCell>
               <div className="text-sm">
                 <p data-cy="lease-start">{format(tenant.checkIn, "MMM dd, yyyy")}</p>
-                <p className="text-muted-foreground" data-cy="lease-end">to {format(tenant.checkOut, "MMM dd, yyyy")}</p>
+                <p className="text-muted-foreground" data-cy="lease-end">
+                  to {format(tenant.checkOut, "MMM dd, yyyy")}
+                </p>
               </div>
             </TableCell>
             <TableCell data-cy="tenant-rent">${tenant.rentAmount}/mo</TableCell>
             <TableCell>
-              <Badge className={statusConfig[tenant.status].color} data-cy={`tenant-status-${tenant.status}`}>{statusConfig[tenant.status].label}</Badge>
+              <Badge className={statusConfig[tenant.status].color} data-cy={`tenant-status-${tenant.status}`}>
+                {statusConfig[tenant.status].label}
+              </Badge>
             </TableCell>
             <TableCell>
               <div className="flex gap-1">
