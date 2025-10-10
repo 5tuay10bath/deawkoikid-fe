@@ -1,5 +1,8 @@
 import { format } from "date-fns"
 import { Download, Send } from "lucide-react"
+import { useRef } from "react"
+import html2canvas from "html2canvas"
+import jsPDF from "jspdf"
 
 import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
@@ -10,6 +13,7 @@ import { useToast } from "../hooks/useToast"
 const ReceiptDialog = () => {
   const { isReceiptOpen, setIsReceiptOpen, selectedPayment } = usePaymentStore()
   const { toast } = useToast()
+  const receiptRef = useRef<HTMLDivElement>(null)
 
   const typeConfig = {
     rent: "Rent",
@@ -19,12 +23,48 @@ const ReceiptDialog = () => {
     addon: "Addon",
   }
 
-  const handleDownloadReceipt = () => {
-    toast({
-      title: "Receipt Generated",
-      description: "Receipt has been downloaded successfully",
-    })
-    setIsReceiptOpen(false)
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current || !selectedPayment) return
+
+    try {
+      toast({
+        title: "Generating PDF...",
+        description: "Please wait while we generate your receipt",
+      })
+
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      })
+
+      const imgData = canvas.toDataURL("image/png")
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      })
+
+      const imgWidth = 190
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
+
+      const fileName = `receipt_${selectedPayment.id}_${format(new Date(), "yyyyMMdd")}.pdf`
+      pdf.save(fileName)
+
+      toast({
+        title: "Receipt Generated",
+        description: "Receipt has been downloaded successfully",
+      })
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to generate receipt. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleSendReceipt = () => {
@@ -42,33 +82,44 @@ const ReceiptDialog = () => {
         </DialogHeader>
         {selectedPayment && (
           <div className="space-y-4">
-            <div className="bg-muted/20 rounded-lg border p-4">
-              <div className="mb-4 text-center">
-                <h3 className="text-lg font-bold">Property Manager</h3>
-                <p className="text-muted-foreground text-sm">Payment Receipt</p>
+            {/* Receipt Content - This will be exported as PDF */}
+            <div ref={receiptRef} className="bg-white rounded-lg border p-6">
+              <div className="mb-6 text-center border-b pb-4">
+                <h3 className="text-2xl font-bold text-gray-900">Property Manager</h3>
+                <p className="text-gray-500 text-sm mt-1">Payment Receipt</p>
+                <p className="text-gray-400 text-xs mt-2">Receipt #{selectedPayment.id}</p>
               </div>
 
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Tenant:</span>
-                  <span className="font-medium">{selectedPayment.tenantName}</span>
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600 font-medium">Tenant:</span>
+                  <span className="font-semibold text-gray-900">{selectedPayment.tenantName}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Unit:</span>
-                  <span className="font-medium">{selectedPayment.unitNumber}</span>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600 font-medium">Unit:</span>
+                  <span className="font-semibold text-gray-900">{selectedPayment.unitNumber}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Type:</span>
-                  <span className="font-medium">{typeConfig[selectedPayment.type]}</span>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600 font-medium">Payment Type:</span>
+                  <span className="font-semibold text-gray-900">{typeConfig[selectedPayment.type]}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Amount:</span>
-                  <span className="font-medium">${selectedPayment.amount}</span>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600 font-medium">Payment Date:</span>
+                  <span className="font-semibold text-gray-900">
+                    {format(selectedPayment.dueDate, "MMMM dd, yyyy")}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Date:</span>
-                  <span className="font-medium">{format(selectedPayment.dueDate, "MMM dd, yyyy")}</span>
+                <div className="flex justify-between py-3 mt-4 bg-gray-50 rounded-lg px-4">
+                  <span className="text-lg font-bold text-gray-900">Total Amount:</span>
+                  <span className="text-2xl font-bold text-emerald-600">${selectedPayment.amount.toFixed(2)}</span>
                 </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t text-center">
+                <p className="text-xs text-gray-500">Thank you for your payment</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Generated on {format(new Date(), "MMMM dd, yyyy 'at' HH:mm")}
+                </p>
               </div>
             </div>
 
