@@ -1,0 +1,66 @@
+import { Edit } from "lucide-react"
+
+import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+
+import { Badge } from "../common/Badge"
+import { Button } from "../common/Button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
+
+const TableUnits = () => {
+  const { units, searchTerm } = useUnitStore()
+
+  const filteredUnits = units.filter(
+    (unit) =>
+      unit.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      unit.type.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const statusConfig = {
+    available: { color: "bg-green-500 text-white", label: "Available" },
+    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
+    maintenance: { color: "bg-orange-500 text-white", label: "Maintenance" },
+    "checkout-pending": {
+      color: "bg-muted text-white",
+      label: "Checkout Pending",
+    },
+  }
+
+  return (
+    <Table data-cy="units-table">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Unit Number</TableHead>
+          <TableHead>Floor</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Size</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {filteredUnits.map((unit) => (
+          <TableRow key={unit.id} data-cy={`unit-row-${unit.number}`}>
+            <TableCell className="font-medium" data-cy="unit-number">
+              {unit.number}
+            </TableCell>
+            <TableCell data-cy="unit-floor">{unit.floor}</TableCell>
+            <TableCell data-cy="unit-type">{unit.type}</TableCell>
+            <TableCell data-cy="unit-size">{unit.size}</TableCell>
+            <TableCell>
+              <Badge className={statusConfig[unit.status].color} data-cy={`unit-status-${unit.status}`}>
+                {statusConfig[unit.status].label}
+              </Badge>
+            </TableCell>
+            <TableCell>
+              <Button variant="ghost" size="sm" data-cy="edit-unit-button">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+
+export default TableUnits

@@ -1,0 +1,17 @@
+{
+  "cn styled": {
+    "prefix": "cns",
+    "body": ["className={cn($1)}"],
+    "description": "cn style component",
+  },
+  "tw styled": {
+    "prefix": "tws",
+    "body": ["${tw$1}"],
+    "description": "tw style component",
+  },
+  "custom styled once": {
+    "prefix": "csc",
+    "body": [" $1 :styled$2\n${tw$3} "],
+    "description": "custom styled component",
+  },
+}
