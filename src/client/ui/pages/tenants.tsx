@@ -8,6 +8,7 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/common/Select"
 import TableTenants from "../components/tenantsCom/Table"
+import DialogTenant from "../components/tenantsCom/Dialog"
 
 export default function Tenants() {
   const { tenants, searchTerm, statusFilter, setSearchTerm, setStatusFilter } = useTenantStore()
@@ -24,7 +25,7 @@ export default function Tenants() {
           <Button variant="outline" data-cy="export-tenants">
             Export Data
           </Button>
-          <Button data-cy="add-tenant">Add Tenant</Button>
+          <DialogTenant />
         </div>
       </div>
 

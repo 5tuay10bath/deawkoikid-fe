@@ -7,12 +7,15 @@ import { GetTenantsPageFactory } from "@infrastructure/inbound/factories/getTena
 type TenantState = {
   tenants: Tenant[]
   tenantsTest: TenantsPageModel[]
+  newTenantsTest: TenantsPageModel
   searchTerm: string
   statusFilter: string
   setTenantsTest: (tenants: TenantsPageModel[]) => void
+  setNewTenant: (patch: Partial<TenantsPageModel>) => void
   setSearchTerm: (term: string) => void
   setStatusFilter: (status: string) => void
   setTenants: (tenants: Tenant[]) => void
+  resetTenantsTest: () => void
 }
 
 interface TenantAction {
@@ -21,15 +24,33 @@ interface TenantAction {
 
 type TenantStore = TenantState & TenantAction
 
+const initialNewTenant = (): TenantsPageModel => ({
+  id: "",
+  fullName: "",
+  phone: "",
+  email: "",
+  emergencyContactName: "",
+  emergencyContactPhone: "",
+  unitNumber: "",
+  startDate: new Date(),
+  endDate: new Date(),
+  rentAmount: 0,
+  billingCycle: "monthly",
+  status: "active",
+})
+
 export const useTenantStore = create<TenantStore>((set) => ({
   tenants: mockDB.getTenants(),
   tenantsTest: [],
+  newTenantsTest: initialNewTenant(),
   searchTerm: "",
   statusFilter: "all",
   setTenantsTest: (tenants) => set({ tenantsTest: tenants }),
+  setNewTenant: (patch) => set((s) => ({ newTenantsTest: { ...s.newTenantsTest, ...patch } })),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setStatusFilter: (status) => set({ statusFilter: status }),
   setTenants: (tenants) => set({ tenants }),
+  resetTenantsTest: () => set({ newTenantsTest: initialNewTenant() }),
 
   getTenants: async () => {
     try {

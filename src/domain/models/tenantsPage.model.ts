@@ -1,15 +1,15 @@
 export interface TenantsPageModel {
   id: string
-  name: string
-  email: string
+  fullName: string
   phone: string
-  emergencyContact: string
-  emergencyPhone: string
+  email: string
+  emergencyContactName: string
+  emergencyContactPhone: string
   unitNumber: string
-  checkIn: Date
-  checkOut: Date
+  startDate: Date
+  endDate: Date
   rentAmount: number
   billingCycle: "monthly" | "yearly"
-  securityDeposit: number
+  // securityDeposit: number
   status: "active" | "checkout-pending" | "overdue"
 }
