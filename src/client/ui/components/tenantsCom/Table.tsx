@@ -1,10 +1,9 @@
 import { format } from "date-fns"
 import { Eye, Edit, Trash2 } from "lucide-react"
-
+import Swal from "sweetalert2"
 import type { Tenant } from "src/infrastructure/mockData/mockData"
-
+import axios from "axios"
 import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
-
 import { Avatar, AvatarFallback } from "../common/Avatar"
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
@@ -32,7 +31,44 @@ const TableTenants = () => {
     },
     overdue: { color: "bg-red-400 text-white", label: "Overdue" },
   }
-
+  const showdialog = (tenant: Tenant) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `You want to delete "${tenant.name}"?`,
+      icon: "error",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      // eslint-disable-next-line promise/always-return
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading()
+          },
+        })
+        try {
+          await axios.delete(`${import.meta.env.VITE_PUBLIC_API_ENDPOINT}units/${tenant.id}`)
+          Swal.fire({
+            title: "Deleted!",
+            text: tenant.name + " has been deleted.",
+            icon: "success",
+          })
+        } catch (error) {
+          console.error(error)
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to delete: " + tenant.name,
+            icon: "error",
+          })
+        }
+      }
+    })
+  }
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -97,7 +133,7 @@ const TableTenants = () => {
                 <Button variant="ghost" size="sm" data-cy="edit-tenant-button">
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" data-cy="delete-tenant-button">
+                <Button variant="ghost" size="sm" data-cy="delete-tenant-button" onClick={() => showdialog(tenant)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
