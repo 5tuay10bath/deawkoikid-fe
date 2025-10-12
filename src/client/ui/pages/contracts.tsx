@@ -1,12 +1,12 @@
-import { FileText, Plus, Search } from "lucide-react"
+import { FileText, Search } from "lucide-react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
-import { Button } from "../components/common/Button"
 import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { StatsCard } from "../components/central/StatsCard"
 import ContractsTable from "../components/contractsCom/Table"
 import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
+import NewContractDialog from "../components/contractsCom/AddDialog"
 
 export default function Contracts() {
   const { contracts, searchTerm, setSearchTerm } = useContractStore()
@@ -22,10 +22,7 @@ export default function Contracts() {
         <div className="flex gap-2">
           <EditTemplateDialog />
 
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Contract
-          </Button>
+          <NewContractDialog />
         </div>
       </div>
 

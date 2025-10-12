@@ -1,15 +1,20 @@
 export interface ContractsModel {
   id: string
   tenantId: string
-  tenantName: string
+  unitId: string
+  fullName: string
+  phone: string
+  identificationNumber: string
   unitNumber: string
-  contractType: "rental" | "lease"
+  unitType: string
+  unitSize: string
+  rentType: "monthly" | "yearly"
+  rentAmount: number
+  waterBillingType: "per_unit" | "flat_rate" | "tiered"
+  internet: boolean
   startDate: Date
   endDate: Date
-  rentAmount: number
-  securityDeposit: number
-  paymentFrequency: "monthly" | "quarterly" | "yearly"
   status: "active" | "expired" | "terminated" | "pending"
-  signedDate: Date | null
-  terminationDate: Date | null
+  // signedDate: Date | null
+  // terminationDate: Date | null
 }
