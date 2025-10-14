@@ -1,14 +1,18 @@
 export interface PaymentsModel {
   id: string
-  tenantId: string
-  tenantName: string
-  unitNumber: string
-  amount: number
-  paymentType: "rent" | "deposit" | "utility" | "maintenance" | "late-fee" | "other"
-  paymentMethod: "cash" | "bank-transfer" | "credit-card" | "mobile-payment"
-  status: "paid" | "pending" | "overdue" | "cancelled"
+  contractid: string
+  apartmentConfigid: string
+  billingMonth: Date
+  electricUsage: number
+  waterUsage: number
+  status: "paid" | "unpaid" | "overdue"
   dueDate: Date
-  paidDate: Date | null
-  invoiceNumber: string
-  description: string | null
+  totalAmount: number // Response only
+  paidDate: Date
+
+  // Apartment Config
+  electricpriceperunit: number
+  waterpriceperunit: number
+  commonFee: number
+  internetprice: number
 }

@@ -3,13 +3,11 @@ export interface TenantsPageModel {
   fullName: string
   phone: string
   email: string
+  role: "tenant" | "staff" | "admin"
+  identificationNumber: string
+  profileImageUrl: string
+  birthDate: Date
+  active: boolean
   emergencyContactName: string
   emergencyContactPhone: string
-  unitNumber: string
-  startDate: Date
-  endDate: Date
-  rentAmount: number
-  billingCycle: "monthly" | "yearly"
-  // securityDeposit: number
-  status: "active" | "checkout-pending" | "overdue"
 }

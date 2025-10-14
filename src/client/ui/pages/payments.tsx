@@ -1,4 +1,4 @@
-import { Search, Receipt, Plus, DollarSign } from "lucide-react"
+import { Search, Receipt, DollarSign } from "lucide-react"
 
 import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
@@ -8,6 +8,8 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import ReceiptDialog from "../components/paymentsCom/ReceiptDialog"
 import TablePayments from "../components/paymentsCom/Table"
+import NewPaymentDialog from "../components/paymentsCom/AddDialog"
+import NewApartmentConfigDialog from "../components/paymentsCom/ApartmentConfigDialog"
 
 export default function Payments() {
   const { payments, searchTerm, setSearchTerm } = usePaymentStore()
@@ -25,11 +27,10 @@ export default function Payments() {
         </div>
 
         <div className="flex gap-2">
+          <NewApartmentConfigDialog />
           <Button variant="outline">Export Reports</Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Record Payment
-          </Button>
+
+          <NewPaymentDialog />
         </div>
       </div>
 

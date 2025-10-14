@@ -15,11 +15,11 @@ import { format } from "date-fns"
 import { Calendar } from "../common/Calendar"
 
 const DialogTenant = () => {
-  const { tenantsTest, setTenantsTest, newTenantsTest, setNewTenant, resetTenantsTest } = useTenantStore()
+  const { newTenantsTest, setNewTenant, resetTenantsTest } = useTenantStore()
   const { toast } = useToast()
   const [isAddTenantOpen, setIsAddTenantOpen] = useState(false)
   const handleAddTenant = () => {
-    if (!newTenantsTest.fullName || !newTenantsTest.phone || !newTenantsTest.rentAmount) {
+    if (!newTenantsTest.fullName || !newTenantsTest.phone) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -27,12 +27,6 @@ const DialogTenant = () => {
       })
       return
     }
-    const tenant: TenantsPageModel = {
-      ...newTenantsTest,
-      id: newTenantsTest.id,
-      rentAmount: Number(newTenantsTest.rentAmount),
-    }
-    setTenantsTest([...(tenantsTest ?? []), tenant])
     toast({
       title: "Tenant Added",
       description: `Tenant "${newTenantsTest.fullName}" has been added`,
@@ -71,91 +65,89 @@ const DialogTenant = () => {
               placeholder="Your Phone Number"
             />
           </div>
-          {/* <div className="space-y-2">
-            <Label>Lease Period</Label>
+          <div className="space-y-2">
+            <Label>Email</Label>
             <Input
-              value={newTenant.size}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewTenant((prev) => ({ ...prev, size: e.target.value }))
-              }
-              placeholder="400 sq ft"
+              value={newTenantsTest.phone}
+              onChange={(e) => setNewTenant({ email: e.target.value })}
+              placeholder="Your Email"
             />
-          </div> */}
+          </div>
+          <div className="space-y-2">
+            <Label>Identification Number</Label>
+            <Input
+              value={newTenantsTest.identificationNumber}
+              onChange={(e) => setNewTenant({ identificationNumber: e.target.value })}
+              placeholder="Your Email"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input
+              value={newTenantsTest.phone}
+              onChange={(e) => setNewTenant({ email: e.target.value })}
+              placeholder="Your Email"
+            />
+          </div>
 
           <div className="space-y-2">
-            <Label>Start Date</Label>
+            <Label>Birth Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left font-normal">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {newTenantsTest.startDate ? format(newTenantsTest.startDate, "PPP") : "Pick a date"}
+                  {newTenantsTest.birthDate ? format(newTenantsTest.birthDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
 
               <PopoverContent className="bg-white w-auto p-0">
                 <Calendar
                   mode="single"
-                  selected={newTenantsTest.startDate}
+                  selected={newTenantsTest.birthDate}
                   onSelect={(date) => {
-                    if (date) setNewTenant({ startDate: date })
+                    if (date) setNewTenant({ birthDate: date })
                   }}
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select
+              value={newTenantsTest.role}
+              onValueChange={(value) => setNewTenant({ role: value as TenantsPageModel["role"] })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Role" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="tenant">tenant</SelectItem>
+                <SelectItem value="staff">staff</SelectItem>
+                <SelectItem value="admin">admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Profile Image URL ? */}
+
+          <div className="space-y-2">
+            <Label>emergency Contact Name</Label>
+            <Input
+              value={newTenantsTest.emergencyContactName}
+              onChange={(e) => setNewTenant({ emergencyContactName: e.target.value })}
+              placeholder="Your Emergency Contact Name"
+            />
           </div>
           <div className="space-y-2">
-            <Label>End Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {newTenantsTest.startDate ? format(newTenantsTest.endDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-
-              <PopoverContent className="bg-white w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={newTenantsTest.endDate}
-                  onSelect={(date) => {
-                    if (date) setNewTenant({ endDate: date })
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <Label>emergency Contact Phone</Label>
+            <Input
+              value={newTenantsTest.emergencyContactPhone}
+              onChange={(e) => setNewTenant({ emergencyContactPhone: e.target.value })}
+              placeholder="Your Emergency Contact Phone"
+            />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Rent Amount</Label>
-              <Input
-                type="number"
-                onChange={(e) => {
-                  const n = e.currentTarget.valueAsNumber
-                  setNewTenant({ rentAmount: Number.isNaN(n) ? 0 : n })
-                }}
-                placeholder="Rent Amount"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={newTenantsTest.status}
-                onValueChange={(value) => setNewTenant({ status: value as TenantsPageModel["status"] })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Status" />
-                </SelectTrigger>
-                <SelectContent className="bg-white">
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                  <SelectItem value="checkout-pending">Checkout-pending</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setIsAddTenantOpen(false)}>
               Cancel

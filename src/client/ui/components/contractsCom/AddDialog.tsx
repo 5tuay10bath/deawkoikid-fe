@@ -47,6 +47,7 @@ const NewContractDialog = () => {
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
+            {/* map unit id */}
             <Label>Unit Number</Label>
             <Input
               value={newContract.unitNumber}
@@ -165,24 +166,3 @@ const NewContractDialog = () => {
   )
 }
 export default NewContractDialog
-
-function ContractsModel(arg0: {
-  id: string
-  rentAmount: number
-  tenantId: string
-  unitId: string
-  fullName: string
-  phone: string
-  identificationNumber: string
-  unitNumber: string
-  unitType: string
-  unitSize: string
-  rentType: "monthly" | "yearly"
-  waterBillingType: "per_unit" | "flat_rate" | "tiered"
-  internet: boolean
-  startDate: Date
-  endDate: Date
-  status: "active" | "expired" | "terminated" | "pending"
-}) {
-  throw new Error("Function not implemented.")
-}

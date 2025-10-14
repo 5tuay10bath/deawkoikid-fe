@@ -3,6 +3,7 @@ export interface ContractsModel {
   tenantId: string
   unitId: string
   fullName: string
+  email: string
   phone: string
   identificationNumber: string
   unitNumber: string
@@ -15,6 +16,4 @@ export interface ContractsModel {
   startDate: Date
   endDate: Date
   status: "active" | "expired" | "terminated" | "pending"
-  // signedDate: Date | null
-  // terminationDate: Date | null
 }
