@@ -56,97 +56,91 @@ const DialogTenant = () => {
               placeholder="Your First Name"
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Contact</Label>
+              <Input
+                value={newTenantsTest.phone}
+                onChange={(e) => setNewTenant({ phone: e.target.value })}
+                placeholder="Your Phone Number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                value={newTenantsTest.phone}
+                onChange={(e) => setNewTenant({ email: e.target.value })}
+                placeholder="Your Email"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Identification Number</Label>
+              <Input
+                value={newTenantsTest.identificationNumber}
+                onChange={(e) => setNewTenant({ identificationNumber: e.target.value })}
+                placeholder="Your Identification Number"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Birth Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newTenantsTest.birthDate ? format(newTenantsTest.birthDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
 
-          <div className="space-y-2">
-            <Label>Contact</Label>
-            <Input
-              value={newTenantsTest.phone}
-              onChange={(e) => setNewTenant({ phone: e.target.value })}
-              placeholder="Your Phone Number"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input
-              value={newTenantsTest.phone}
-              onChange={(e) => setNewTenant({ email: e.target.value })}
-              placeholder="Your Email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Identification Number</Label>
-            <Input
-              value={newTenantsTest.identificationNumber}
-              onChange={(e) => setNewTenant({ identificationNumber: e.target.value })}
-              placeholder="Your Email"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input
-              value={newTenantsTest.phone}
-              onChange={(e) => setNewTenant({ email: e.target.value })}
-              placeholder="Your Email"
-            />
-          </div>
+                <PopoverContent className="bg-white w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={newTenantsTest.birthDate}
+                    onSelect={(date) => {
+                      if (date) setNewTenant({ birthDate: date })
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          <div className="space-y-2">
-            <Label>Birth Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {newTenantsTest.birthDate ? format(newTenantsTest.birthDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-
-              <PopoverContent className="bg-white w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={newTenantsTest.birthDate}
-                  onSelect={(date) => {
-                    if (date) setNewTenant({ birthDate: date })
-                  }}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={newTenantsTest.role}
+                onValueChange={(value) => setNewTenant({ role: value as TenantsPageModel["role"] })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Role" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="tenant">tenant</SelectItem>
+                  <SelectItem value="staff">staff</SelectItem>
+                  <SelectItem value="admin">admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={newTenantsTest.role}
-              onValueChange={(value) => setNewTenant({ role: value as TenantsPageModel["role"] })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select Role" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="tenant">tenant</SelectItem>
-                <SelectItem value="staff">staff</SelectItem>
-                <SelectItem value="admin">admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Profile Image URL ? */}
-
-          <div className="space-y-2">
-            <Label>emergency Contact Name</Label>
-            <Input
-              value={newTenantsTest.emergencyContactName}
-              onChange={(e) => setNewTenant({ emergencyContactName: e.target.value })}
-              placeholder="Your Emergency Contact Name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>emergency Contact Phone</Label>
-            <Input
-              value={newTenantsTest.emergencyContactPhone}
-              onChange={(e) => setNewTenant({ emergencyContactPhone: e.target.value })}
-              placeholder="Your Emergency Contact Phone"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Emergency Contact Name</Label>
+              <Input
+                value={newTenantsTest.emergencyContactName}
+                onChange={(e) => setNewTenant({ emergencyContactName: e.target.value })}
+                placeholder="Your Emergency Contact Name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Emergency Contact Phone</Label>
+              <Input
+                value={newTenantsTest.emergencyContactPhone}
+                onChange={(e) => setNewTenant({ emergencyContactPhone: e.target.value })}
+                placeholder="Your Emergency Contact Phone"
+              />
+            </div>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setIsAddTenantOpen(false)}>
