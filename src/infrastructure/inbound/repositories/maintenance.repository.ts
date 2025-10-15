@@ -1,8 +1,6 @@
 import type { IMaintenanceRepository } from "@application/ports/maintenance.repository.port"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
-import type { MaintenanceEntity } from "@client/entities/maintenance.entity"
-import type { SupplyEntity } from "@client/entities/supply.entity"
 import type { MaintenanceModel } from "@domain/models/maintenance.model"
 import type { SupplyModel } from "@domain/models/supply.model"
 import { MaintenanceMapper } from "../port/maintenance.mapper"
@@ -22,11 +20,11 @@ export class MaintenanceRepository implements IMaintenanceRepository {
     const {} = dto
 
     try {
-      const url = `/maintenance`
+      const url = `/maintenances`
 
-      const { data } = await axiosInstance.get<MaintenanceEntity[]>(url)
+      const { data } = await axiosInstance.get(url)
 
-      const result: MaintenanceModel[] = MaintenanceMapper.toDomainArray(data)
+      const result: MaintenanceModel[] = MaintenanceMapper.toDomainArray(data.data)
 
       return right(result)
     } catch (error) {
@@ -41,9 +39,9 @@ export class MaintenanceRepository implements IMaintenanceRepository {
     try {
       const url = `/supplies`
 
-      const { data } = await axiosInstance.get<SupplyEntity[]>(url)
+      const { data } = await axiosInstance.get(url)
 
-      const result: SupplyModel[] = SupplyMapper.toDomainArray(data)
+      const result: SupplyModel[] = SupplyMapper.toDomainArray(data.data)
 
       return right(result)
     } catch (error) {

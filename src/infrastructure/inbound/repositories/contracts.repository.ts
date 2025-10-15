@@ -1,7 +1,6 @@
 import type { IContractsRepository } from "@application/ports/contracts.repository.port"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
-import type { ContractsEntity } from "@client/entities/contracts.entity"
 import type { ContractsModel } from "@domain/models/contracts.model"
 import { ContractsMapper } from "../port/contracts.mapper"
 import { left, right } from "@shared/either"
@@ -21,9 +20,9 @@ export class ContractsRepository implements IContractsRepository {
     try {
       const url = `/contracts`
 
-      const { data } = await axiosInstance.get<ContractsEntity[]>(url)
+      const { data } = await axiosInstance.get(url)
 
-      const result: ContractsModel[] = ContractsMapper.toDomainArray(data)
+      const result: ContractsModel[] = ContractsMapper.toDomainArray(data.data)
 
       return right(result)
     } catch (error) {

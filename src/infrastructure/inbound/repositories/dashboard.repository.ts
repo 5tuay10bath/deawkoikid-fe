@@ -1,7 +1,6 @@
 import type { IDashboardRepository } from "@application/ports/dashboard.repository.port"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
-import type { DashboardEntity } from "@client/entities/dashboard.entity"
 import type { DashboardModel } from "@domain/models/dashboard.model"
 import { DashboardMapper } from "../port/dashboard.mapper"
 import { left, right } from "@shared/either"
@@ -19,11 +18,15 @@ export class DashboardRepository implements IDashboardRepository {
     const {} = dto
 
     try {
-      const url = `/dashboard`
+      const url = `/contracts`
 
-      const { data } = await axiosInstance.get<DashboardEntity>(url)
+      const { data } = await axiosInstance.get(url)
 
-      const result: DashboardModel = DashboardMapper.toDomain(data)
+      console.log("data:", data)
+
+      const result: DashboardModel = DashboardMapper.toDomain(data.data)
+
+      console.log("result:", result)
 
       return right(result)
     } catch (error) {

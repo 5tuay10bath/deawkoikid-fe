@@ -7,9 +7,14 @@ import { StatsCard } from "../components/central/StatsCard"
 import ContractsTable from "../components/contractsCom/Table"
 import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
+import { useEffect } from "react"
 
 export default function Contracts() {
-  const { contracts, searchTerm, setSearchTerm } = useContractStore()
+  const { contracts, searchTerm, setSearchTerm, getContracts } = useContractStore()
+
+  useEffect(() => {
+    getContracts()
+  }, [getContracts])
 
   return (
     <div className="space-y-6">
@@ -33,7 +38,7 @@ export default function Contracts() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatsCard
           label="Active Contracts"
-          value={contracts.filter((c) => c.status === "active").length}
+          value={contracts.filter((c) => c.status.toUpperCase() === "ACTIVE").length}
           icon={FileText}
           color={{
             valueColor: "text-emerald-500",
@@ -53,7 +58,7 @@ export default function Contracts() {
 
         <StatsCard
           label="Draft Contracts"
-          value={contracts.filter((c) => c.status === "draft").length}
+          value={contracts.filter((c) => c.status === "DRAFT").length}
           icon={FileText}
           color={{
             valueColor: "text-blue-500",

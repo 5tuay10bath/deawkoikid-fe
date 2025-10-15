@@ -10,10 +10,9 @@ import { Label } from "../common/Label"
 import { Input } from "../common/Input"
 import { format } from "date-fns"
 import { useToast } from "../hooks/useToast"
-import { mockDB, type MaintenanceTask } from "@infrastructure/mockData/mockData"
 
 const NewTaskDialog = () => {
-  const { isNewTaskOpen, setIsNewTaskOpen, newTask, updateNewTask, resetNewTask, addTask } = useMaintenanceStore()
+  const { isNewTaskOpen, setIsNewTaskOpen, newTask, updateNewTask, resetNewTask } = useMaintenanceStore()
   const { toast } = useToast()
   const handleCreateTask = () => {
     if (!newTask.title || !newTask.unitNumber || !newTask.priority) {
@@ -25,18 +24,20 @@ const NewTaskDialog = () => {
       return
     }
 
-    const task = mockDB.addMaintenanceTask({
-      title: newTask.title,
-      description: newTask.description,
-      unitNumber: newTask.unitNumber,
-      priority: newTask.priority as MaintenanceTask["priority"],
-      status: "pending",
-      assignedTo: newTask.assignedTo || "Unassigned",
-      dueDate: newTask.dueDate || new Date(),
-      type: (newTask.type as MaintenanceTask["type"]) || "general",
-    })
+    // TODO: Implement task creation with API
+    // const task = {
+    //   id: Date.now().toString(),
+    //   title: newTask.title,
+    //   description: newTask.description,
+    //   unit: { unitNumber: newTask.unitNumber },
+    //   priority: newTask.priority,
+    //   status: "REPORTED",
+    //   assignedTo: null,
+    //   reportedBy: { fullName: "System" },
+    //   dueDate: newTask.dueDate || new Date(),
+    // }
+    // addTask(task)
 
-    addTask(task)
     toast({
       title: "Task Created",
       description: `Maintenance task "${newTask.title}" has been created`,
@@ -143,8 +144,7 @@ const NewTaskDialog = () => {
 }
 
 export const NewSupplyDialog = () => {
-  const { isNewSupplyOpen, setIsNewSupplyOpen, newSupply, updateNewSupply, resetNewSupply, addSupply } =
-    useMaintenanceStore()
+  const { isNewSupplyOpen, setIsNewSupplyOpen, newSupply, updateNewSupply, resetNewSupply } = useMaintenanceStore()
   const { toast } = useToast()
 
   const handleAddSupply = () => {
@@ -157,16 +157,16 @@ export const NewSupplyDialog = () => {
       return
     }
 
-    const supply = mockDB.addSupply({
-      name: newSupply.name,
-      category: newSupply.category || "General",
-      quantity: parseInt(newSupply.quantity),
-      unit: newSupply.unit || "pieces",
-      minStock: parseInt(newSupply.minStock) || 0,
-      cost: parseFloat(newSupply.cost) || 0,
-    })
+    // TODO: Implement supply creation with API
+    // const supply = {
+    //   id: Date.now().toString(),
+    //   name: newSupply.name,
+    //   category: newSupply.category || "General",
+    //   quantity: parseInt(newSupply.quantity),
+    //   minStock: parseInt(newSupply.minStock) || 0,
+    // }
+    // addSupply(supply)
 
-    addSupply(supply)
     toast({
       title: "Supply Added",
       description: `${newSupply.name} has been added to inventory`,

@@ -1,4 +1,4 @@
-import type { Room } from "@infrastructure/mockData/mockData"
+import type { DashboardModel } from "@domain/models/dashboard.model"
 import { create } from "zustand"
 
 interface AddonForm {
@@ -8,14 +8,14 @@ interface AddonForm {
 }
 
 interface RoomDetailState {
-  room: Room | null
+  room: DashboardModel | null
   isCheckOutOpen: boolean
   isAddonOpen: boolean
   isReceiptOpen: boolean
   isContractOpen: boolean
   addonForm: AddonForm
 
-  setRoom: (room: Room | null) => void
+  setRoom: (room: DashboardModel | null) => void
   setIsCheckOutOpen: (isOpen: boolean) => void
   setIsAddonOpen: (isOpen: boolean) => void
   setIsReceiptOpen: (isOpen: boolean) => void

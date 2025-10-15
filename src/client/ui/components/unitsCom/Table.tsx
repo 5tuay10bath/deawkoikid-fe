@@ -11,18 +11,14 @@ const TableUnits = () => {
 
   const filteredUnits = units.filter(
     (unit) =>
-      unit.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.type.toLowerCase().includes(searchTerm.toLowerCase()),
+      unit.unitNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      unit.unitType.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   const statusConfig = {
     available: { color: "bg-green-500 text-white", label: "Available" },
     occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    maintenance: { color: "bg-orange-500 text-white", label: "Maintenance" },
-    "checkout-pending": {
-      color: "bg-muted text-white",
-      label: "Checkout Pending",
-    },
+    reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
   }
 
   return (
@@ -39,13 +35,13 @@ const TableUnits = () => {
       </TableHeader>
       <TableBody>
         {filteredUnits.map((unit) => (
-          <TableRow key={unit.id} data-cy={`unit-row-${unit.number}`}>
+          <TableRow key={unit.id} data-cy={`unit-row-${unit.unitNumber}`}>
             <TableCell className="font-medium" data-cy="unit-number">
-              {unit.number}
+              {unit.unitNumber}
             </TableCell>
             <TableCell data-cy="unit-floor">{unit.floor}</TableCell>
-            <TableCell data-cy="unit-type">{unit.type}</TableCell>
-            <TableCell data-cy="unit-size">{unit.size}</TableCell>
+            <TableCell data-cy="unit-type">{unit.unitType}</TableCell>
+            <TableCell data-cy="unit-size">{unit.unitSize} sq ft</TableCell>
             <TableCell>
               <Badge className={statusConfig[unit.status].color} data-cy={`unit-status-${unit.status}`}>
                 {statusConfig[unit.status].label}

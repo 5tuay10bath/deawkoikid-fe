@@ -35,7 +35,7 @@ export const CheckOutDialog = () => {
         </DialogHeader>
         <div className="space-y-4">
           <p>
-            Are you sure you want to check out {room?.tenant?.name} from Room {room?.number}?
+            Are you sure you want to check out {room?.user.fullName} from Room {room?.unit.unitNumber}?
           </p>
           <div className="flex gap-3">
             <Button variant="outline" onClick={() => setIsCheckOutOpen(false)}>

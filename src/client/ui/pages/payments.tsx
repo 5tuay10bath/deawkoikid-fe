@@ -8,13 +8,22 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import ReceiptDialog from "../components/paymentsCom/ReceiptDialog"
 import TablePayments from "../components/paymentsCom/Table"
+import { useEffect } from "react"
 
 export default function Payments() {
-  const { payments, searchTerm, setSearchTerm } = usePaymentStore()
+  const { payments, searchTerm, setSearchTerm, getPayments } = usePaymentStore()
 
-  const totalRevenue = payments.filter((p) => p.status === "paid").reduce((sum, p) => sum + p.amount, 0)
+  const totalRevenue = payments
+    .filter((p) => p.status.toUpperCase() === "PAID")
+    .reduce((sum, p) => sum + p.totalAmount, 0)
 
-  const pendingAmount = payments.filter((p) => p.status !== "paid").reduce((sum, p) => sum + p.amount, 0)
+  const pendingAmount = payments
+    .filter((p) => p.status.toUpperCase() !== "PAID")
+    .reduce((sum, p) => sum + p.totalAmount, 0)
+
+  useEffect(() => {
+    getPayments()
+  }, [getPayments])
 
   return (
     <div className="space-y-6">

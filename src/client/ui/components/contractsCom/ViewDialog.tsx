@@ -18,14 +18,14 @@ const ViewDialog = () => {
 
   const contractContent = selectedContract
     ? template.content
-        .replace(/\[TENANT_NAME\]/g, selectedContract.tenantName)
-        .replace(/\[UNIT_NUMBER\]/g, selectedContract.unitNumber)
+        .replace(/\[TENANT_NAME\]/g, selectedContract.user.fullName)
+        .replace(/\[UNIT_NUMBER\]/g, selectedContract.unit.unitNumber)
         .replace(/\[START_DATE\]/g, format(selectedContract.startDate, dateFormat))
         .replace(/\[END_DATE\]/g, format(selectedContract.endDate, dateFormat))
         .replace(/\[RENT_AMOUNT\]/g, selectedContract.rentAmount.toString())
         .replace(/\[SECURITY_DEPOSIT\]/g, selectedContract.rentAmount.toString())
         .replace(/\[DATE\]/g, format(new Date(), dateFormat))
-        .replace(/\[PROPERTY_ADDRESS\]/g, "123 Main Street, City, State 12345")
+        .replace(/\[PROPERTY_ADDRESS\]/g, selectedContract.unit.address)
     : ""
 
   const handleDownloadPDF = async () => {
@@ -56,7 +56,7 @@ const ViewDialog = () => {
 
       pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
 
-      const fileName = `contract_${selectedContract.tenantName.replace(/\s+/g, "_")}_${format(new Date(), "yyyyMMdd")}.pdf`
+      const fileName = `contract_${selectedContract.user.fullName.replace(/\s+/g, "_")}_${format(new Date(), "yyyyMMdd")}.pdf`
       pdf.save(fileName)
 
       toast({
@@ -76,7 +76,7 @@ const ViewDialog = () => {
     <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
       <DialogContent className="bg-white max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Lease Agreement - {selectedContract?.tenantName}</DialogTitle>
+          <DialogTitle>Lease Agreement - {selectedContract?.user.fullName}</DialogTitle>
         </DialogHeader>
         {selectedContract && (
           <div className="space-y-4">
@@ -105,7 +105,7 @@ const ViewDialog = () => {
                     <div>
                       <p className="text-sm text-gray-600 mb-2">Tenant Signature:</p>
                       <div className="border-b border-gray-400 h-10"></div>
-                      <p className="text-xs text-gray-500 mt-2">{selectedContract.tenantName}</p>
+                      <p className="text-xs text-gray-500 mt-2">{selectedContract.user.fullName}</p>
                     </div>
                   </div>
                 </div>

@@ -1,18 +1,47 @@
-import { useState } from "react"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Building, Users, DollarSign, Wrench } from "lucide-react"
-import { mockDB } from "@infrastructure/mockData/mockData"
 import { Badge } from "../components/common/Badge"
 import { RoomCard } from "../components/common/RoomCard"
 import { DashboardStatCard } from "../components/central/StatsCard"
+import { useContractStore } from "@infrastructure/libs/store/contracts.store"
+import type { DashboardModel } from "@domain/models/dashboard.model"
+
+// Helper function to transform ContractsModel to Room-like structure for display
+const transformContractToRoom = (contract: DashboardModel) => ({
+  id: contract.unit.id,
+  number: contract.unit.unitNumber,
+  floor: contract.unit.floor,
+  type: contract.unit.unitType,
+  size: contract.unit.unitSize,
+  status: contract.unit.status,
+  tenant: {
+    name: contract.user.fullName,
+    email: contract.user.email,
+    phone: contract.user.phone,
+    checkIn: contract.startDate,
+    checkOut: contract.endDate,
+    rentAmount: contract.rentAmount,
+    billingCycle: (contract.rentType === "MONTHLY" ? "monthly" : "yearly") as "monthly" | "yearly",
+    emergencyContact: contract.user.emergencyContactName || "N/A",
+  },
+})
 
 export default function Dashboard() {
-  const [rooms] = useState(() => mockDB.getRooms())
+  const { contracts, getContracts } = useContractStore()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    getContracts()
+  }, [getContracts])
+
+  // Transform contracts to room-like structure
+  const rooms = contracts.map(transformContractToRoom)
+
+  const totalRooms = rooms.length
   const occupiedRooms = rooms.filter((room) => room.status === "occupied").length
   const availableRooms = rooms.filter((room) => room.status === "available").length
-  const maintenanceRooms = rooms.filter((room) => room.status === "maintenance").length
+  const maintenanceRooms = rooms.filter((room) => room.status === "reserved").length
 
   const totalRevenue = rooms
     .filter((room) => room.tenant)
@@ -37,7 +66,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-cy="dashboard-stats">
         <DashboardStatCard
           title="Total Units"
-          value="24"
+          value={totalRooms.toString()}
           description="Across 2 floors"
           icon={Building}
           data-cy="total-units-stat"

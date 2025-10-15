@@ -7,7 +7,11 @@ export class UnitPageMapper {
     return StrictBuilder<UnitPageModel>()
       .id(unitPageEntity.id)
       .unitNumber(unitPageEntity.unitNumber)
-      .isActive(unitPageEntity.isActive)
+      .floor(unitPageEntity.floor)
+      .unitType(unitPageEntity.unitType as "A" | "B" | "C")
+      .unitSize(unitPageEntity.unitSize)
+      .address(unitPageEntity.address)
+      .status(unitPageEntity.status as "available" | "reserved" | "occupied")
       .latestAirconService(unitPageEntity.latestAirconService)
       .build()
   }

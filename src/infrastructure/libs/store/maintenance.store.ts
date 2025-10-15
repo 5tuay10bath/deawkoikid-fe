@@ -1,6 +1,5 @@
 import { create } from "zustand/react"
 
-import { mockDB, type MaintenanceTask, type Supply } from "src/infrastructure/mockData/mockData"
 import type { MaintenanceModel } from "@domain/models/maintenance.model"
 import type { SupplyModel } from "@domain/models/supply.model"
 import { GetMaintenanceFactory } from "@infrastructure/inbound/factories/getMaintenance.factory"
@@ -26,19 +25,15 @@ type NewSupply = {
 }
 
 type MaintenanceState = {
-  tasks: MaintenanceTask[]
-  supplies: Supply[]
-  maintenanceTasksTest: MaintenanceModel[]
-  suppliesTest: SupplyModel[]
+  tasks: MaintenanceModel[]
+  supplies: SupplyModel[]
   searchTerm: string
   isNewTaskOpen: boolean
   isNewSupplyOpen: boolean
   newTask: NewTask
   newSupply: NewSupply
-  setMaintenanceTasksTest: (tasks: MaintenanceModel[]) => void
-  setSuppliesTest: (supplies: SupplyModel[]) => void
-  setTasks: (tasks: MaintenanceTask[]) => void
-  setSupplies: (supplies: Supply[]) => void
+  setTasks: (tasks: MaintenanceModel[]) => void
+  setSupplies: (supplies: SupplyModel[]) => void
   setSearchTerm: (term: string) => void
   setIsNewTaskOpen: (isOpen: boolean) => void
   setIsNewSupplyOpen: (isOpen: boolean) => void
@@ -48,8 +43,8 @@ type MaintenanceState = {
   updateNewSupply: (updates: Partial<NewSupply>) => void
   resetNewTask: () => void
   resetNewSupply: () => void
-  addTask: (task: MaintenanceTask) => void
-  addSupply: (supply: Supply) => void
+  addTask: (task: MaintenanceModel) => void
+  addSupply: (supply: SupplyModel) => void
 }
 
 interface MaintenanceAction {
@@ -79,17 +74,13 @@ const initialNewSupply: NewSupply = {
 }
 
 export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
-  tasks: mockDB.getMaintenanceTasks(),
-  supplies: mockDB.getSupplies(),
-  maintenanceTasksTest: [],
-  suppliesTest: [],
+  tasks: [],
+  supplies: [],
   searchTerm: "",
   isNewTaskOpen: false,
   isNewSupplyOpen: false,
   newTask: initialNewTask,
   newSupply: initialNewSupply,
-  setMaintenanceTasksTest: (tasks) => set({ maintenanceTasksTest: tasks }),
-  setSuppliesTest: (supplies) => set({ suppliesTest: supplies }),
   setTasks: (tasks) => set({ tasks }),
   setSupplies: (supplies) => set({ supplies }),
   setSearchTerm: (term) => set({ searchTerm: term }),
@@ -108,7 +99,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
     try {
       const result = await GetMaintenanceFactory().handler({})
       if (result.isRight()) {
-        set({ maintenanceTasksTest: result.value })
+        set({ tasks: result.value })
       } else if (result.isLeft()) {
         console.error(result.value)
       }
@@ -121,7 +112,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
     try {
       const result = await GetSupplyFactory().handler({})
       if (result.isRight()) {
-        set({ suppliesTest: result.value })
+        set({ supplies: result.value })
       } else if (result.isLeft()) {
         console.error(result.value)
       }

@@ -16,7 +16,7 @@ const RoomReceiptDialog = () => {
   const receiptRef = useRef<HTMLDivElement>(null)
 
   const handleDownloadReceipt = async () => {
-    if (!receiptRef.current || !room?.tenant) return
+    if (!receiptRef.current || !room) return
 
     try {
       toast({
@@ -43,7 +43,7 @@ const RoomReceiptDialog = () => {
 
       pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
 
-      const fileName = `receipt_${room.number}_${format(new Date(), "yyyyMMdd")}.pdf`
+      const fileName = `receipt_${room.unit.unitNumber}_${format(new Date(), "yyyyMMdd")}.pdf`
       pdf.save(fileName)
 
       toast({
@@ -60,15 +60,15 @@ const RoomReceiptDialog = () => {
   }
 
   const handleSendReceipt = () => {
-    if (!room?.tenant) return
+    if (!room) return
     toast({
       title: "Receipt Sent",
-      description: `Receipt has been sent to ${room.tenant.name}`,
+      description: `Receipt has been sent to ${room.user.fullName}`,
     })
     setIsReceiptOpen(false)
   }
 
-  if (!room?.tenant) return null
+  if (!room) return null
 
   return (
     <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
@@ -88,11 +88,11 @@ const RoomReceiptDialog = () => {
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Tenant:</span>
-                <span className="font-semibold text-gray-900">{room.tenant.name}</span>
+                <span className="font-semibold text-gray-900">{room.user.fullName}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Unit:</span>
-                <span className="font-semibold text-gray-900">{room.number}</span>
+                <span className="font-semibold text-gray-900">{room.unit.unitNumber}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Payment Type:</span>
@@ -104,7 +104,7 @@ const RoomReceiptDialog = () => {
               </div>
               <div className="flex justify-between py-3 mt-4 bg-gray-50 rounded-lg px-4">
                 <span className="text-lg font-bold text-gray-900">Total Amount:</span>
-                <span className="text-2xl font-bold text-emerald-600">${room.tenant.rentAmount.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-emerald-600">${room.rentAmount.toFixed(2)}</span>
               </div>
             </div>
 

@@ -8,9 +8,14 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/common/Select"
 import TableTenants from "../components/tenantsCom/Table"
+import { useEffect } from "react"
 
 export default function Tenants() {
-  const { tenants, searchTerm, statusFilter, setSearchTerm, setStatusFilter } = useTenantStore()
+  const { tenants, searchTerm, statusFilter, setSearchTerm, setStatusFilter, getTenants } = useTenantStore()
+
+  useEffect(() => {
+    getTenants()
+  }, [getTenants])
 
   return (
     <div className="space-y-6">
@@ -33,20 +38,14 @@ export default function Tenants() {
 
         <StatsCard
           label="Active"
-          value={tenants.filter((t) => t.status === "active").length}
+          value={tenants.filter((t) => t.active).length}
           color={{ valueColor: "text-green-500" }}
         />
 
         <StatsCard
-          label="Overdue"
-          value={tenants.filter((t) => t.status === "overdue").length}
+          label="Inactive"
+          value={tenants.filter((t) => !t.active).length}
           color={{ valueColor: "text-red-500" }}
-        />
-
-        <StatsCard
-          label="Check-out Pending"
-          value={tenants.filter((t) => t.status === "checkout-pending").length}
-          color={{ valueColor: "text-blue-500" }}
         />
       </div>
 

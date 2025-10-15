@@ -1,16 +1,13 @@
 import { create } from "zustand/react"
 
-import { mockDB, type Room } from "src/infrastructure/mockData/mockData"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
 import { GetUnitPageFactory } from "@infrastructure/inbound/factories/getUnitPage.factory"
 
 type UnitState = {
-  units: Room[]
-  unitsTest: UnitPageModel[]
+  units: UnitPageModel[]
   searchTerm: string
-  setUnitsTest: (units: UnitPageModel[]) => void
   setSearchTerm: (term: string) => void
-  setUnits: (units: Room[]) => void
+  setUnits: (units: UnitPageModel[]) => void
 }
 
 interface UnitAction {
@@ -20,10 +17,8 @@ interface UnitAction {
 type UnitStore = UnitState & UnitAction
 
 export const useUnitStore = create<UnitStore>((set) => ({
-  units: mockDB.getRooms(),
+  units: [],
   searchTerm: "",
-  unitsTest: [],
-  setUnitsTest: (units) => set({ unitsTest: units }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setUnits: (units) => set({ units }),
 
@@ -31,7 +26,7 @@ export const useUnitStore = create<UnitStore>((set) => ({
     try {
       const result = await GetUnitPageFactory().handler({})
       if (result.isRight()) {
-        set({ unitsTest: result.value })
+        set({ units: result.value })
       } else if (result.isLeft()) {
         console.error(result.value)
       }

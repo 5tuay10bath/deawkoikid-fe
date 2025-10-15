@@ -1,7 +1,6 @@
 import type { IUnitPageRepository } from "@application/ports/unitPage.repository.port"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
-import type { UnitPageEntity } from "@client/entities/unitPage.entity"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
 import { UnitPageMapper } from "../port/unitPage.mapper"
 import { left, right } from "@shared/either"
@@ -21,9 +20,9 @@ export class UnitPageRepository implements IUnitPageRepository {
     try {
       const url = `/units`
 
-      const { data } = await axiosInstance.get<UnitPageEntity[]>(url)
+      const { data } = await axiosInstance.get(url)
 
-      const result: UnitPageModel[] = UnitPageMapper.toDomainArray(data)
+      const result: UnitPageModel[] = UnitPageMapper.toDomainArray(data.data)
 
       return right(result)
     } catch (error) {

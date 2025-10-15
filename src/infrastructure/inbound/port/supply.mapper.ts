@@ -9,12 +9,7 @@ export class SupplyMapper {
       .name(supplyEntity.name)
       .category(supplyEntity.category)
       .quantity(supplyEntity.quantity)
-      .unit(supplyEntity.unit)
-      .minQuantity(supplyEntity.minQuantity)
-      .supplier(supplyEntity.supplier)
-      .lastRestockDate(supplyEntity.lastRestockDate)
-      .cost(supplyEntity.cost)
-      .status(supplyEntity.status)
+      .minStock(supplyEntity.minStock)
       .build()
   }
 

@@ -47,20 +47,20 @@ This agreement is governed by local rental laws.
 Landlord Signature: ___________________ Date: ___________
 Tenant Signature: ____________________ Date: ___________`
 
-  const contractContent = room?.tenant
+  const contractContent = room
     ? defaultTemplate
-        .replace(/\[TENANT_NAME\]/g, room.tenant.name)
-        .replace(/\[UNIT_NUMBER\]/g, room.number)
-        .replace(/\[START_DATE\]/g, format(room.tenant.checkIn, dateFormat))
-        .replace(/\[END_DATE\]/g, format(room.tenant.checkOut, dateFormat))
-        .replace(/\[RENT_AMOUNT\]/g, room.tenant.rentAmount.toString())
-        .replace(/\[SECURITY_DEPOSIT\]/g, room.tenant.securityDeposit.toString())
+        .replace(/\[TENANT_NAME\]/g, room.user.fullName)
+        .replace(/\[UNIT_NUMBER\]/g, room.unit.unitNumber)
+        .replace(/\[START_DATE\]/g, format(room.startDate, dateFormat))
+        .replace(/\[END_DATE\]/g, format(room.endDate, dateFormat))
+        .replace(/\[RENT_AMOUNT\]/g, room.rentAmount.toString())
+        .replace(/\[SECURITY_DEPOSIT\]/g, "N/A")
         .replace(/\[DATE\]/g, format(new Date(), dateFormat))
         .replace(/\[PROPERTY_ADDRESS\]/g, "123 Main Street, City, State 12345")
     : ""
 
   const handleDownloadPDF = async () => {
-    if (!contractRef.current || !room?.tenant) return
+    if (!contractRef.current || !room) return
 
     try {
       toast({
@@ -87,7 +87,7 @@ Tenant Signature: ____________________ Date: ___________`
 
       pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
 
-      const fileName = `contract_${room.tenant.name.replace(/\s+/g, "_")}_${format(new Date(), "yyyyMMdd")}.pdf`
+      const fileName = `contract_${room.user.fullName.replace(/\s+/g, "_")}_${format(new Date(), "yyyyMMdd")}.pdf`
       pdf.save(fileName)
 
       toast({
@@ -103,13 +103,13 @@ Tenant Signature: ____________________ Date: ___________`
     }
   }
 
-  if (!room?.tenant) return null
+  if (!room) return null
 
   return (
     <Dialog open={isContractOpen} onOpenChange={setIsContractOpen}>
       <DialogContent className="bg-white max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Lease Agreement - {room.tenant.name}</DialogTitle>
+          <DialogTitle>Lease Agreement - {room.user.fullName}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {/* Contract Content - This will be exported as PDF */}
@@ -137,7 +137,7 @@ Tenant Signature: ____________________ Date: ___________`
                   <div>
                     <p className="text-sm text-gray-600 mb-2">Tenant Signature:</p>
                     <div className="border-b border-gray-400 h-10"></div>
-                    <p className="text-xs text-gray-500 mt-2">{room.tenant.name}</p>
+                    <p className="text-xs text-gray-500 mt-2">{room.user.fullName}</p>
                   </div>
                 </div>
               </div>

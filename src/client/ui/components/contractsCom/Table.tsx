@@ -4,22 +4,29 @@ import { Button } from "../common/Button"
 import { format } from "date-fns"
 import { Download, Eye, Edit } from "lucide-react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
-import type { Contract } from "@infrastructure/mockData/mockData"
+import type { ContractsModel } from "@domain/models/contracts.model"
 
 const ContractsTable = () => {
   const { contracts, searchTerm, setSelectedContract, setIsViewOpen } = useContractStore()
   const filteredContracts = contracts.filter(
     (contract) =>
-      contract.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) || contract.unitNumber.includes(searchTerm),
+      contract.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contract.unit.unitNumber.includes(searchTerm),
   )
 
   const statusConfig = {
-    active: { color: "bg-green-500 text-white", label: "Active" },
-    expired: { color: "bg-red-500 text-white", label: "Expired" },
-    draft: { color: "bg-yellow-500 text-white", label: "Draft" },
+    ACTIVE: { color: "bg-green-500 text-white", label: "Active" },
+    EXPIRED: { color: "bg-red-500 text-white", label: "Expired" },
+    DRAFT: { color: "bg-yellow-500 text-white", label: "Draft" },
+    SIGNED: { color: "bg-blue-500 text-white", label: "Signed" },
   }
 
-  const handleViewContract = (contract: Contract) => {
+  const getStatusConfig = (status: string) => {
+    const upperStatus = status.toUpperCase()
+    return statusConfig[upperStatus as keyof typeof statusConfig] || { color: "bg-gray-500 text-white", label: status }
+  }
+
+  const handleViewContract = (contract: ContractsModel) => {
     setSelectedContract(contract)
     setIsViewOpen(true)
   }
@@ -39,13 +46,15 @@ const ContractsTable = () => {
       <TableBody>
         {filteredContracts.map((contract) => (
           <TableRow key={contract.id}>
-            <TableCell className="font-medium">{contract.tenantName}</TableCell>
-            <TableCell>{contract.unitNumber}</TableCell>
+            <TableCell className="font-medium">{contract.user.fullName}</TableCell>
+            <TableCell>{contract.unit.unitNumber}</TableCell>
             <TableCell>{format(contract.startDate, "MMM dd, yyyy")}</TableCell>
             <TableCell>{format(contract.endDate, "MMM dd, yyyy")}</TableCell>
-            <TableCell>${contract.rentAmount}/mo</TableCell>
             <TableCell>
-              <Badge className={statusConfig[contract.status].color}>{statusConfig[contract.status].label}</Badge>
+              ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
+            </TableCell>
+            <TableCell>
+              <Badge className={getStatusConfig(contract.status).color}>{getStatusConfig(contract.status).label}</Badge>
             </TableCell>
             <TableCell>
               <div className="flex gap-1">

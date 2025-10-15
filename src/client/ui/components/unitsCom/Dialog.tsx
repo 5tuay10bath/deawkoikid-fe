@@ -1,8 +1,6 @@
 import { Plus } from "lucide-react"
 import React, { useState } from "react"
 
-import type { Room } from "src/infrastructure/mockData/mockData"
-
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Button } from "../common/Button"
@@ -15,27 +13,29 @@ const DialogUnits = () => {
   const { units, setUnits } = useUnitStore()
   const [isAddUnitOpen, setIsAddUnitOpen] = useState(false)
   const [newUnit, setNewUnit] = useState({
-    number: "",
+    unitNumber: "",
     floor: "",
-    type: "",
-    size: "",
+    unitType: "",
+    unitSize: "",
   })
   const handleAddUnit = () => {
-    if (!newUnit.number || !newUnit.floor || !newUnit.type) {
+    if (!newUnit.unitNumber || !newUnit.floor || !newUnit.unitType) {
       return
     }
 
-    const unit: Room = {
-      id: newUnit.number,
-      number: newUnit.number,
+    const unit = {
+      id: Date.now().toString(),
+      address: "",
+      unitNumber: newUnit.unitNumber,
       floor: parseInt(newUnit.floor),
-      type: newUnit.type,
-      size: newUnit.size || "400 sq ft",
-      status: "available",
+      unitType: newUnit.unitType as "A" | "B" | "C",
+      unitSize: parseInt(newUnit.unitSize) || 400,
+      status: "available" as const,
+      latestAirconService: new Date(),
     }
 
     setUnits([...units, unit])
-    setNewUnit({ number: "", floor: "", type: "", size: "" })
+    setNewUnit({ unitNumber: "", floor: "", unitType: "", unitSize: "" })
     setIsAddUnitOpen(false)
   }
   return (
@@ -55,9 +55,9 @@ const DialogUnits = () => {
             <div className="space-y-2">
               <Label>Unit Number</Label>
               <Input
-                value={newUnit.number}
+                value={newUnit.unitNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewUnit((prev) => ({ ...prev, number: e.target.value }))
+                  setNewUnit((prev) => ({ ...prev, unitNumber: e.target.value }))
                 }
                 placeholder="101"
               />
@@ -81,27 +81,28 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Unit Type</Label>
             <Select
-              value={newUnit.type}
-              onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, type: value }))}
+              value={newUnit.unitType}
+              onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, unitType: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="Studio">Studio</SelectItem>
-                <SelectItem value="1BR">1 Bedroom</SelectItem>
-                <SelectItem value="2BR">2 Bedroom</SelectItem>
+                <SelectItem value="A">Type A</SelectItem>
+                <SelectItem value="B">Type B</SelectItem>
+                <SelectItem value="C">Type C</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Size</Label>
+            <Label>Size (sq ft)</Label>
             <Input
-              value={newUnit.size}
+              value={newUnit.unitSize}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, size: e.target.value }))
+                setNewUnit((prev) => ({ ...prev, unitSize: e.target.value }))
               }
-              placeholder="400 sq ft"
+              placeholder="400"
+              type="number"
             />
           </div>
           <div className="flex gap-3">
