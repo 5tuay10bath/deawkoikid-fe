@@ -21,6 +21,16 @@ const TableUnits = () => {
     reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
   }
 
+  const getStatusConfig = (status: string) => {
+    const normalizedStatus = status.toLowerCase()
+    return (
+      statusConfig[normalizedStatus as keyof typeof statusConfig] || {
+        color: "bg-gray-500 text-white",
+        label: status,
+      }
+    )
+  }
+
   return (
     <Table data-cy="units-table">
       <TableHeader>
@@ -43,8 +53,8 @@ const TableUnits = () => {
             <TableCell data-cy="unit-type">{unit.unitType}</TableCell>
             <TableCell data-cy="unit-size">{unit.unitSize} sq ft</TableCell>
             <TableCell>
-              <Badge className={statusConfig[unit.status].color} data-cy={`unit-status-${unit.status}`}>
-                {statusConfig[unit.status].label}
+              <Badge className={getStatusConfig(unit.status).color} data-cy={`unit-status-${unit.status}`}>
+                {getStatusConfig(unit.status).label}
               </Badge>
             </TableCell>
             <TableCell>

@@ -14,7 +14,7 @@ const MaintainTable = () => {
   }
 
   const priorityConfig = {
-    LOW: { color: "bg-gray-500 text-white", label: "Low" },
+    LOW: { color: "bg-slate-500 text-white", label: "Low" },
     MEDIUM: { color: "bg-yellow-500 text-white", label: "Medium" },
     HIGH: { color: "bg-orange-500 text-white", label: "High" },
     URGENT: { color: "bg-red-500 text-white", label: "Urgent" },

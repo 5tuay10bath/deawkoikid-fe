@@ -1,7 +1,9 @@
 import type { IPaymentsRepository } from "@application/ports/payments.repository.port"
+import type { CreatePaymentDto } from "../dtos/createPayment.dto"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { PaymentsModel } from "@domain/models/payments.model"
+import type { ApiResponse } from "@domain/models/apiResponse.model"
 import { PaymentsMapper } from "../port/payments.mapper"
 import { left, right } from "@shared/either"
 
@@ -23,6 +25,25 @@ export class PaymentsRepository implements IPaymentsRepository {
       const { data } = await axiosInstance.get(url)
 
       const result: PaymentsModel[] = PaymentsMapper.toDomainArray(data.data)
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async createPayment(dto: CreatePaymentDto): Promise<IPaymentsRepository.createPayment> {
+    try {
+      const url = `/invoices`
+
+      const { data } = await axiosInstance.post(url, dto)
+
+      const result: ApiResponse = {
+        status: data.status,
+        message: data.message,
+        timestamp: data.timestamp,
+      }
 
       return right(result)
     } catch (error) {

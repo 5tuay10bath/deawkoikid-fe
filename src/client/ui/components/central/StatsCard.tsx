@@ -15,6 +15,17 @@ type StatsCardProps = {
 
 export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: StatsCardProps) {
   const { valueColor = "text-gray-900", iconColor = "text-blue-500" } = color
+
+  // Format number:
+  // - If prefix is "$" (money): show 2 decimal places
+  // - Otherwise (count): show as integer with comma separator
+  const formattedValue =
+    typeof value === "number"
+      ? prefix === "$"
+        ? value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : value.toLocaleString("en-US", { maximumFractionDigits: 0 })
+      : value
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -23,7 +34,7 @@ export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: Stat
             <p className="text-muted-foreground text-sm">{label}</p>
             <p className={`text-2xl font-bold ${valueColor}`}>
               {prefix}
-              {value}
+              {formattedValue}
             </p>
           </div>
           {Icon && <Icon className={`h-8 w-8 ${iconColor}`} />}

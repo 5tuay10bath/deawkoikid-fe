@@ -26,8 +26,8 @@ const TableTenants = () => {
   })
 
   const statusConfig = {
-    active: { color: "bg-green-400 text-white", label: "Active" },
-    inactive: { color: "bg-gray-400 text-white", label: "Inactive" },
+    active: { color: "bg-green-500 text-white", label: "Active" },
+    inactive: { color: "bg-slate-500 text-white", label: "Inactive" },
   }
 
   const getInitials = (name: string) => {
