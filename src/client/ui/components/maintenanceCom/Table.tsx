@@ -1,22 +1,38 @@
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
-import { format } from "date-fns"
 import { Badge } from "../common/Badge"
 
 const MaintainTable = () => {
   const { tasks, searchTerm } = useMaintenanceStore()
 
   const statusConfig = {
-    pending: { color: "bg-yellow-500 text-white", label: "Pending" },
-    "in-progress": { color: "bg-blue-500 text-white", label: "In Progress" },
-    completed: { color: "bg-green-500 text-white", label: "Completed" },
+    REPORTED: { color: "bg-yellow-500 text-white", label: "Reported" },
+    SCHEDULED: { color: "bg-blue-400 text-white", label: "Scheduled" },
+    IN_PROGRESS: { color: "bg-blue-500 text-white", label: "In Progress" },
+    COMPLETED: { color: "bg-green-500 text-white", label: "Completed" },
+    CANCELLED: { color: "bg-gray-500 text-white", label: "Cancelled" },
   }
 
   const priorityConfig = {
-    low: { color: "bg-gray-500 text-white", label: "Low" },
-    medium: { color: "bg-yellow-500 text-white", label: "Medium" },
-    high: { color: "bg-red-500 text-white", label: "High" },
-    urgent: { color: "bg-red-500 text-white", label: "Urgent" },
+    LOW: { color: "bg-slate-500 text-white", label: "Low" },
+    MEDIUM: { color: "bg-yellow-500 text-white", label: "Medium" },
+    HIGH: { color: "bg-orange-500 text-white", label: "High" },
+    URGENT: { color: "bg-red-500 text-white", label: "Urgent" },
+  }
+
+  const getStatusConfig = (status: string) => {
+    const upperStatus = status.toUpperCase()
+    return statusConfig[upperStatus as keyof typeof statusConfig] || { color: "bg-gray-500 text-white", label: status }
+  }
+
+  const getPriorityConfig = (priority: string) => {
+    const upperPriority = priority.toUpperCase()
+    return (
+      priorityConfig[upperPriority as keyof typeof priorityConfig] || {
+        color: "bg-gray-500 text-white",
+        label: priority,
+      }
+    )
   }
 
   const filteredTasks = tasks.filter((task) => {
@@ -25,8 +41,8 @@ const MaintainTable = () => {
     return (
       task.title.toLowerCase().includes(searchLower) ||
       task.description.toLowerCase().includes(searchLower) ||
-      task.unitNumber.toLowerCase().includes(searchLower) ||
-      task.assignedTo.toLowerCase().includes(searchLower) ||
+      task.unit.unitNumber.toLowerCase().includes(searchLower) ||
+      (task.assignedTo && task.assignedTo.fullName.toLowerCase().includes(searchLower)) ||
       task.priority.toLowerCase().includes(searchLower) ||
       task.status.toLowerCase().includes(searchLower)
     )
@@ -39,7 +55,7 @@ const MaintainTable = () => {
           <TableHead>Unit</TableHead>
           <TableHead>Priority</TableHead>
           <TableHead>Assigned To</TableHead>
-          <TableHead>Due Date</TableHead>
+          <TableHead>Reported By</TableHead>
           <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
@@ -52,14 +68,14 @@ const MaintainTable = () => {
                 <p className="text-sm text-muted-foreground">{task.description}</p>
               </div>
             </TableCell>
-            <TableCell>{task.unitNumber}</TableCell>
+            <TableCell>{task.unit.unitNumber}</TableCell>
             <TableCell>
-              <Badge className={priorityConfig[task.priority].color}>{priorityConfig[task.priority].label}</Badge>
+              <Badge className={getPriorityConfig(task.priority).color}>{getPriorityConfig(task.priority).label}</Badge>
             </TableCell>
-            <TableCell>{task.assignedTo}</TableCell>
-            <TableCell>{format(task.dueDate, "MMM dd, yyyy")}</TableCell>
+            <TableCell>{task.assignedTo ? task.assignedTo.fullName : "Unassigned"}</TableCell>
+            <TableCell>{task.reportedBy.fullName}</TableCell>
             <TableCell>
-              <Badge className={statusConfig[task.status].color}>{statusConfig[task.status].label}</Badge>
+              <Badge className={getStatusConfig(task.status).color}>{getStatusConfig(task.status).label}</Badge>
             </TableCell>
           </TableRow>
         ))}
@@ -78,7 +94,6 @@ export const SupplyTable = () => {
           <TableHead>Category</TableHead>
           <TableHead>Current Stock</TableHead>
           <TableHead>Min Stock</TableHead>
-          <TableHead>Unit Cost</TableHead>
           <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
@@ -87,13 +102,8 @@ export const SupplyTable = () => {
           <TableRow key={supply.id}>
             <TableCell className="font-medium">{supply.name}</TableCell>
             <TableCell>{supply.category}</TableCell>
-            <TableCell>
-              {supply.quantity} {supply.unit}
-            </TableCell>
-            <TableCell>
-              {supply.minStock} {supply.unit}
-            </TableCell>
-            <TableCell>${supply.cost}</TableCell>
+            <TableCell>{supply.quantity}</TableCell>
+            <TableCell>{supply.minStock}</TableCell>
             <TableCell>
               {supply.quantity <= supply.minStock ? (
                 <Badge className="bg-yellow-500 text-white">Low Stock</Badge>

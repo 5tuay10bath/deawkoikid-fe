@@ -1,4 +1,4 @@
-import { Search, Receipt, Plus, DollarSign } from "lucide-react"
+import { Search, Receipt, DollarSign } from "lucide-react"
 
 import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
 
@@ -7,14 +7,24 @@ import { StatsCard } from "../components/central/StatsCard"
 import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import ReceiptDialog from "../components/paymentsCom/ReceiptDialog"
+import DialogPayments from "../components/paymentsCom/Dialog"
 import TablePayments from "../components/paymentsCom/Table"
+import { useEffect } from "react"
 
 export default function Payments() {
-  const { payments, searchTerm, setSearchTerm } = usePaymentStore()
+  const { payments, searchTerm, setSearchTerm, getPayments } = usePaymentStore()
 
-  const totalRevenue = payments.filter((p) => p.status === "paid").reduce((sum, p) => sum + p.amount, 0)
+  const totalRevenue = payments
+    .filter((p) => p.status.toUpperCase() === "PAID")
+    .reduce((sum, p) => sum + p.totalAmount, 0)
 
-  const pendingAmount = payments.filter((p) => p.status !== "paid").reduce((sum, p) => sum + p.amount, 0)
+  const pendingAmount = payments
+    .filter((p) => p.status.toUpperCase() !== "PAID")
+    .reduce((sum, p) => sum + p.totalAmount, 0)
+
+  useEffect(() => {
+    getPayments()
+  }, [getPayments])
 
   return (
     <div className="space-y-6">
@@ -26,10 +36,7 @@ export default function Payments() {
 
         <div className="flex gap-2">
           <Button variant="outline">Export Reports</Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Record Payment
-          </Button>
+          <DialogPayments />
         </div>
       </div>
 

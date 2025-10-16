@@ -6,12 +6,23 @@ export class DashboardMapper {
   static toDomain(dashboardEntity: DashboardEntity): DashboardModel {
     return StrictBuilder<DashboardModel>()
       .id(dashboardEntity.id)
-      .totalUnits(dashboardEntity.totalUnits)
-      .occupiedUnits(dashboardEntity.occupiedUnits)
-      .availableUnits(dashboardEntity.availableUnits)
-      .totalRevenue(dashboardEntity.totalRevenue)
-      .pendingMaintenance(dashboardEntity.pendingMaintenance)
-      .overduePayments(dashboardEntity.overduePayments)
+      .address(dashboardEntity.address)
+      .unitNumber(dashboardEntity.unitNumber)
+      .unitType(dashboardEntity.unitType)
+      .unitSize(dashboardEntity.unitSize)
+      .unitStatus(dashboardEntity.unitStatus)
+      .floor(dashboardEntity.floor)
+      .latestAirconService(dashboardEntity.latestAirconService)
+      .contract(dashboardEntity.contract)
       .build()
+  }
+
+  static toDomainArray(dashboardEntities: DashboardEntity[]): DashboardModel[] {
+    if (!Array.isArray(dashboardEntities)) {
+      console.error("Expected array but received:", typeof dashboardEntities)
+      return []
+    }
+
+    return dashboardEntities.map((entity) => this.toDomain(entity))
   }
 }

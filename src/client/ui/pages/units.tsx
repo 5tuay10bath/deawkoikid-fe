@@ -9,11 +9,10 @@ import TableUnits from "../components/unitsCom/Table"
 import { useEffect } from "react"
 
 export default function Units() {
-  const { searchTerm, unitsTest, setSearchTerm, getUnits } = useUnitStore()
-  console.log("unitsTest", unitsTest)
+  const { searchTerm, setSearchTerm, getUnits } = useUnitStore()
   useEffect(() => {
     getUnits()
-  }, [])
+  }, [getUnits])
 
   return (
     <div className="space-y-6">

@@ -1,29 +1,27 @@
 import { create } from "zustand/react"
 
-import { mockDB, type Room } from "src/infrastructure/mockData/mockData"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
+import type { CreateUnitDto } from "@infrastructure/inbound/dtos/createUnit.dto"
 import { GetUnitPageFactory } from "@infrastructure/inbound/factories/getUnitPage.factory"
+import { CreateUnitFactory } from "@infrastructure/inbound/factories/createUnit.factory"
 
 type UnitState = {
-  units: Room[]
-  unitsTest: UnitPageModel[]
+  units: UnitPageModel[]
   searchTerm: string
-  setUnitsTest: (units: UnitPageModel[]) => void
   setSearchTerm: (term: string) => void
-  setUnits: (units: Room[]) => void
+  setUnits: (units: UnitPageModel[]) => void
 }
 
 interface UnitAction {
   getUnits: () => Promise<void>
+  createUnit: (dto: CreateUnitDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type UnitStore = UnitState & UnitAction
 
-export const useUnitStore = create<UnitStore>((set) => ({
-  units: mockDB.getRooms(),
+export const useUnitStore = create<UnitStore>((set, get) => ({
+  units: [],
   searchTerm: "",
-  unitsTest: [],
-  setUnitsTest: (units) => set({ unitsTest: units }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setUnits: (units) => set({ units }),
 
@@ -31,12 +29,30 @@ export const useUnitStore = create<UnitStore>((set) => ({
     try {
       const result = await GetUnitPageFactory().handler({})
       if (result.isRight()) {
-        set({ unitsTest: result.value })
+        set({ units: result.value })
       } else if (result.isLeft()) {
         console.error(result.value)
       }
     } catch (error) {
       console.error(error)
+    }
+  },
+
+  createUnit: async (dto: CreateUnitDto) => {
+    try {
+      const result = await CreateUnitFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh the units list after creating
+        await get().getUnits()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        console.error(result.value)
+        return { success: false, message: "Failed to create unit" }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

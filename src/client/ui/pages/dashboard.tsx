@@ -1,25 +1,59 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Building, Users, DollarSign, Wrench } from "lucide-react"
-import { mockDB } from "@infrastructure/mockData/mockData"
+import { Building, Users, DollarSign } from "lucide-react"
 import { Badge } from "../components/common/Badge"
 import { RoomCard } from "../components/common/RoomCard"
 import { DashboardStatCard } from "../components/central/StatsCard"
+import { CheckInDialog } from "../components/common/CheckInDialog"
+import type { DashboardModel } from "@domain/models/dashboard.model"
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
+
+const transformContractToRoom = (unit: DashboardModel) => ({
+  id: unit.id,
+  number: unit.unitNumber,
+  floor: unit.floor,
+  type: unit.unitType,
+  size: unit.unitSize,
+  status: unit.unitStatus.toLowerCase() as "available" | "occupied" | "reserved",
+  tenant: unit.contract
+    ? {
+        name: unit.contract.user.fullName,
+        email: unit.contract.user.email,
+        phone: unit.contract.user.phone,
+        checkIn: new Date(unit.contract.startDate),
+        checkOut: new Date(unit.contract.endDate),
+        rentAmount: unit.contract.rentAmount,
+        billingCycle: (unit.contract.rentType === "MONTHLY" ? "monthly" : "yearly") as "monthly" | "yearly",
+        emergencyContact: unit.contract.user.emergencyContactName || "N/A",
+      }
+    : undefined,
+})
 
 export default function Dashboard() {
-  const [rooms] = useState(() => mockDB.getRooms())
+  const { dashboard, getDashboard } = useDashboardStore()
   const navigate = useNavigate()
+  const [isCheckInOpen, setIsCheckInOpen] = useState(false)
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
 
+  useEffect(() => {
+    getDashboard()
+  }, [getDashboard])
+
+  const rooms = dashboard.map(transformContractToRoom)
+  const selectedUnit = dashboard.find((unit) => unit.id === selectedRoomId)
+
+  const totalRooms = rooms.length
   const occupiedRooms = rooms.filter((room) => room.status === "occupied").length
   const availableRooms = rooms.filter((room) => room.status === "available").length
-  const maintenanceRooms = rooms.filter((room) => room.status === "maintenance").length
+  const reservedRooms = rooms.filter((room) => room.status === "reserved").length
 
   const totalRevenue = rooms
     .filter((room) => room.tenant)
     .reduce((sum, room) => sum + (room.tenant?.rentAmount || 0), 0)
 
   const handleCheckIn = (roomId: string) => {
-    navigate(`/check-in/${roomId}`)
+    setSelectedRoomId(roomId)
+    setIsCheckInOpen(true)
   }
 
   const handleViewDetails = (roomId: string) => {
@@ -37,7 +71,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-cy="dashboard-stats">
         <DashboardStatCard
           title="Total Units"
-          value="24"
+          value={totalRooms.toString()}
           description="Across 2 floors"
           icon={Building}
           data-cy="total-units-stat"
@@ -62,10 +96,9 @@ export default function Dashboard() {
         />
 
         <DashboardStatCard
-          title="Maintenance"
-          value={maintenanceRooms}
-          description="Units under maintenance"
-          icon={Wrench}
+          title="Reserved"
+          value={reservedRooms}
+          description="Units under reservation"
           valueColor="text-orange-500"
           data-cy="maintenance-stat"
         />
@@ -90,6 +123,9 @@ export default function Dashboard() {
           </div>
         </div>
       ))}
+
+      {/* Check-in Dialog */}
+      <CheckInDialog isOpen={isCheckInOpen} onClose={() => setIsCheckInOpen(false)} unit={selectedUnit} />
     </div>
   )
 }

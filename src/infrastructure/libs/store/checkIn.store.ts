@@ -14,10 +14,8 @@ interface CheckInFormData {
 }
 
 interface CheckInState {
-  // Data
   formData: CheckInFormData
 
-  // Actions
   updateFormData: (updates: Partial<CheckInFormData>) => void
   resetFormData: () => void
   setFormField: (field: keyof CheckInFormData, value: string | Date) => void
