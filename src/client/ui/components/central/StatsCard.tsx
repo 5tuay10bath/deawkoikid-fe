@@ -16,9 +16,6 @@ type StatsCardProps = {
 export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: StatsCardProps) {
   const { valueColor = "text-gray-900", iconColor = "text-blue-500" } = color
 
-  // Format number:
-  // - If prefix is "$" (money): show 2 decimal places
-  // - Otherwise (count): show as integer with comma separator
   const formattedValue =
     typeof value === "number"
       ? prefix === "$"
@@ -48,7 +45,7 @@ interface DashboardStatCardProps {
   title: string
   value: string | number
   description: string
-  icon: LucideIcon
+  icon?: LucideIcon
   valueColor?: string
   iconColor?: string
   "data-cy"?: string
@@ -67,7 +64,7 @@ export function DashboardStatCard({
     <Card data-cy={dataCy}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className={`h-4 w-4 ${iconColor}`} />
+        {Icon && <Icon className={`h-4 w-4 ${iconColor}`} />}
       </CardHeader>
       <CardContent>
         <div className={`text-2xl font-bold ${valueColor}`}>{value}</div>

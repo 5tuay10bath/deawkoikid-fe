@@ -20,15 +20,11 @@ export class DashboardRepository implements IDashboardRepository {
     const {} = dto
 
     try {
-      const url = `/contracts`
+      const url = `/dashboard`
 
       const { data } = await axiosInstance.get(url)
 
-      console.log("data:", data)
-
-      const result: DashboardModel = DashboardMapper.toDomain(data.data)
-
-      console.log("result:", result)
+      const result: DashboardModel[] = DashboardMapper.toDomainArray(data.data)
 
       return right(result)
     } catch (error) {
@@ -39,9 +35,9 @@ export class DashboardRepository implements IDashboardRepository {
 
   async checkIn(dto: CheckInDto): Promise<IDashboardRepository.checkIn> {
     try {
-      const url = `/contracts`
+      const url = `/dashboard/${dto.id}`
 
-      const { data } = await axiosInstance.post(url, dto)
+      const { data } = await axiosInstance.put(url)
 
       const result: ApiResponse = {
         status: data.status,

@@ -1,7 +1,9 @@
 import { create } from "zustand/react"
 
 import type { ContractsModel } from "@domain/models/contracts.model"
+import type { CreateContractDto } from "@infrastructure/inbound/dtos/createContract.dto"
 import { GetContractsFactory } from "@infrastructure/inbound/factories/getContracts.factory"
+import { CreateContractFactory } from "@infrastructure/inbound/factories/createContract.factory"
 
 type ContractTemplate = {
   name: string
@@ -26,6 +28,7 @@ type ContractState = {
 
 interface ContractAction {
   getContracts: () => Promise<void>
+  createContract: (dto: CreateContractDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type ContractStore = ContractState & ContractAction
@@ -82,11 +85,24 @@ Tenant Signature: ____________________ Date: ___________`,
       const result = await GetContractsFactory().handler({})
       if (result.isRight()) {
         set({ contracts: result.value })
-      } else if (result.isLeft()) {
-        console.error(result.value)
       }
-    } catch (error) {
-      console.error(error)
+    } catch {
+      // Error handling
+    }
+  },
+
+  createContract: async (dto: CreateContractDto) => {
+    try {
+      const result = await CreateContractFactory().handler(dto)
+      if (result.isRight()) {
+        await get().getContracts()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        return { success: false, message: "Failed to create contract" }
+      }
+      return { success: false }
+    } catch {
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

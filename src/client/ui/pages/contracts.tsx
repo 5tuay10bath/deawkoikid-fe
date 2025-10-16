@@ -1,12 +1,12 @@
-import { FileText, Plus, Search } from "lucide-react"
+import { FileText, Search } from "lucide-react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
-import { Button } from "../components/common/Button"
 import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { StatsCard } from "../components/central/StatsCard"
 import ContractsTable from "../components/contractsCom/Table"
 import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
+import DialogContracts from "../components/contractsCom/Dialog"
 import { useEffect } from "react"
 
 export default function Contracts() {
@@ -27,10 +27,7 @@ export default function Contracts() {
         <div className="flex gap-2">
           <EditTemplateDialog />
 
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Contract
-          </Button>
+          <DialogContracts />
         </div>
       </div>
 
@@ -47,12 +44,12 @@ export default function Contracts() {
         />
 
         <StatsCard
-          label="Expiring Soon"
-          value={2}
+          label="Signed Contracts"
+          value={contracts.filter((c) => c.status === "SIGNED").length}
           icon={FileText}
           color={{
-            valueColor: "text-amber-500",
-            iconColor: "text-amber-500",
+            valueColor: "text-blue-500",
+            iconColor: "text-blue-500",
           }}
         />
 
@@ -61,8 +58,8 @@ export default function Contracts() {
           value={contracts.filter((c) => c.status === "DRAFT").length}
           icon={FileText}
           color={{
-            valueColor: "text-blue-500",
-            iconColor: "text-blue-500",
+            valueColor: "text-amber-500",
+            iconColor: "text-amber-500",
           }}
         />
       </div>

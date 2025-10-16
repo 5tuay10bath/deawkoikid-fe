@@ -5,6 +5,7 @@ export interface TenantsPageModel {
   email: string
   identificationNumber: string
   profileImageUrl: string | null
+  role: "USER" | "TENANT" | "ADMIN" | "STAFF"
   birthDate: string
   active: boolean
   emergencyContactName: string | null

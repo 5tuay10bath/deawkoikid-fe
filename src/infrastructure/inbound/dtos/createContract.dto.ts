@@ -1,6 +1,6 @@
 export interface CreateContractDto {
-  userId: string
   unitId: string
+  email: string
   rentType: "MONTHLY" | "YEARLY"
   rentAmount: number
   waterBillingType: "PER_UNIT" | "FLAT_RATE" | "TIERED"

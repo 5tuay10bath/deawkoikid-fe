@@ -1,7 +1,9 @@
 import { create } from "zustand/react"
 
 import type { UnitPageModel } from "@domain/models/unitPage.model"
+import type { CreateUnitDto } from "@infrastructure/inbound/dtos/createUnit.dto"
 import { GetUnitPageFactory } from "@infrastructure/inbound/factories/getUnitPage.factory"
+import { CreateUnitFactory } from "@infrastructure/inbound/factories/createUnit.factory"
 
 type UnitState = {
   units: UnitPageModel[]
@@ -12,11 +14,12 @@ type UnitState = {
 
 interface UnitAction {
   getUnits: () => Promise<void>
+  createUnit: (dto: CreateUnitDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type UnitStore = UnitState & UnitAction
 
-export const useUnitStore = create<UnitStore>((set) => ({
+export const useUnitStore = create<UnitStore>((set, get) => ({
   units: [],
   searchTerm: "",
   setSearchTerm: (term) => set({ searchTerm: term }),
@@ -32,6 +35,24 @@ export const useUnitStore = create<UnitStore>((set) => ({
       }
     } catch (error) {
       console.error(error)
+    }
+  },
+
+  createUnit: async (dto: CreateUnitDto) => {
+    try {
+      const result = await CreateUnitFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh the units list after creating
+        await get().getUnits()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        console.error(result.value)
+        return { success: false, message: "Failed to create unit" }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

@@ -7,5 +7,5 @@ export interface IGetDashboardUsecase {
 }
 
 export namespace IGetDashboardUsecase {
-  export type output = Promise<Either<any, DashboardModel>>
+  export type output = Promise<Either<any, DashboardModel[]>>
 }

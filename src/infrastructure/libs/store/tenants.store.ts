@@ -1,7 +1,9 @@
 import { create } from "zustand/react"
 
 import type { TenantsPageModel } from "@domain/models/tenantsPage.model"
+import type { CreateTenantDto } from "@infrastructure/inbound/dtos/createTenant.dto"
 import { GetTenantsPageFactory } from "@infrastructure/inbound/factories/getTenantsPage.factory"
+import { CreateTenantFactory } from "@infrastructure/inbound/factories/createTenant.factory"
 
 type TenantState = {
   tenants: TenantsPageModel[]
@@ -14,11 +16,12 @@ type TenantState = {
 
 interface TenantAction {
   getTenants: () => Promise<void>
+  createTenant: (dto: CreateTenantDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type TenantStore = TenantState & TenantAction
 
-export const useTenantStore = create<TenantStore>((set) => ({
+export const useTenantStore = create<TenantStore>((set, get) => ({
   tenants: [],
   searchTerm: "",
   statusFilter: "all",
@@ -36,6 +39,24 @@ export const useTenantStore = create<TenantStore>((set) => ({
       }
     } catch (error) {
       console.error(error)
+    }
+  },
+
+  createTenant: async (dto: CreateTenantDto) => {
+    try {
+      const result = await CreateTenantFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh the tenants list after creating
+        await get().getTenants()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        console.error(result.value)
+        return { success: false, message: "Failed to create tenant" }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

@@ -8,6 +8,7 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/common/Select"
 import TableTenants from "../components/tenantsCom/Table"
+import DialogTenants from "../components/tenantsCom/Dialog"
 import { useEffect } from "react"
 
 export default function Tenants() {
@@ -29,7 +30,7 @@ export default function Tenants() {
           <Button variant="outline" data-cy="export-tenants">
             Export Data
           </Button>
-          <Button data-cy="add-tenant">Add Tenant</Button>
+          <DialogTenants />
         </div>
       </div>
 

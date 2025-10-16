@@ -4,13 +4,19 @@ import { useRef } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
+import type { DashboardModel } from "@domain/models/dashboard.model"
+
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
-import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
 import { useToast } from "../hooks/useToast"
 
-const RoomContractDialog = () => {
-  const { isContractOpen, setIsContractOpen, room } = useRoomDetailStore()
+interface RoomContractDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  unit: DashboardModel | undefined
+}
+
+const RoomContractDialog = ({ isOpen, onClose, unit }: RoomContractDialogProps) => {
   const { toast } = useToast()
   const contractRef = useRef<HTMLDivElement>(null)
 
@@ -47,20 +53,20 @@ This agreement is governed by local rental laws.
 Landlord Signature: ___________________ Date: ___________
 Tenant Signature: ____________________ Date: ___________`
 
-  const contractContent = room
+  const contractContent = unit
     ? defaultTemplate
-        .replace(/\[TENANT_NAME\]/g, room.user.fullName)
-        .replace(/\[UNIT_NUMBER\]/g, room.unit.unitNumber)
-        .replace(/\[START_DATE\]/g, format(room.startDate, dateFormat))
-        .replace(/\[END_DATE\]/g, format(room.endDate, dateFormat))
-        .replace(/\[RENT_AMOUNT\]/g, room.rentAmount.toString())
+        .replace(/\[TENANT_NAME\]/g, unit.contract?.user.fullName || "N/A")
+        .replace(/\[UNIT_NUMBER\]/g, unit.unitNumber)
+        .replace(/\[START_DATE\]/g, unit.contract ? format(new Date(unit.contract.startDate), dateFormat) : "N/A")
+        .replace(/\[END_DATE\]/g, unit.contract ? format(new Date(unit.contract.endDate), dateFormat) : "N/A")
+        .replace(/\[RENT_AMOUNT\]/g, unit.contract?.rentAmount.toString() || "0")
         .replace(/\[SECURITY_DEPOSIT\]/g, "N/A")
         .replace(/\[DATE\]/g, format(new Date(), dateFormat))
-        .replace(/\[PROPERTY_ADDRESS\]/g, "123 Main Street, City, State 12345")
+        .replace(/\[PROPERTY_ADDRESS\]/g, unit.address || "N/A")
     : ""
 
   const handleDownloadPDF = async () => {
-    if (!contractRef.current || !room) return
+    if (!contractRef.current || !unit) return
 
     try {
       toast({
@@ -87,7 +93,8 @@ Tenant Signature: ____________________ Date: ___________`
 
       pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
 
-      const fileName = `contract_${room.user.fullName.replace(/\s+/g, "_")}_${format(new Date(), "yyyyMMdd")}.pdf`
+      const tenantName = unit.contract?.user.fullName.replace(/\s+/g, "_") || "tenant"
+      const fileName = `contract_${tenantName}_${format(new Date(), "yyyyMMdd")}.pdf`
       pdf.save(fileName)
 
       toast({
@@ -103,13 +110,13 @@ Tenant Signature: ____________________ Date: ___________`
     }
   }
 
-  if (!room) return null
+  if (!unit) return null
 
   return (
-    <Dialog open={isContractOpen} onOpenChange={setIsContractOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Lease Agreement - {room.user.fullName}</DialogTitle>
+          <DialogTitle>Lease Agreement - {unit.contract?.user.fullName || "N/A"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {/* Contract Content - This will be exported as PDF */}
@@ -137,7 +144,7 @@ Tenant Signature: ____________________ Date: ___________`
                   <div>
                     <p className="text-sm text-gray-600 mb-2">Tenant Signature:</p>
                     <div className="border-b border-gray-400 h-10"></div>
-                    <p className="text-xs text-gray-500 mt-2">{room.user.fullName}</p>
+                    <p className="text-xs text-gray-500 mt-2">{unit.contract?.user.fullName || "N/A"}</p>
                   </div>
                 </div>
               </div>
@@ -145,13 +152,13 @@ Tenant Signature: ____________________ Date: ___________`
               {/* Footer */}
               <div className="text-center text-xs text-gray-400 border-t pt-4 mt-6">
                 <p>Generated on {format(new Date(), "MMMM dd, yyyy 'at' HH:mm")}</p>
-                <p className="mt-1">Contract ID: {room.id}</p>
+                <p className="mt-1">Contract ID: {unit.id}</p>
               </div>
             </div>
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsContractOpen(false)}>
+            <Button variant="outline" onClick={onClose}>
               Close
             </Button>
             <Button variant="outline" onClick={handleDownloadPDF}>

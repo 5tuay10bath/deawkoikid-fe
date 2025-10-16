@@ -13,6 +13,7 @@ export class TenantsPageMapper {
       .profileImageUrl(tenantsPageEntity.profileImageUrl)
       .birthDate(tenantsPageEntity.birthDate)
       .active(tenantsPageEntity.active)
+      .role(tenantsPageEntity.role)
       .emergencyContactName(tenantsPageEntity.emergencyContactName)
       .emergencyContactPhone(tenantsPageEntity.emergencyContactPhone)
       .build()

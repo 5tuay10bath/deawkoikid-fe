@@ -88,13 +88,11 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
           )}
 
           <div className="pt-2">
-            {room.status === "available" && (
+            {room.status === "reserved" ? (
               <Button size="sm" className="w-full" onClick={() => onCheckIn?.(room.id)} data-cy="check-in-button">
                 Check In
               </Button>
-            )}
-
-            {room.status !== "available" && (
+            ) : (
               <Button
                 size="sm"
                 variant="outline"

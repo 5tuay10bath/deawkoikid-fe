@@ -2,8 +2,12 @@ import { create } from "zustand/react"
 
 import type { MaintenanceModel } from "@domain/models/maintenance.model"
 import type { SupplyModel } from "@domain/models/supply.model"
+import type { CreateMaintenanceDto } from "@infrastructure/inbound/dtos/createMaintenance.dto"
+import type { CreateSupplyDto } from "@infrastructure/inbound/dtos/createSupply.dto"
 import { GetMaintenanceFactory } from "@infrastructure/inbound/factories/getMaintenance.factory"
 import { GetSupplyFactory } from "@infrastructure/inbound/factories/getSupply.factory"
+import { CreateMaintenanceFactory } from "@infrastructure/inbound/factories/createMaintenance.factory"
+import { CreateSupplyFactory } from "@infrastructure/inbound/factories/createSupply.factory"
 
 type NewTask = {
   title: string
@@ -50,6 +54,8 @@ type MaintenanceState = {
 interface MaintenanceAction {
   getMaintenanceTasks: () => Promise<void>
   getSupplies: () => Promise<void>
+  createMaintenance: (dto: CreateMaintenanceDto) => Promise<{ success: boolean; message?: string }>
+  createSupply: (dto: CreateSupplyDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type MaintenanceStore = MaintenanceState & MaintenanceAction
@@ -118,6 +124,42 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
       }
     } catch (error) {
       console.error(error)
+    }
+  },
+
+  createMaintenance: async (dto: CreateMaintenanceDto) => {
+    try {
+      const result = await CreateMaintenanceFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh the maintenance tasks list after creating
+        await get().getMaintenanceTasks()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        console.error(result.value)
+        return { success: false, message: "Failed to create maintenance task" }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      return { success: false, message: "An error occurred" }
+    }
+  },
+
+  createSupply: async (dto: CreateSupplyDto) => {
+    try {
+      const result = await CreateSupplyFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh the supplies list after creating
+        await get().getSupplies()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        console.error(result.value)
+        return { success: false, message: "Failed to create supply" }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

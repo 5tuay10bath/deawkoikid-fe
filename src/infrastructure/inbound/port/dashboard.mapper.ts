@@ -6,15 +6,14 @@ export class DashboardMapper {
   static toDomain(dashboardEntity: DashboardEntity): DashboardModel {
     return StrictBuilder<DashboardModel>()
       .id(dashboardEntity.id)
-      .user(dashboardEntity.user)
-      .unit(dashboardEntity.unit)
-      .rentType(dashboardEntity.rentType as "MONTHLY" | "YEARLY")
-      .rentAmount(dashboardEntity.rentAmount)
-      .waterBillingType(dashboardEntity.waterBillingType as "PER_UNIT" | "FLAT_RATE" | "TIERED")
-      .internet(dashboardEntity.internet)
-      .startDate(dashboardEntity.startDate)
-      .endDate(dashboardEntity.endDate)
-      .status(dashboardEntity.status as "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED")
+      .address(dashboardEntity.address)
+      .unitNumber(dashboardEntity.unitNumber)
+      .unitType(dashboardEntity.unitType)
+      .unitSize(dashboardEntity.unitSize)
+      .unitStatus(dashboardEntity.unitStatus)
+      .floor(dashboardEntity.floor)
+      .latestAirconService(dashboardEntity.latestAirconService)
+      .contract(dashboardEntity.contract)
       .build()
   }
 

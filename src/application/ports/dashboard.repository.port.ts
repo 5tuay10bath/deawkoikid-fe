@@ -12,6 +12,6 @@ export interface IDashboardRepository {
 }
 
 export namespace IDashboardRepository {
-  export type getDashboard = Promise<Either<any, DashboardModel>>
+  export type getDashboard = Promise<Either<any, DashboardModel[]>>
   export type checkIn = Promise<Either<any, ApiResponse>>
 }

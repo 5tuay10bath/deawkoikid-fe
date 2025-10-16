@@ -4,19 +4,24 @@ import { useRef } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
-import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
+import type { DashboardModel } from "@domain/models/dashboard.model"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
 import { useToast } from "../hooks/useToast"
 
-const RoomReceiptDialog = () => {
-  const { isReceiptOpen, setIsReceiptOpen, room } = useRoomDetailStore()
+interface RoomReceiptDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  unit: DashboardModel | undefined
+}
+
+const RoomReceiptDialog = ({ isOpen, onClose, unit }: RoomReceiptDialogProps) => {
   const { toast } = useToast()
   const receiptRef = useRef<HTMLDivElement>(null)
 
   const handleDownloadReceipt = async () => {
-    if (!receiptRef.current || !room) return
+    if (!receiptRef.current || !unit) return
 
     try {
       toast({
@@ -43,7 +48,7 @@ const RoomReceiptDialog = () => {
 
       pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
 
-      const fileName = `receipt_${room.unit.unitNumber}_${format(new Date(), "yyyyMMdd")}.pdf`
+      const fileName = `receipt_${unit.unitNumber}_${format(new Date(), "yyyyMMdd")}.pdf`
       pdf.save(fileName)
 
       toast({
@@ -60,18 +65,18 @@ const RoomReceiptDialog = () => {
   }
 
   const handleSendReceipt = () => {
-    if (!room) return
+    if (!unit) return
     toast({
       title: "Receipt Sent",
-      description: `Receipt has been sent to ${room.user.fullName}`,
+      description: `Receipt has been sent to ${unit.contract?.user.fullName || "tenant"}`,
     })
-    setIsReceiptOpen(false)
+    onClose()
   }
 
-  if (!room) return null
+  if (!unit) return null
 
   return (
-    <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-white">
         <DialogHeader>
           <DialogTitle>Generate Receipt</DialogTitle>
@@ -82,17 +87,17 @@ const RoomReceiptDialog = () => {
             <div className="mb-6 text-center border-b pb-4">
               <h3 className="text-2xl font-bold text-gray-900">Property Manager</h3>
               <p className="text-gray-500 text-sm mt-1">Payment Receipt</p>
-              <p className="text-gray-400 text-xs mt-2">Receipt #{room.id}</p>
+              <p className="text-gray-400 text-xs mt-2">Receipt #{unit.id}</p>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Tenant:</span>
-                <span className="font-semibold text-gray-900">{room.user.fullName}</span>
+                <span className="font-semibold text-gray-900">{unit.contract?.user.fullName || "N/A"}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Unit:</span>
-                <span className="font-semibold text-gray-900">{room.unit.unitNumber}</span>
+                <span className="font-semibold text-gray-900">{unit.unitNumber}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600 font-medium">Payment Type:</span>
@@ -104,7 +109,9 @@ const RoomReceiptDialog = () => {
               </div>
               <div className="flex justify-between py-3 mt-4 bg-gray-50 rounded-lg px-4">
                 <span className="text-lg font-bold text-gray-900">Total Amount:</span>
-                <span className="text-2xl font-bold text-emerald-600">${room.rentAmount.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-emerald-600">
+                  ${unit.contract?.rentAmount?.toFixed(2) || "0.00"}
+                </span>
               </div>
             </div>
 
@@ -117,7 +124,7 @@ const RoomReceiptDialog = () => {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsReceiptOpen(false)}>
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button variant="outline" onClick={handleDownloadReceipt}>
