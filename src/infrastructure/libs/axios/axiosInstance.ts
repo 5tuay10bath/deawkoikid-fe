@@ -8,7 +8,6 @@ const axiosInstance = axios.create({
 })
 
 axiosInstance.interceptors.request.use(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (config: AxiosRequestConfig): Promise<any> => {
     const newConfig = cloneDeep(config)
 
