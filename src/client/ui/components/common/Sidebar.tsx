@@ -31,7 +31,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onToggle, childre
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-gray-50 p-4 transition-transform md:hidden",
+          "fixed left-0 top-0 z-40 h-full border-r border-gray-200 bg-gray-50 p-4 transition-transform md:hidden",
           "w-1/2",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}

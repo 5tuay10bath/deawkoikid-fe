@@ -8,12 +8,17 @@ import { Badge } from "../components/common/Badge"
 import { mockDB } from "@infrastructure/mockData/mockData"
 import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
 import { AddBillingDialog, CheckOutDialog } from "../components/roomDetailCom/Dialog"
+import RoomReceiptDialog from "../components/roomDetailCom/ReceiptDialog"
+import RoomContractDialog from "../components/roomDetailCom/ContractDialog"
 
 export default function RoomDetails() {
   const { roomId } = useParams()
   const navigate = useNavigate()
 
-  const { room, setRoom } = useRoomDetailStore()
+  const { room, setRoom, setIsReceiptOpen, setIsContractOpen } = useRoomDetailStore()
+
+  const BACK_TO_DASHBOARD = "flex items-center gap-2"
+  const DASHBOARD_PATH = "/dashboard"
 
   useEffect(() => {
     if (roomId) {
@@ -37,7 +42,7 @@ export default function RoomDetails() {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(DASHBOARD_PATH)} className={BACK_TO_DASHBOARD}>
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Button>
@@ -54,7 +59,7 @@ export default function RoomDetails() {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(DASHBOARD_PATH)} className={BACK_TO_DASHBOARD}>
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Button>
@@ -70,7 +75,7 @@ export default function RoomDetails() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate(DASHBOARD_PATH)} className={BACK_TO_DASHBOARD}>
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Button>
@@ -182,17 +187,21 @@ export default function RoomDetails() {
 
               <AddBillingDialog />
 
-              <Button variant="outline" className="w-full" onClick={() => navigate("/payments")}>
+              <Button variant="outline" className="w-full" onClick={() => setIsReceiptOpen(true)}>
                 Generate Receipt
               </Button>
 
-              <Button variant="outline" className="w-full" onClick={() => navigate("/contracts")}>
+              <Button variant="outline" className="w-full" onClick={() => setIsContractOpen(true)}>
                 View Contract
               </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <RoomReceiptDialog />
+      <RoomContractDialog />
     </div>
   )
 }
