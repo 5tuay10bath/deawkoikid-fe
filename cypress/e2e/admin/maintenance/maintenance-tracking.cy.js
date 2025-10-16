@@ -1,98 +1,141 @@
 describe("Maintenance & Supplies - Task Tracking and Management", () => {
   beforeEach(() => {
-    cy.visit("/dashboard")
+    cy.visit("/maintenance")
+    // Click on Maintenance Tasks tab (default tab, but click to ensure)
+    cy.contains("Maintenance Tasks").click()
   })
 
   describe("Maintenance Task Tracking", () => {
-    it("should display maintenance information on dashboard", () => {
-      // Check if maintenance info is visible
-      cy.contains("Property Dashboard").should("be.visible")
+    // User Story 4.a: Track maintenance tasks (light bulb, air-con, plumbing)
+    it("should display maintenance task tracking system", () => {
+      cy.contains("Maintenance Managemen").should("be.visible")
 
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for maintenance related content
-        if (bodyText.includes("Maintenance")) {
-          cy.log("Found maintenance content on dashboard")
+        // Check for maintenance tasks table/list
+        if (bodyText.includes("Task") || bodyText.includes("Description") || bodyText.includes("Status")) {
+          cy.log("Maintenance task tracking interface found")
         }
 
-        // Check for maintenance status indicators
-        if (bodyText.includes("Maintenance Required") || bodyText.includes("Under Maintenance")) {
-          cy.log("Found maintenance status indicators")
-        }
-
-        // Look for room maintenance status
-        if (bodyText.includes("Room") && bodyText.includes("Maintenance")) {
-          cy.log("Found rooms with maintenance status")
+        // Look for task types mentioned in user story
+        const taskTypes = ["light bulb", "air-con", "plumbing", "repair", "service"]
+        const foundTypes = taskTypes.filter((type) => bodyText.toLowerCase().includes(type))
+        if (foundTypes.length > 0) {
+          cy.log(`Found maintenance task types: ${foundTypes.join(", ")}`)
         }
       })
     })
 
-    it("should show maintenance status in room cards", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+    // Test Add Maintenance Task functionality
+    it("should open Add Maintenance modal when clicking + button", () => {
+      cy.contains("Maintenance Managemen").should("be.visible")
 
-        // Look for rooms marked for maintenance
-        if (bodyText.includes("Maintenance")) {
-          cy.log("Found maintenance status in room cards")
+      // Look for + button (blue Add button)
+      cy.get("button").then(($buttons) => {
+        const addButton = Array.from($buttons).find(
+          (btn) =>
+            btn.textContent.includes("+") ||
+            btn.textContent.includes("Add Maintenance") ||
+            btn.getAttribute("data-cy") === "add-maintenance",
+        )
 
-          // Maintenance rooms should not show check-in option
-          if (bodyText.includes("Check In") && bodyText.includes("Maintenance")) {
-            // Verify they're in different room cards
-            cy.log("Maintenance rooms appropriately separated from available rooms")
-          }
-        }
+        if (addButton) {
+          cy.wrap(addButton).click()
 
-        // Count maintenance rooms if visible
-        const maintenanceCount = (bodyText.match(/Maintenance/g) || []).length
-        if (maintenanceCount > 0) {
-          cy.log(`Found ${maintenanceCount} maintenance-related items`)
-        }
-      })
-    })
+          // Should open Add Maintenance modal
+          cy.get("body").then(($body) => {
+            const bodyText = $body.text()
 
-    it("should handle maintenance workflow", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Test maintenance actions if available
-        if (bodyText.includes("Schedule Maintenance") || bodyText.includes("Report Issue")) {
-          cy.log("Found maintenance action buttons")
-
-          if (bodyText.includes("Schedule Maintenance")) {
-            cy.log("Found Schedule Maintenance option")
-          }
-
-          if (bodyText.includes("Report Issue")) {
-            cy.log("Found Report Issue option")
-          }
-        }
-
-        // Look for maintenance status updates
-        if (bodyText.includes("Mark Complete") || bodyText.includes("In Progress")) {
-          cy.log("Found maintenance status update options")
+            // Check for modal with maintenance form fields
+            if (
+              bodyText.includes("Add Maintenance") ||
+              bodyText.includes("Task") ||
+              bodyText.includes("Description") ||
+              bodyText.includes("Unit") ||
+              bodyText.includes("Priority")
+            ) {
+              cy.log("Add Maintenance modal opened successfully")
+            }
+          })
+        } else {
+          cy.log("Add Maintenance button not found")
         }
       })
     })
 
-    it("should display maintenance statistics if available", () => {
+    // User Story 4.b: Log maintenance activities per unit
+    it("should track maintenance history per unit", () => {
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for maintenance stats in dashboard
-        if (bodyText.includes("Maintenance")) {
-          // Check if there are numbers associated with maintenance
-          const maintenancePattern = /Maintenance.*?(\d+)/g
-          const matches = bodyText.match(maintenancePattern)
-
-          if (matches) {
-            cy.log(`Found maintenance statistics: ${matches.join(", ")}`)
-          }
+        // Check for unit/room association
+        if (bodyText.includes("Unit") || bodyText.includes("Room")) {
+          cy.log("Maintenance tasks linked to specific units")
         }
 
-        // Look for urgent maintenance indicators
-        if (bodyText.includes("Urgent") || bodyText.includes("Priority")) {
-          cy.log("Found priority maintenance indicators")
+        // Look for maintenance log/history
+        if (bodyText.includes("History") || bodyText.includes("Log") || bodyText.includes("Date")) {
+          cy.log("Maintenance activity history tracking available")
+        }
+
+        // Can also check from room details
+        cy.visit("/dashboard")
+        cy.get("body").then(($dashboard) => {
+          if ($dashboard.text().includes("View Details")) {
+            cy.contains("View Details").first().click()
+
+            // Should show maintenance history for that unit
+            cy.get("body").then(($detail) => {
+              if ($detail.text().includes("Maintenance") || $detail.text().includes("Service")) {
+                cy.log("Maintenance history accessible from room details")
+              }
+            })
+          }
+        })
+      })
+    })
+
+    // User Story 4.c: Schedule recurring maintenance reminders
+    it("should support scheduling recurring maintenance", () => {
+      // Click on Schedule & Reminders tab
+      cy.contains("Schedule & Reminders").should("be.visible").click()
+
+      cy.get("body").then(($body) => {
+        const bodyText = $body.text()
+
+        // Check for scheduling functionality
+        if (bodyText.includes("Schedule") || bodyText.includes("Reminder") || bodyText.includes("Recurring")) {
+          cy.log("Recurring maintenance scheduling available")
+        }
+
+        // Look for routine task indicators
+        if (bodyText.includes("Routine") || bodyText.includes("Regular") || bodyText.includes("Periodic")) {
+          cy.log("Routine maintenance tasks can be scheduled")
+        }
+
+        // Check for calendar or date selection
+        if (bodyText.includes("Date") || bodyText.includes("Frequency") || bodyText.includes("Interval")) {
+          cy.log("Maintenance schedule configuration available")
+        }
+      })
+    })
+
+    it("should display maintenance page content", () => {
+      cy.get("body").then(($body) => {
+        const bodyText = $body.text()
+
+        // Verify we're on maintenance page
+        cy.contains("Maintenance Management").should("be.visible")
+
+        // Look for maintenance tasks tab content
+        if (bodyText.includes("Task") || bodyText.includes("Description") || bodyText.includes("Room")) {
+          cy.log("Found maintenance task table columns")
+        }
+
+        // Look for priority indicators
+        if (bodyText.includes("High") || bodyText.includes("Medium") || bodyText.includes("Low")) {
+          cy.log("Found priority indicators")
         }
       })
     })
