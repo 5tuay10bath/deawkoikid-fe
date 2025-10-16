@@ -73,14 +73,14 @@ const DialogTenant = () => {
                 placeholder="Your Email"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Identification Number</Label>
-              <Input
-                value={newTenantsTest.identificationNumber}
-                onChange={(e) => setNewTenant({ identificationNumber: e.target.value })}
-                placeholder="Your Identification Number"
-              />
-            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Identification Number</Label>
+            <Input
+              value={newTenantsTest.identificationNumber}
+              onChange={(e) => setNewTenant({ identificationNumber: e.target.value })}
+              placeholder="Your Identification Number"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -116,9 +116,9 @@ const DialogTenant = () => {
                   <SelectValue placeholder="Select Role" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="tenant">tenant</SelectItem>
-                  <SelectItem value="staff">staff</SelectItem>
-                  <SelectItem value="admin">admin</SelectItem>
+                  <SelectItem value="tenant">Tenant</SelectItem>
+                  <SelectItem value="staff">Staff</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
