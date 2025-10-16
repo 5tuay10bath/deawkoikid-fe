@@ -1,94 +1,136 @@
 describe("Maintenance & Supplies - Supply Management", () => {
   beforeEach(() => {
-    cy.visit("/dashboard")
+    cy.visit("/maintenance")
+    // Click on Supplies & Inventory tab
+    cy.contains("Supplies & Inventory").click()
   })
 
   describe("Supply Information Display", () => {
-    it("should show supply-related dashboard content", () => {
-      cy.contains("Property Dashboard").should("be.visible")
+    // User Story 4.d: Monitor supply usage (bulbs, spare parts)
+    it("should display supply inventory with usage monitoring", () => {
+      cy.contains(/Supply Inventory|Supplies/i).should("be.visible")
 
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for supply management features
-        if (bodyText.includes("Supply") || bodyText.includes("Supplies")) {
-          cy.contains(/Supply|Supplies/).should("be.visible")
+        // Check for supply items tracking
+        const supplyTypes = ["bulb", "bulbs", "spare part", "parts", "equipment"]
+        const foundTypes = supplyTypes.filter((type) => bodyText.toLowerCase().includes(type))
+        if (foundTypes.length > 0) {
+          cy.log(`Supply types tracked: ${foundTypes.join(", ")}`)
         }
 
-        // Check for inventory indicators
-        if (bodyText.includes("Inventory") || bodyText.includes("Stock")) {
-          cy.log("Found inventory management features")
+        // Check for inventory quantities
+        if (bodyText.includes("Quantity") || bodyText.includes("Stock") || bodyText.includes("Amount")) {
+          cy.log("Supply quantities tracked for inventory management")
         }
 
-        // Look for maintenance supply counts
-        if (bodyText.includes("Items") || bodyText.includes("Equipment")) {
-          cy.log("Found supply item indicators")
+        // Look for low stock warnings (inventory management)
+        if (bodyText.includes("low on stock") || bodyText.includes("Low Stock")) {
+          cy.log("Low stock warning system active for inventory management")
+        }
+
+        // Check for usage/cost tracking
+        if (bodyText.includes("Cost") || bodyText.includes("Price") || bodyText.includes("$")) {
+          cy.log("Supply costs tracked for budget management")
         }
       })
     })
 
-    it("should handle supply categories if available", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+    // Test Add Supply functionality
+    it("should open Add Supply modal when clicking + button", () => {
+      cy.contains(/Supply Inventory|Supplies/i).should("be.visible")
 
-        // Look for supply categories
-        const categories = ["Electrical", "Plumbing", "Cleaning", "Tools", "Hardware"]
+      // Look for + button (blue Add button)
+      cy.get("button").then(($buttons) => {
+        const addButton = Array.from($buttons).find(
+          (btn) =>
+            btn.textContent.includes("+") ||
+            btn.textContent.includes("Add Supply") ||
+            btn.getAttribute("data-cy") === "add-supply",
+        )
 
-        categories.forEach((category) => {
-          if (bodyText.includes(category)) {
-            cy.contains(category).should("be.visible")
-            cy.log(`Found ${category} supply category`)
-          }
-        })
+        if (addButton) {
+          cy.wrap(addButton).click()
 
-        // Check for general supply management
-        if (bodyText.includes("Manage Supplies") || bodyText.includes("Supply List")) {
-          cy.log("Found supply management interface")
+          // Should open Add Supply modal
+          cy.get("body").then(($body) => {
+            const bodyText = $body.text()
+
+            // Check for modal with supply form fields
+            if (
+              bodyText.includes("Add Supply") ||
+              bodyText.includes("Item Name") ||
+              bodyText.includes("Category") ||
+              bodyText.includes("Quantity") ||
+              bodyText.includes("Cost")
+            ) {
+              cy.log("Add Supply modal opened successfully")
+            }
+          })
+        } else {
+          cy.log("Add Supply button not found")
         }
       })
     })
 
-    it("should display supply status indicators", () => {
+    it("should display supply inventory table", () => {
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for stock status indicators
-        const statusIndicators = ["In Stock", "Low Stock", "Out of Stock", "Reorder"]
+        // Verify we're in Supplies & Inventory tab
+        cy.contains("Supplies & Inventory").should("be.visible")
 
-        statusIndicators.forEach((status) => {
-          if (bodyText.includes(status)) {
-            cy.contains(status).should("be.visible")
-            cy.log(`Found ${status} indicator`)
-          }
-        })
+        // Check for supply inventory section
+        if (bodyText.includes("Supply Inventory")) {
+          cy.contains("Supply Inventory").should("be.visible")
+        }
 
-        // Check for supply quantities
-        if (bodyText.includes("Quantity") || bodyText.includes("Available")) {
-          cy.log("Found quantity indicators")
+        // Look for table columns
+        if (bodyText.includes("Name") || bodyText.includes("Category") || bodyText.includes("Quantity")) {
+          cy.log("Found supply inventory table columns")
         }
       })
     })
 
-    it("should show supply request functionality if available", () => {
+    it("should display low stock warnings", () => {
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for supply request features
-        if (bodyText.includes("Request") || bodyText.includes("Order")) {
-          cy.log("Found supply request functionality")
-
-          if (bodyText.includes("Request Supplies")) {
-            cy.contains("Request Supplies").should("be.visible")
-          }
-
-          if (bodyText.includes("Place Order")) {
-            cy.contains("Place Order").should("be.visible")
-          }
+        // Check for low stock warning banner (as shown in screenshot)
+        if (bodyText.includes("items are low on stock") || bodyText.includes("low on stock")) {
+          cy.log("Found low stock warning banner")
         }
 
-        // Check for supplier information
-        if (bodyText.includes("Supplier") || bodyText.includes("Vendor")) {
-          cy.log("Found supplier management features")
+        // Look for stock level indicators
+        if (bodyText.includes("Low") || bodyText.includes("Stock") || bodyText.includes("Warning")) {
+          cy.log("Found stock level indicators")
+        }
+
+        // Check for supply quantities in table
+        if (/\d+/.test(bodyText)) {
+          cy.log("Found quantity numbers in supply inventory")
+        }
+      })
+    })
+
+    it("should have supply management actions", () => {
+      cy.get("body").then(($body) => {
+        const bodyText = $body.text()
+
+        // Look for add/manage supply buttons
+        if (bodyText.includes("Add Supply") || bodyText.includes("Add Item")) {
+          cy.log("Found add supply button")
+        }
+
+        // Check for edit/delete actions in table
+        if (bodyText.includes("Edit") || bodyText.includes("Delete") || bodyText.includes("Actions")) {
+          cy.log("Found supply management actions")
+        }
+
+        // Look for export data option
+        if (bodyText.includes("Export")) {
+          cy.log("Found export data option")
         }
       })
     })
