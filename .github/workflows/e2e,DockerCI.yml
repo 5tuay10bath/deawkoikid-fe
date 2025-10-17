@@ -28,7 +28,7 @@ jobs:
           --health-retries=30
 
     env:
-      DB_URL: jdbc:postgresql://postgres:5432/app_test
+      DB_URL: jdbc:postgresql://localhost:5432/app_test
       DB_USERNAME: app
       DB_PASSWORD: password
       JWT_SECRET_BASE64: pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc=
@@ -55,7 +55,7 @@ jobs:
           docker run -d --name be \
             -p ${BE_PORT}:8080 \
             --env SPRING_PROFILES_ACTIVE=test \
-            --env SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/app_test \
+            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
             --env SPRING_DATASOURCE_USERNAME=app \
             --env SPRING_DATASOURCE_PASSWORD=password \
             --env JWT_SECRET_BASE64=pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc= \
