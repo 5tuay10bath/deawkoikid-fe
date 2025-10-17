@@ -32,7 +32,7 @@ export default function Contracts() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatsCard
           label="Active Contracts"
           value={contracts.filter((c) => c.status.toUpperCase() === "ACTIVE").length}
@@ -60,6 +60,16 @@ export default function Contracts() {
           color={{
             valueColor: "text-amber-500",
             iconColor: "text-amber-500",
+          }}
+        />
+
+        <StatsCard
+          label="Expired Contracts"
+          value={contracts.filter((c) => c.status === "EXPIRED").length}
+          icon={FileText}
+          color={{
+            valueColor: "text-red-500",
+            iconColor: "text-red-500",
           }}
         />
       </div>

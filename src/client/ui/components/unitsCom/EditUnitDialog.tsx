@@ -1,32 +1,60 @@
-import { Plus } from "lucide-react"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
-import type { CreateUnitDto } from "@infrastructure/inbound/dtos/createUnit.dto"
+import type { UpdateUnitDto } from "@infrastructure/inbound/dtos/updateUnit.dto"
+import type { UnitPageModel } from "@domain/models/unitPage.model"
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Button } from "../common/Button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
 import { Input } from "../common/Input"
 import { Label } from "../common/Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../common/Select"
 import { useToast } from "../hooks/useToast"
 
-const DialogUnits = () => {
-  const { createUnit } = useUnitStore()
+interface EditUnitDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  unit: UnitPageModel | null
+}
+
+const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
+  const { updateUnit } = useUnitStore()
   const { toast } = useToast()
-  const [isAddUnitOpen, setIsAddUnitOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newUnit, setNewUnit] = useState<CreateUnitDto>({
+  const [editUnit, setEditUnit] = useState<Omit<UpdateUnitDto, "id">>({
     unitNumber: "",
     address: "",
     unitType: "A",
     unitSize: 400,
-    status: "AVAILABLE",
+    unitStatus: "AVAILABLE",
     floor: 1,
   })
 
-  const handleAddUnit = async () => {
-    if (!newUnit.unitNumber || !newUnit.address) {
+  // Update form when unit prop changes
+  useEffect(() => {
+    if (unit) {
+      setEditUnit({
+        unitNumber: unit.unitNumber,
+        address: unit.address,
+        unitType: unit.unitType as "A" | "B" | "C",
+        unitSize: unit.unitSize,
+        unitStatus: unit.status as "AVAILABLE" | "OCCUPIED" | "RESERVED",
+        floor: unit.floor,
+      })
+    }
+  }, [unit])
+
+  const handleUpdateUnit = async () => {
+    if (!unit?.id) {
+      toast({
+        title: "Error",
+        description: "Unit ID is missing",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!editUnit.unitNumber || !editUnit.address) {
       toast({
         title: "Error",
         description: "Please fill in unit number and address",
@@ -37,25 +65,22 @@ const DialogUnits = () => {
 
     setIsSubmitting(true)
     try {
-      const result = await createUnit(newUnit)
+      const dto: UpdateUnitDto = {
+        id: unit.id,
+        ...editUnit,
+      }
+
+      const result = await updateUnit(dto)
       if (result.success) {
-        setNewUnit({
-          unitNumber: "",
-          address: "",
-          unitType: "A",
-          unitSize: 400,
-          status: "AVAILABLE",
-          floor: 1,
-        })
-        setIsAddUnitOpen(false)
+        onClose()
         toast({
           title: "Success",
-          description: result.message || "Unit created successfully!",
+          description: result.message || "Unit updated successfully!",
         })
       } else {
         toast({
           title: "Error",
-          description: result.message || "Failed to create unit",
+          description: result.message || "Failed to update unit",
           variant: "destructive",
         })
       }
@@ -65,25 +90,19 @@ const DialogUnits = () => {
   }
 
   return (
-    <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Unit
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Add New Unit</DialogTitle>
+          <DialogTitle>Edit Unit</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Unit Number</Label>
               <Input
-                value={newUnit.unitNumber}
+                value={editUnit.unitNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewUnit((prev) => ({ ...prev, unitNumber: e.target.value }))
+                  setEditUnit((prev) => ({ ...prev, unitNumber: e.target.value }))
                 }
                 placeholder="101"
               />
@@ -91,8 +110,8 @@ const DialogUnits = () => {
             <div className="space-y-2">
               <Label>Floor</Label>
               <Select
-                value={newUnit.floor.toString()}
-                onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, floor: parseInt(value) }))}
+                value={editUnit.floor.toString()}
+                onValueChange={(value: string) => setEditUnit((prev) => ({ ...prev, floor: parseInt(value) }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select floor" />
@@ -110,9 +129,9 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Address</Label>
             <Input
-              value={newUnit.address}
+              value={editUnit.address}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, address: e.target.value }))
+                setEditUnit((prev) => ({ ...prev, address: e.target.value }))
               }
               placeholder="Building A, 123 Street"
             />
@@ -120,8 +139,8 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Unit Type</Label>
             <Select
-              value={newUnit.unitType}
-              onValueChange={(value: "A" | "B" | "C") => setNewUnit((prev) => ({ ...prev, unitType: value }))}
+              value={editUnit.unitType}
+              onValueChange={(value: "A" | "B" | "C") => setEditUnit((prev) => ({ ...prev, unitType: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
@@ -136,9 +155,9 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Size (sq ft)</Label>
             <Input
-              value={newUnit.unitSize.toString()}
+              value={editUnit.unitSize.toString()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, unitSize: parseInt(e.target.value) || 400 }))
+                setEditUnit((prev) => ({ ...prev, unitSize: parseInt(e.target.value) || 400 }))
               }
               placeholder="400"
               type="number"
@@ -147,9 +166,9 @@ const DialogUnits = () => {
           <div className="space-y-2">
             <Label>Status</Label>
             <Select
-              value={newUnit.status}
+              value={editUnit.unitStatus}
               onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED") =>
-                setNewUnit((prev) => ({ ...prev, status: value }))
+                setEditUnit((prev) => ({ ...prev, unitStatus: value }))
               }
             >
               <SelectTrigger>
@@ -163,11 +182,11 @@ const DialogUnits = () => {
             </Select>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsAddUnitOpen(false)} disabled={isSubmitting}>
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleAddUnit} disabled={isSubmitting}>
-              {isSubmitting ? "Adding..." : "Add Unit"}
+            <Button onClick={handleUpdateUnit} disabled={isSubmitting}>
+              {isSubmitting ? "Updating..." : "Update Unit"}
             </Button>
           </div>
         </div>
@@ -176,4 +195,4 @@ const DialogUnits = () => {
   )
 }
 
-export default DialogUnits
+export default EditUnitDialog

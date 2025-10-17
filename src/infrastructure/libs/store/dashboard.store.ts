@@ -3,7 +3,9 @@ import { create } from "zustand/react"
 import type { DashboardModel } from "@domain/models/dashboard.model"
 import { GetDashboardFactory } from "@infrastructure/inbound/factories/getDashboard.factory"
 import { CheckInFactory } from "@infrastructure/inbound/factories/checkIn.factory"
+import { CheckOutFactory } from "@infrastructure/inbound/factories/checkOut.factory"
 import type { CheckInDto } from "@infrastructure/inbound/dtos/checkIn.dto"
+import type { CheckOutDto } from "@infrastructure/inbound/dtos/checkOut.dto"
 
 type DashboardState = {
   dashboard: DashboardModel[]
@@ -13,6 +15,7 @@ type DashboardState = {
 interface DashboardAction {
   getDashboard: () => Promise<void>
   checkIn: (dto: CheckInDto) => Promise<{ success: boolean; message: string }>
+  checkOut: (dto: CheckOutDto) => Promise<{ success: boolean; message: string }>
 }
 
 type DashboardStore = DashboardState & DashboardAction
@@ -46,6 +49,23 @@ export const useDashboardStore = create<DashboardStore>((set) => ({
       return { success: false, message: "Check-in failed" }
     } catch {
       return { success: false, message: "An error occurred during check-in" }
+    }
+  },
+
+  checkOut: async (dto: CheckOutDto) => {
+    try {
+      const result = await CheckOutFactory().handler(dto)
+      if (result.isRight()) {
+        // Refresh dashboard after check-out
+        const dashboardResult = await GetDashboardFactory().handler({})
+        if (dashboardResult.isRight()) {
+          set({ dashboard: dashboardResult.value })
+        }
+        return { success: true, message: result.value.message }
+      }
+      return { success: false, message: "Check-out failed" }
+    } catch {
+      return { success: false, message: "An error occurred during check-out" }
     }
   },
 }))

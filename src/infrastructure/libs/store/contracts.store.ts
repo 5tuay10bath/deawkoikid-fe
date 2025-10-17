@@ -2,8 +2,10 @@ import { create } from "zustand/react"
 
 import type { ContractsModel } from "@domain/models/contracts.model"
 import type { CreateContractDto } from "@infrastructure/inbound/dtos/createContract.dto"
+import type { UpdateContractDto } from "@infrastructure/inbound/dtos/updateContract.dto"
 import { GetContractsFactory } from "@infrastructure/inbound/factories/getContracts.factory"
 import { CreateContractFactory } from "@infrastructure/inbound/factories/createContract.factory"
+import { UpdateContractFactory } from "@infrastructure/inbound/factories/updateContract.factory"
 
 type ContractTemplate = {
   name: string
@@ -29,6 +31,7 @@ type ContractState = {
 interface ContractAction {
   getContracts: () => Promise<void>
   createContract: (dto: CreateContractDto) => Promise<{ success: boolean; message?: string }>
+  updateContract: (dto: UpdateContractDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type ContractStore = ContractState & ContractAction
@@ -99,6 +102,21 @@ Tenant Signature: ____________________ Date: ___________`,
         return { success: true, message: result.value.message }
       } else if (result.isLeft()) {
         return { success: false, message: "Failed to create contract" }
+      }
+      return { success: false }
+    } catch {
+      return { success: false, message: "An error occurred" }
+    }
+  },
+
+  updateContract: async (dto: UpdateContractDto) => {
+    try {
+      const result = await UpdateContractFactory().handler(dto)
+      if (result.isRight()) {
+        await get().getContracts()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        return { success: false, message: "Failed to update contract" }
       }
       return { success: false }
     } catch {
