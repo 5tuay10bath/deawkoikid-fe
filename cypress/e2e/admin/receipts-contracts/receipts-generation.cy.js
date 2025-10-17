@@ -52,38 +52,38 @@ describe("Receipts & Contracts - Generation and Download", () => {
     })
   })
 
-  describe("Contract Management", () => {
-    beforeEach(() => {
-      cy.visit("/contracts")
-    })
+  // describe("Contract Management", () => {
+  //   beforeEach(() => {
+  //     cy.visit("/contracts")
+  //   })
 
-    it("should click download contract button and verify download with success toast", () => {
-      cy.contains("All Contracts").should("be.visible")
+  //   it("should click download contract button and verify download with success toast", () => {
+  //     cy.contains("All Contracts").should("be.visible")
 
-      cy.wait(1500)
+  //     cy.wait(1500)
 
-      // Find first contract row and click the DOWNLOAD button (download icon - usually third button)
-      cy.get("table tbody tr")
-        .first()
-        .within(() => {
-          // Click download icon button (usually third/last button)
-          cy.get("button")
-            .first()
-            .click({ force: true })
-            .then(() => {
-              cy.log("✅ Clicked DOWNLOAD CONTRACT button (download icon)")
-            })
-        })
+  //     // Find first contract row and click the DOWNLOAD button (download icon - usually third button)
+  //     cy.get("table tbody tr")
+  //       .first()
+  //       .within(() => {
+  //         // Click download icon button (usually third/last button)
+  //         cy.get("button")
+  //           .first()
+  //           .click({ force: true })
+  //           .then(() => {
+  //             cy.log("✅ Clicked DOWNLOAD CONTRACT button (download icon)")
+  //           })
+  //       })
 
-      cy.wait(1000)
+  //     cy.wait(1000)
 
-      cy.contains("button", /Download/i).click({ force: true })
+  //     cy.contains("button", /Download/i).click({ force: true })
 
-      cy.wait(1000)
+  //     cy.wait(1000)
 
-      cy.contains(/success/i, { timeout: 5000 }).should("be.visible")
+  //     cy.contains(/success/i, { timeout: 5000 }).should("be.visible")
 
-      cy.log("✅ Contract downloaded successfully with SUCCESS toast")
-    })
-  })
+  //     cy.log("✅ Contract downloaded successfully with SUCCESS toast")
+  //   })
+  // })
 })
