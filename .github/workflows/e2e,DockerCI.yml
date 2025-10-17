@@ -80,15 +80,27 @@ jobs:
       
       - name: Install deps
         run: pnpm install --frozen-lockfile
+        
       - name: Start frontend
         run: pnpm dev &
         env:
           NODE_ENV: test
+          
       - name: Wait for frontend
         run: npx wait-on http://localhost:3000
+        
       - name: Run Cypress E2E
         run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
-      - name: Build the Docker image
-        run: docker build --file Dockerfile -t iamyasuomain/deawkoikid_frontend:latest .
-      - name: push docker
-        run: docker push iamyasuomain/deawkoikid_frontend:latest
+
+      - name: Generate version tag
+        id: tag
+        run: echo "TAG=$(date ='%Y$m$d-%H%M')-$(git rev-parse --short HEAD)" >> $GITHB_ENV
+
+      - name: Build frontend Docker image
+        run: docker build -t iamyasuomain/deawkoikid_frontend:${{ env.TAG }} -t iamyasuomain/deawkoikid_frontend:latest .
+
+      - name: Push frontend Docker image
+        run: |
+          docker push iamyasuomain/deawkoikid_frontend:${{ env.TAG }}
+          docker push iamyasuomain/deawkoikid_frontend:latest
+          echo "✅ Pushed iamyasuomain/deawkoikid_frontend:${{ env.TAG }}"
