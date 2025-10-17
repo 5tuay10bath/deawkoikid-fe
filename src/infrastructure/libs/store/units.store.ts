@@ -10,6 +10,7 @@ import { UpdateUnitFactory } from "@infrastructure/inbound/factories/updateUnit.
 type UnitState = {
   units: UnitPageModel[]
   searchTerm: string
+  isLoading: boolean
   setSearchTerm: (term: string) => void
   setUnits: (units: UnitPageModel[]) => void
 }
@@ -25,10 +26,12 @@ type UnitStore = UnitState & UnitAction
 export const useUnitStore = create<UnitStore>((set, get) => ({
   units: [],
   searchTerm: "",
+  isLoading: false,
   setSearchTerm: (term) => set({ searchTerm: term }),
   setUnits: (units) => set({ units }),
 
   getUnits: async () => {
+    set({ isLoading: true })
     try {
       const result = await GetUnitPageFactory().handler({})
       if (result.isRight()) {
@@ -38,6 +41,8 @@ export const useUnitStore = create<UnitStore>((set, get) => ({
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      set({ isLoading: false })
     }
   },
 

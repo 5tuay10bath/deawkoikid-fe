@@ -13,3 +13,13 @@ export interface ContractsModel {
   endDate: Date
   status: "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED"
 }
+
+export interface CreateUnitModel {
+  id: string
+  address: string
+}
+
+export interface CreateUserModel {
+  id: string
+  email: string
+}

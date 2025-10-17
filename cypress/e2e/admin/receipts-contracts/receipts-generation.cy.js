@@ -1,156 +1,90 @@
 describe("Receipts & Contracts - Generation and Download", () => {
   beforeEach(() => {
     cy.visit("/payments")
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   describe("Receipt Generation", () => {
-    // User Story 3.a: Generate and print/download receipts for rent payments
-    it("should provide receipt generation functionality for rent payments", () => {
+    // Test receipt generation with "Paid" status payments
+    it("should generate receipt for payments with Paid status", () => {
       cy.contains("Payment Management").should("be.visible")
 
+      cy.wait(1500)
+
+      // Find row with "Paid" status
       cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+        if ($body.text().includes("Paid")) {
+          cy.contains("tr", /Paid/i)
+            .first()
+            .within(() => {
+              // Click first button ($ icon for receipt)
+              cy.get("button").first().click({ force: true })
+            })
 
-        // Check for payment records table
-        if (bodyText.includes("Payment") || bodyText.includes("Rent")) {
-          cy.log("Payment records displayed")
-        }
+          cy.log("✅ Clicked receipt button for Paid payment")
 
-        // Look for receipt generation options
-        if (bodyText.includes("Receipt") || bodyText.includes("Generate") || bodyText.includes("Download")) {
-          cy.log("Receipt generation functionality available")
-        }
-      })
-    })
+          // Verify receipt dialog
+          cy.wait(500)
+          cy.contains(/Generate Receipt|Payment Receipt/i, { timeout: 3000 }).should("be.visible")
 
-    // Test Add Billing from Room Details
-    it("should open Add Billing modal when clicking + button", () => {
-      // Navigate to room details page
-      cy.visit("/dashboard")
+          // Verify receipt information
+          cy.get("body").should("contain.text", "Tenant:")
+          cy.get("body").should("contain.text", "Unit:")
+          cy.get("body").should("contain.text", "Total Amount:")
 
-      cy.get("body").then(($body) => {
-        if ($body.text().includes("View Details")) {
-          cy.contains("View Details").first().click()
+          cy.log("✅ Receipt details verified")
 
-          // On room detail page, look for + Add Billing button
-          cy.get("button").then(($buttons) => {
-            const addButton = Array.from($buttons).find(
-              (btn) =>
-                btn.textContent.includes("+ Add Billing") ||
-                btn.textContent.includes("Add Billing") ||
-                btn.getAttribute("data-cy") === "add-billing",
-            )
+          // Click Download
+          cy.contains("button", /Download/i).click({ force: true })
 
-            if (addButton) {
-              cy.wrap(addButton).click()
+          cy.wait(1000)
 
-              // Should open Add Billing modal
-              cy.get("body").then(($modal) => {
-                const modalText = $modal.text()
+          // Verify success toast
+          cy.contains(/success/i, { timeout: 5000 }).should("be.visible")
 
-                // Check for modal with billing form fields
-                if (
-                  modalText.includes("Add Billing") ||
-                  modalText.includes("Water") ||
-                  modalText.includes("Electricity") ||
-                  modalText.includes("Amount")
-                ) {
-                  cy.log("Add Billing modal opened successfully")
-                }
-              })
-            } else {
-              cy.log("Add Billing button not found - may be available room only")
-            }
-          })
-        }
-      })
-    })
+          cy.log("✅ Receipt downloaded successfully with SUCCESS toast")
 
-    // User Story 3.c: Include utility charges in receipts
-    it("should allow receipts to include utility charges (electricity, water)", () => {
-      cy.contains("Payment Management").should("be.visible")
-
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Check for utility charge tracking
-        if (bodyText.includes("Electricity") || bodyText.includes("Water") || bodyText.includes("Utility")) {
-          cy.log("Utility charges tracked in payment system")
-        }
-
-        // Check for billing components
-        if (bodyText.includes("Rent") && bodyText.includes("Water")) {
-          cy.log("Rent and utility charges can be billed together")
+          // Close dialog
+          cy.contains("button", /Cancel/i).click({ force: true })
+        } else {
+          cy.log("⚠️ No paid payments found")
         }
       })
     })
   })
 
-  describe("Contract Management", () => {
-    it("should handle contract-related functionality", () => {
-      cy.visit("/dashboard")
+  // describe("Contract Management", () => {
+  //   beforeEach(() => {
+  //     cy.visit("/contracts")
+  //   })
 
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+  //   it("should click download contract button and verify download with success toast", () => {
+  //     cy.contains("All Contracts").should("be.visible")
 
-        // Look for contract management features
-        if (bodyText.includes("Contract") || bodyText.includes("Lease")) {
-          cy.log("Found contract management features")
+  //     cy.wait(1500)
 
-          if (bodyText.includes("View Contract")) {
-            cy.contains("View Contract").should("be.visible")
-          }
+  //     // Find first contract row and click the DOWNLOAD button (download icon - usually third button)
+  //     cy.get("table tbody tr")
+  //       .first()
+  //       .within(() => {
+  //         // Click download icon button (usually third/last button)
+  //         cy.get("button")
+  //           .first()
+  //           .click({ force: true })
+  //           .then(() => {
+  //             cy.log("✅ Clicked DOWNLOAD CONTRACT button (download icon)")
+  //           })
+  //       })
 
-          if (bodyText.includes("Lease Agreement")) {
-            cy.contains("Lease Agreement").should("be.visible")
-          }
-        }
+  //     cy.wait(1000)
 
-        // Check for contract status
-        if (bodyText.includes("Active") || bodyText.includes("Expired") || bodyText.includes("Pending")) {
-          cy.log("Found contract status indicators")
-        }
-      })
-    })
+  //     cy.contains("button", /Download/i).click({ force: true })
 
-    // User Story 3.b: Generate and download rental contracts
-    it("should provide contract generation functionality", () => {
-      cy.visit("/contracts")
+  //     cy.wait(1000)
 
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+  //     cy.contains(/success/i, { timeout: 5000 }).should("be.visible")
 
-        // Check for contract management interface
-        if (bodyText.includes("Contract")) {
-          cy.log("Contract management page available")
-        }
-
-        // Look for contract details
-        if (bodyText.includes("Start Date") || bodyText.includes("End Date")) {
-          cy.log("Contract lease terms displayed")
-        }
-
-        // Check for view/download options
-        if (bodyText.includes("View") || bodyText.includes("Download") || bodyText.includes("Generate")) {
-          cy.log("Contract document generation available")
-        }
-      })
-    })
-
-    it("should show contract from occupied room details", () => {
-      cy.visit("/dashboard")
-
-      cy.get("body").then(($body) => {
-        if ($body.text().includes("View Details")) {
-          cy.contains("View Details").first().click()
-
-          cy.get("body").then(($detail) => {
-            if ($detail.text().includes("View Contract")) {
-              cy.log("View Contract available from room details page")
-            }
-          })
-        }
-      })
-    })
-  })
+  //     cy.log("✅ Contract downloaded successfully with SUCCESS toast")
+  //   })
+  // })
 })

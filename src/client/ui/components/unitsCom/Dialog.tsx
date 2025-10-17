@@ -148,7 +148,7 @@ const DialogUnits = () => {
             <Label>Status</Label>
             <Select
               value={newUnit.status}
-              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED") =>
+              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED" | "PENDING") =>
                 setNewUnit((prev) => ({ ...prev, status: value }))
               }
             >
@@ -159,6 +159,7 @@ const DialogUnits = () => {
                 <SelectItem value="AVAILABLE">Available</SelectItem>
                 <SelectItem value="RESERVED">Reserved</SelectItem>
                 <SelectItem value="OCCUPIED">Occupied</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
               </SelectContent>
             </Select>
           </div>
