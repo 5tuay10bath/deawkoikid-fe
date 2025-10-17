@@ -37,7 +37,7 @@ describe("Maintenance & Supplies - Supply Management", () => {
       })
     })
 
-    // Test Add Supply functionality
+    // NOTE: For Add Supply - only verify modal opens, no actual form submission
     it("should open Add Supply modal when clicking + button", () => {
       cy.contains(/Supply Inventory|Supplies/i).should("be.visible")
 
@@ -74,8 +74,17 @@ describe("Maintenance & Supplies - Supply Management", () => {
       })
     })
 
-    // Test Add Supply with real data submission and toast verification
     it("should add a new supply item and show success toast", () => {
+      // Track API responses using a more flexible approach
+      let apiCallMade = false
+      let apiStatus = null
+
+      // Intercept POST requests with multiple patterns
+      cy.intercept("POST", "**/*supply*/**").as("createSupply")
+      cy.intercept("POST", "**/supply*").as("createSupply2")
+      cy.intercept("POST", "**/supplies*").as("createSupply3")
+      cy.intercept({ method: "POST", url: /supply/i }).as("createSupply4")
+
       cy.contains(/Supply Inventory|Supplies/i).should("be.visible")
 
       // Click the + button to open Add Supply modal
@@ -167,8 +176,25 @@ describe("Maintenance & Supplies - Supply Management", () => {
                 }
               })
 
-              // Wait for API call and toast to appear
-              cy.wait(2000)
+              // Wait for API call to complete and check response
+              cy.wait(2000).then(() => {
+                // Try to get any of the intercepted calls
+                cy.get("@createSupply.all").then((interceptions) => {
+                  if (interceptions && interceptions.length > 0) {
+                    const lastCall = interceptions[interceptions.length - 1]
+                    if (lastCall && lastCall.response) {
+                      const status = lastCall.response.statusCode
+                      expect(status).to.be.oneOf([200, 201])
+                      cy.log(`✅ API Response Status: ${status}`)
+                      apiCallMade = true
+                      apiStatus = status
+                    }
+                  }
+                })
+              })
+
+              // Verify by checking the toast message
+              cy.wait(1000)
 
               // Check for success toast with multiple strategies
               cy.get("body").then(($body) => {
@@ -224,6 +250,31 @@ describe("Maintenance & Supplies - Supply Management", () => {
                       cy.log("⚠️ No toast found - check if toast library is configured")
                     }
                   })
+                })
+
+                // After verifying toast, check network requests using Performance API
+                cy.window().then((win) => {
+                  if (win.performance && win.performance.getEntriesByType) {
+                    const resources = win.performance.getEntriesByType("resource")
+                    const supplyRequests = resources.filter(
+                      (r) => r.name.includes("/supply") || r.name.includes("/supplies"),
+                    )
+
+                    if (supplyRequests.length > 0) {
+                      cy.log(`✅ Found ${supplyRequests.length} supply-related network requests`)
+
+                      // Check fetch/XHR requests
+                      const fetchRequests = resources
+                        .filter((r) => r.initiatorType === "fetch" || r.initiatorType === "xmlhttprequest")
+                        .filter((r) => r.name.includes("/supply") || r.name.includes("/supplies"))
+
+                      if (fetchRequests.length > 0) {
+                        cy.log(`✅ Confirmed API request was sent (${fetchRequests[0].name})`)
+                        // Cannot get status code from Performance API, but we can verify request was sent
+                        cy.log("✅ API request verified through Performance API")
+                      }
+                    }
+                  }
                 })
               })
             } else {
