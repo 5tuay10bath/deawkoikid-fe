@@ -94,7 +94,7 @@ jobs:
 
       - name: Generate version tag
         id: tag
-        run: echo "TAG=$(date +'%Y$m$d-%H%M')-$(git rev-parse --short HEAD)" >> $GITHB_ENV
+        run: echo "TAG=$(date +'%Y$m$d-%H%M')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Build frontend Docker image
         run: docker build -t iamyasuomain/deawkoikid_frontend:${{ env.TAG }} -t iamyasuomain/deawkoikid_frontend:latest .
