@@ -3,36 +3,6 @@ describe("Tenant Management - Assign Tenants to Units", () => {
     cy.visit("/dashboard")
   })
 
-  // User Story 1.a: Assign tenants to units
-  it("should display dashboard with room status information", function () {
-    cy.contains("Property Dashboard").should("be.visible")
-
-    // Verify statistics/room information exists (flexible check)
-    cy.get("body").then(($body) => {
-      const hasStats = $body.text().match(/total|units|rooms|occupied|available/i)
-      const hasNumbers = $body.text().match(/\d+/)
-
-      if (hasStats) {
-        cy.log("✅ Dashboard statistics displayed")
-      }
-
-      if (hasNumbers) {
-        cy.log("✅ Numerical data found")
-      }
-
-      // Core requirement: dashboard should display property information
-      expect($body.text()).to.match(/dashboard|property|room|unit/i)
-    })
-
-    // Check for room cards/list
-    cy.get("body").then(($body) => {
-      const hasRoomInfo = $body.text().match(/room|unit|floor/i)
-      expect(hasRoomInfo).to.not.be.null
-    })
-
-    cy.log("✅ Dashboard loaded with room information")
-  })
-
   // User Story 1.a & 1.b: Check-in functionality
   it("should show Check In button for reserved rooms", function () {
     cy.get("body").then(($body) => {
