@@ -60,6 +60,15 @@ jobs:
             --env SPRING_DATASOURCE_PASSWORD=password \
             --env JWT_SECRET_BASE64=pC3U3MRYNraVk2gczQoDQ4xXhmWTKlwZEk5nMEkmlDc= \
             "$BE_IMAGE"
+            echo "Waiting for backend..."
+            for i in {1..15}; do
+              if curl -fsS http://localhost:${BE_PORT}/health > /dev/null; then
+                echo "Backend is ready"
+                break
+              fi
+              echo "Waiting... ($i/15)"
+              sleep 2
+              done
 
       - name: Setup Node
         uses: actions/setup-node@v4
