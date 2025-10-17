@@ -1,0 +1,2 @@
+export const DEAWKOIKID_API_BASE_URL =
+  import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || window.__DEAWKOIKID_API_BASE_URL__
