@@ -4,7 +4,7 @@ export interface UnitPageModel {
   unitNumber: string
   unitType: "A" | "B" | "C"
   unitSize: number
-  status: "available" | "reserved" | "occupied"
+  status: "available" | "reserved" | "occupied" | "pending"
   floor: number
   latestAirconService: Date
 }

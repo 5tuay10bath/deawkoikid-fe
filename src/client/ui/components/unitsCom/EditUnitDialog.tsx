@@ -26,7 +26,7 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
     address: "",
     unitType: "A",
     unitSize: 400,
-    unitStatus: "AVAILABLE",
+    status: "AVAILABLE",
     floor: 1,
   })
 
@@ -38,7 +38,7 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
         address: unit.address,
         unitType: unit.unitType as "A" | "B" | "C",
         unitSize: unit.unitSize,
-        unitStatus: unit.status as "AVAILABLE" | "OCCUPIED" | "RESERVED",
+        status: unit.status.toUpperCase() as "AVAILABLE" | "OCCUPIED" | "RESERVED" | "PENDING",
         floor: unit.floor,
       })
     }
@@ -166,9 +166,9 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
           <div className="space-y-2">
             <Label>Status</Label>
             <Select
-              value={editUnit.unitStatus}
-              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED") =>
-                setEditUnit((prev) => ({ ...prev, unitStatus: value }))
+              value={editUnit.status}
+              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED" | "PENDING") =>
+                setEditUnit((prev) => ({ ...prev, status: value }))
               }
             >
               <SelectTrigger>
@@ -178,6 +178,7 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
                 <SelectItem value="AVAILABLE">Available</SelectItem>
                 <SelectItem value="RESERVED">Reserved</SelectItem>
                 <SelectItem value="OCCUPIED">Occupied</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
               </SelectContent>
             </Select>
           </div>

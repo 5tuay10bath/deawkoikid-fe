@@ -32,6 +32,7 @@ type MaintenanceState = {
   tasks: MaintenanceModel[]
   supplies: SupplyModel[]
   searchTerm: string
+  isLoading: boolean
   isNewTaskOpen: boolean
   isNewSupplyOpen: boolean
   newTask: NewTask
@@ -83,6 +84,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
   tasks: [],
   supplies: [],
   searchTerm: "",
+  isLoading: false,
   isNewTaskOpen: false,
   isNewSupplyOpen: false,
   newTask: initialNewTask,
@@ -102,6 +104,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
   addSupply: (supply) => set({ supplies: [...get().supplies, supply] }),
 
   getMaintenanceTasks: async () => {
+    set({ isLoading: true })
     try {
       const result = await GetMaintenanceFactory().handler({})
       if (result.isRight()) {
@@ -111,6 +114,8 @@ export const useMaintenanceStore = create<MaintenanceStore>((set, get) => ({
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      set({ isLoading: false })
     }
   },
 

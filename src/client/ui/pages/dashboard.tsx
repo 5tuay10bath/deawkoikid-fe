@@ -14,7 +14,7 @@ const transformContractToRoom = (unit: DashboardModel) => ({
   floor: unit.floor,
   type: unit.unitType,
   size: unit.unitSize,
-  status: unit.unitStatus.toLowerCase() as "available" | "occupied" | "reserved",
+  status: unit.unitStatus.toLowerCase() as "available" | "occupied" | "reserved" | "pending",
   tenant: unit.contract
     ? {
         name: unit.contract.user.fullName,
@@ -46,6 +46,7 @@ export default function Dashboard() {
   const occupiedRooms = rooms.filter((room) => room.status === "occupied").length
   const availableRooms = rooms.filter((room) => room.status === "available").length
   const reservedRooms = rooms.filter((room) => room.status === "reserved").length
+  const pendingRooms = rooms.filter((room) => room.status === "pending").length
 
   const totalRevenue = rooms
     .filter((room) => room.tenant)
@@ -68,7 +69,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-cy="dashboard-stats">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-cy="dashboard-stats">
         <DashboardStatCard
           title="Total Units"
           value={totalRooms.toString()}
@@ -100,6 +101,14 @@ export default function Dashboard() {
           value={reservedRooms}
           description="Units under reservation"
           valueColor="text-orange-500"
+          data-cy="maintenance-stat"
+        />
+
+        <DashboardStatCard
+          title="Pending"
+          value={pendingRooms}
+          description="Pending"
+          valueColor="text-blue-500"
           data-cy="maintenance-stat"
         />
       </div>

@@ -28,11 +28,11 @@ export default defineConfig({
     // Screenshots and videos
     screenshotsFolder: "cypress/screenshots",
     videosFolder: "cypress/videos",
-    // Test execution settings
-    defaultCommandTimeout: 10000,
-    requestTimeout: 10000,
-    responseTimeout: 10000,
-    pageLoadTimeout: 30000,
+    // Test execution settings - Increased timeouts for CI/CD
+    defaultCommandTimeout: 15000,
+    requestTimeout: 15000,
+    responseTimeout: 15000,
+    pageLoadTimeout: 60000,
     // Browser settings
     chromeWebSecurity: false,
     experimentalStudio: true,

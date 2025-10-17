@@ -1,11 +1,13 @@
 import { create } from "zustand/react"
 
-import type { ContractsModel } from "@domain/models/contracts.model"
+import type { ContractsModel, CreateUnitModel, CreateUserModel } from "@domain/models/contracts.model"
 import type { CreateContractDto } from "@infrastructure/inbound/dtos/createContract.dto"
 import type { UpdateContractDto } from "@infrastructure/inbound/dtos/updateContract.dto"
 import { GetContractsFactory } from "@infrastructure/inbound/factories/getContracts.factory"
 import { CreateContractFactory } from "@infrastructure/inbound/factories/createContract.factory"
 import { UpdateContractFactory } from "@infrastructure/inbound/factories/updateContract.factory"
+import { GetCreateUnitsFactory } from "@infrastructure/inbound/factories/getCreateUnits.factory"
+import { GetCreateUsersFactory } from "@infrastructure/inbound/factories/getCreateUsers.factory"
 
 type ContractTemplate = {
   name: string
@@ -14,12 +16,17 @@ type ContractTemplate = {
 
 type ContractState = {
   contracts: ContractsModel[]
+  createUnits: CreateUnitModel[]
+  createUsers: CreateUserModel[]
   searchTerm: string
+  isLoading: boolean
   isTemplateOpen: boolean
   isViewOpen: boolean
   selectedContract: ContractsModel | null
   template: ContractTemplate
   setContracts: (contracts: ContractsModel[]) => void
+  setCreateUnits: (units: CreateUnitModel[]) => void
+  setCreateUsers: (users: CreateUserModel[]) => void
   setSearchTerm: (term: string) => void
   setIsTemplateOpen: (isOpen: boolean) => void
   setIsViewOpen: (isOpen: boolean) => void
@@ -30,6 +37,8 @@ type ContractState = {
 
 interface ContractAction {
   getContracts: () => Promise<void>
+  getCreateUnits: () => Promise<void>
+  getCreateUsers: () => Promise<void>
   createContract: (dto: CreateContractDto) => Promise<{ success: boolean; message?: string }>
   updateContract: (dto: UpdateContractDto) => Promise<{ success: boolean; message?: string }>
 }
@@ -38,7 +47,10 @@ type ContractStore = ContractState & ContractAction
 
 export const useContractStore = create<ContractStore>((set, get) => ({
   contracts: [],
+  createUnits: [],
+  createUsers: [],
   searchTerm: "",
+  isLoading: false,
   isTemplateOpen: false,
   isViewOpen: false,
   selectedContract: null,
@@ -76,6 +88,8 @@ Landlord Signature: ___________________ Date: ___________
 Tenant Signature: ____________________ Date: ___________`,
   },
   setContracts: (contracts) => set({ contracts }),
+  setCreateUnits: (units) => set({ createUnits: units }),
+  setCreateUsers: (users) => set({ createUsers: users }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setIsTemplateOpen: (isOpen) => set({ isTemplateOpen: isOpen }),
   setIsViewOpen: (isOpen) => set({ isViewOpen: isOpen }),
@@ -84,6 +98,7 @@ Tenant Signature: ____________________ Date: ___________`,
   updateTemplate: (updates) => set({ template: { ...get().template, ...updates } }),
 
   getContracts: async () => {
+    set({ isLoading: true })
     try {
       const result = await GetContractsFactory().handler({})
       if (result.isRight()) {
@@ -91,6 +106,30 @@ Tenant Signature: ____________________ Date: ___________`,
       }
     } catch {
       // Error handling
+    } finally {
+      set({ isLoading: false })
+    }
+  },
+
+  getCreateUnits: async () => {
+    try {
+      const result = await GetCreateUnitsFactory().handler({})
+      if (result.isRight()) {
+        set({ createUnits: result.value })
+      }
+    } catch {
+      console.error("Failed to fetch create units")
+    }
+  },
+
+  getCreateUsers: async () => {
+    try {
+      const result = await GetCreateUsersFactory().handler({})
+      if (result.isRight()) {
+        set({ createUsers: result.value })
+      }
+    } catch {
+      console.error("Failed to fetch create users")
     }
   },
 
