@@ -16,9 +16,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: deawkoikid_db
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: app_test
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
@@ -28,9 +28,9 @@ jobs:
           --health-retries=30
 
     env:
-      DB_URL: jdbc:postgresql://localhost:5432/deawkoikid_db
-      DB_USERNAME: admin
-      DB_PASSWORD: admin
+      DB_URL: jdbc:postgresql://localhost:5432/app_test
+      DB_USERNAME: app
+      DB_PASSWORD: password
       JWT_SECRET_BASE64: ohjosdfhsofOPsaofhwpjNOFIAHWFP90285984nsvlksnvplng20sdfknPONENFLSDNF23452n5wpp
       BE_IMAGE: docker.io/iamyasuomain/deawkoikid_backend:latest
       BE_PORT: 8080
@@ -49,15 +49,28 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Wait for backend health
+        run: |
+          echo "Waiting for backend health..."
+          for i in {1..30}; do
+            if curl -fsS http://localhost:${BE_PORT}/health > /dev/null; then
+              echo "✅ Backend is ready"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            docker logs be | tail -n 20
+            sleep 2
+          done
+
       - name: Pull & run backend container
         run: |
           docker pull "$BE_IMAGE"
           docker run -d --name be \
             -p ${BE_PORT}:8080 \
             --env SPRING_PROFILES_ACTIVE=test \
-            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/deawkoikid_db \
-            --env SPRING_DATASOURCE_USERNAME=admin \
-            --env SPRING_DATASOURCE_PASSWORD=admin \
+            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
+            --env SPRING_DATASOURCE_USERNAME=app \
+            --env SPRING_DATASOURCE_PASSWORD=password \
             --env JWT_SECRET_BASE64=ohjosdfhsofOPsaofhwpjNOFIAHWFP90285984nsvlksnvplng20sdfknPONENFLSDNF23452n5wpp \
             "$BE_IMAGE"
             echo "Waiting for backend..."
