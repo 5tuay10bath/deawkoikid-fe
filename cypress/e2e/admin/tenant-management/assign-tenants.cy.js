@@ -1,6 +1,8 @@
 describe("Tenant Management - Assign Tenants to Units", () => {
   beforeEach(() => {
     cy.visit("/dashboard")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   // User Story 1.a & 1.b: Check-in functionality

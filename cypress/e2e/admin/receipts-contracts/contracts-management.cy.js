@@ -1,6 +1,8 @@
 describe("Contract Management - Data and Actions", () => {
   beforeEach(() => {
     cy.visit("/contracts")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   it("should display contracts management page", () => {

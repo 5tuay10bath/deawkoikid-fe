@@ -1,6 +1,8 @@
 describe("Maintenance & Supplies - Task Tracking and Management", () => {
   beforeEach(() => {
     cy.visit("/maintenance")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
     // Click on Maintenance Tasks tab (default tab, but click to ensure)
     cy.contains("Maintenance Tasks").click()
   })

@@ -1,6 +1,8 @@
 describe("Maintenance & Supplies - Supply Management", () => {
   beforeEach(() => {
     cy.visit("/maintenance")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
     // Click on Supplies & Inventory tab
     cy.contains("Supplies & Inventory").click()
   })
