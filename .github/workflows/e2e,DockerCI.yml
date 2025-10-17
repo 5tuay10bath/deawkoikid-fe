@@ -16,9 +16,9 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: app_test
-          POSTGRES_USER: app
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: deawkoikid_db
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
         ports:
           - 5432:5432
         options: >-
@@ -28,9 +28,9 @@ jobs:
           --health-retries=30
 
     env:
-      DB_URL: jdbc:postgresql://localhost:5432/app_test
-      DB_USERNAME: app
-      DB_PASSWORD: password
+      DB_URL: jdbc:postgresql://localhost:5432/deawkoikid_db
+      DB_USERNAME: admin
+      DB_PASSWORD: admin
       JWT_SECRET_BASE64: ohjosdfhsofOPsaofhwpjNOFIAHWFP90285984nsvlksnvplng20sdfknPONENFLSDNF23452n5wpp
       BE_IMAGE: docker.io/iamyasuomain/deawkoikid_backend:latest
       BE_PORT: 8080
@@ -55,9 +55,9 @@ jobs:
           docker run -d --name be \
             -p ${BE_PORT}:8080 \
             --env SPRING_PROFILES_ACTIVE=test \
-            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
-            --env SPRING_DATASOURCE_USERNAME=app \
-            --env SPRING_DATASOURCE_PASSWORD=password \
+            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/deawkoikid_db \
+            --env SPRING_DATASOURCE_USERNAME=admin \
+            --env SPRING_DATASOURCE_PASSWORD=admin \
             --env JWT_SECRET_BASE64=ohjosdfhsofOPsaofhwpjNOFIAHWFP90285984nsvlksnvplng20sdfknPONENFLSDNF23452n5wpp \
             "$BE_IMAGE"
             echo "Waiting for backend..."
