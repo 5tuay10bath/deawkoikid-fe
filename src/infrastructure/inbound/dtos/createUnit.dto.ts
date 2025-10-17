@@ -3,6 +3,6 @@ export interface CreateUnitDto {
   address: string
   unitType: "A" | "B" | "C"
   unitSize: number
-  status: "AVAILABLE" | "RESERVED" | "OCCUPIED"
+  status: "AVAILABLE" | "RESERVED" | "OCCUPIED" | "PENDING"
   floor: number
 }

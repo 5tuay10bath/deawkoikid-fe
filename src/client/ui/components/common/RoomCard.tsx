@@ -8,7 +8,7 @@ interface RoomData {
   id: string
   number: string
   floor: number
-  status: "available" | "occupied" | "reserved" | "maintenance" | "checkout-pending"
+  status: "available" | "occupied" | "reserved" | "maintenance" | "checkout-pending" | "pending"
   tenant?: {
     name: string
     checkIn: Date
@@ -44,6 +44,10 @@ const statusConfig = {
   "checkout-pending": {
     color: "bg-info text-info-foreground",
     label: "Check-out Pending",
+  },
+  pending: {
+    color: "bg-blue-500 text-white",
+    label: "Pending",
   },
 }
 

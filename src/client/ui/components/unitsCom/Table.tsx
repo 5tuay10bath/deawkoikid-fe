@@ -29,6 +29,7 @@ const TableUnits = () => {
     available: { color: "bg-green-500 text-white", label: "Available" },
     occupied: { color: "bg-red-500 text-white", label: "Occupied" },
     reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
+    pending: { color: "bg-blue-500 text-white", label: "Pending" },
   }
 
   const getStatusConfig = (status: string) => {

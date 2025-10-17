@@ -8,9 +8,10 @@ import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
 import DialogContracts from "../components/contractsCom/Dialog"
 import { useEffect } from "react"
+import { TableLoading } from "../components/common/TableLoading"
 
 export default function Contracts() {
-  const { contracts, searchTerm, setSearchTerm, getContracts } = useContractStore()
+  const { contracts, searchTerm, isLoading, setSearchTerm, getContracts } = useContractStore()
 
   useEffect(() => {
     getContracts()
@@ -92,9 +93,7 @@ export default function Contracts() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <ContractsTable />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <ContractsTable />}</CardContent>
       </Card>
 
       {/* Contract Viewer */}

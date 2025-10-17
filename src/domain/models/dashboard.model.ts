@@ -6,7 +6,7 @@ export interface DashboardModel {
   unitNumber: string
   unitType: "A" | "B" | "C"
   unitSize: number
-  unitStatus: "AVAILABLE" | "RESERVED" | "OCCUPIED"
+  unitStatus: "AVAILABLE" | "RESERVED" | "OCCUPIED" | "PENDING"
   floor: number
   latestAirconService: Date
   contract: ContractsModel

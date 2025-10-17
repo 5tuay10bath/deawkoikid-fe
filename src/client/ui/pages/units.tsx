@@ -6,10 +6,12 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import DialogUnits from "../components/unitsCom/Dialog"
 import TableUnits from "../components/unitsCom/Table"
+import { TableLoading } from "../components/common/TableLoading"
 import { useEffect } from "react"
 
 export default function Units() {
-  const { searchTerm, setSearchTerm, getUnits } = useUnitStore()
+  const { searchTerm, isLoading, setSearchTerm, getUnits } = useUnitStore()
+
   useEffect(() => {
     getUnits()
   }, [getUnits])
@@ -45,9 +47,7 @@ export default function Units() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <TableUnits />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <TableUnits />}</CardContent>
       </Card>
     </div>
   )

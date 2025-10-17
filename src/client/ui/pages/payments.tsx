@@ -10,9 +10,11 @@ import ReceiptDialog from "../components/paymentsCom/ReceiptDialog"
 import DialogPayments from "../components/paymentsCom/Dialog"
 import TablePayments from "../components/paymentsCom/Table"
 import { useEffect } from "react"
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 
 export default function Payments() {
   const { payments, searchTerm, setSearchTerm, getPayments } = usePaymentStore()
+  const { getDashboard } = useDashboardStore()
 
   const totalRevenue = payments
     .filter((p) => p.status.toUpperCase() === "PAID")
@@ -24,7 +26,8 @@ export default function Payments() {
 
   useEffect(() => {
     getPayments()
-  }, [getPayments])
+    getDashboard()
+  }, [getPayments, getDashboard])
 
   return (
     <div className="space-y-6">

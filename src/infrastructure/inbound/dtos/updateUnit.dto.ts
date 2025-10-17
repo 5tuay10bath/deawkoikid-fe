@@ -5,5 +5,5 @@ export interface UpdateUnitDto {
   unitSize: number
   floor: number
   address: string
-  unitStatus: "AVAILABLE" | "OCCUPIED" | "RESERVED"
+  status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "PENDING"
 }

@@ -11,7 +11,7 @@ export class UnitPageMapper {
       .unitType(unitPageEntity.unitType as "A" | "B" | "C")
       .unitSize(unitPageEntity.unitSize)
       .address(unitPageEntity.address)
-      .status(unitPageEntity.status as "available" | "reserved" | "occupied")
+      .status(unitPageEntity.status as "available" | "reserved" | "occupied" | "pending")
       .latestAirconService(unitPageEntity.latestAirconService)
       .build()
   }

@@ -6,10 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/common/c
 import { StatsCard } from "../components/central/StatsCard"
 import NewTaskDialog, { NewSupplyDialog } from "../components/maintenanceCom/Dialog"
 import MaintainTable, { SupplyTable } from "../components/maintenanceCom/Table"
+import { TableLoading } from "../components/common/TableLoading"
 import { useEffect } from "react"
 
 export default function Maintenance() {
-  const { tasks, supplies, searchTerm, setSearchTerm, getMaintenanceTasks, getSupplies } = useMaintenanceStore()
+  const { tasks, supplies, searchTerm, isLoading, setSearchTerm, getMaintenanceTasks, getSupplies } =
+    useMaintenanceStore()
 
   const lowStockSupplies = supplies.filter((supply) => supply.quantity <= supply.minStock)
 
@@ -119,9 +121,7 @@ export default function Maintenance() {
                 Maintenance Tasks
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <MaintainTable />
-            </CardContent>
+            <CardContent>{isLoading ? <TableLoading /> : <MaintainTable />}</CardContent>
           </Card>
         </TabsContent>
 
