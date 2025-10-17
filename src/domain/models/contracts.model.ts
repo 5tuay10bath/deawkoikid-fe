@@ -1,15 +1,15 @@
+import type { TenantsPageModel } from "./tenantsPage.model"
+import type { UnitPageModel } from "./unitPage.model"
+
 export interface ContractsModel {
   id: string
-  tenantId: string
-  tenantName: string
-  unitNumber: string
-  contractType: "rental" | "lease"
+  user: TenantsPageModel
+  unit: UnitPageModel
+  rentType: "MONTHLY" | "YEARLY"
+  rentAmount: number
+  waterBillingType: "PER_UNIT" | "FLAT_RATE" | "TIERED"
+  internet: boolean
   startDate: Date
   endDate: Date
-  rentAmount: number
-  securityDeposit: number
-  paymentFrequency: "monthly" | "quarterly" | "yearly"
-  status: "active" | "expired" | "terminated" | "pending"
-  signedDate: Date | null
-  terminationDate: Date | null
+  status: "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED"
 }

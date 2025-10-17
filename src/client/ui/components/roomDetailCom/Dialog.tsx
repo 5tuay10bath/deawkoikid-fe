@@ -1,27 +1,52 @@
 import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { useToast } from "../hooks/useToast"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Plus } from "lucide-react"
 import { Label } from "../common/Label"
 import { Input } from "../common/Input"
 import { Textarea } from "../common/TextArea"
+import { useState } from "react"
 
 export const CheckOutDialog = () => {
   const { room, isCheckOutOpen, setIsCheckOutOpen } = useRoomDetailStore()
+  const { checkOut } = useDashboardStore()
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { roomId } = useParams()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleCheckOut = () => {
-    toast({
-      title: "Check-out Initiated",
-      description: `Check-out process started for Room ${roomId}`,
-    })
-    setIsCheckOutOpen(false)
-    navigate("/")
+  const handleCheckOut = async () => {
+    if (!room?.contract?.id) {
+      toast({
+        title: "Error",
+        description: "Contract information not found",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    const result = await checkOut({ id: room.contract.id })
+    setIsLoading(false)
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: result.message || `Check-out completed for Room ${room.unitNumber}`,
+      })
+      setIsCheckOutOpen(false)
+      navigate("/dashboard")
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || "Failed to check out",
+        variant: "destructive",
+      })
+    }
   }
+
   return (
     <Dialog open={isCheckOutOpen} onOpenChange={setIsCheckOutOpen}>
       <DialogTrigger asChild>
@@ -35,14 +60,14 @@ export const CheckOutDialog = () => {
         </DialogHeader>
         <div className="space-y-4">
           <p>
-            Are you sure you want to check out {room?.tenant?.name} from Room {room?.number}?
+            Are you sure you want to check out {room?.contract?.user.fullName} from Room {room?.unitNumber}?
           </p>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsCheckOutOpen(false)}>
+            <Button variant="outline" onClick={() => setIsCheckOutOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleCheckOut}>
-              Confirm Check-out
+            <Button variant="destructive" onClick={handleCheckOut} disabled={isLoading}>
+              {isLoading ? "Processing..." : "Confirm Check-out"}
             </Button>
           </div>
         </div>

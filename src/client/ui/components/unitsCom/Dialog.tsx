@@ -1,8 +1,7 @@
 import { Plus } from "lucide-react"
 import React, { useState } from "react"
 
-import type { Room } from "src/infrastructure/mockData/mockData"
-
+import type { CreateUnitDto } from "@infrastructure/inbound/dtos/createUnit.dto"
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
 
 import { Button } from "../common/Button"
@@ -10,34 +9,61 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "../common/Input"
 import { Label } from "../common/Label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../common/Select"
+import { useToast } from "../hooks/useToast"
 
 const DialogUnits = () => {
-  const { units, setUnits } = useUnitStore()
+  const { createUnit } = useUnitStore()
+  const { toast } = useToast()
   const [isAddUnitOpen, setIsAddUnitOpen] = useState(false)
-  const [newUnit, setNewUnit] = useState({
-    number: "",
-    floor: "",
-    type: "",
-    size: "",
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [newUnit, setNewUnit] = useState<CreateUnitDto>({
+    unitNumber: "",
+    address: "",
+    unitType: "A",
+    unitSize: 400,
+    status: "AVAILABLE",
+    floor: 1,
   })
-  const handleAddUnit = () => {
-    if (!newUnit.number || !newUnit.floor || !newUnit.type) {
+
+  const handleAddUnit = async () => {
+    if (!newUnit.unitNumber || !newUnit.address) {
+      toast({
+        title: "Error",
+        description: "Please fill in unit number and address",
+        variant: "destructive",
+      })
       return
     }
 
-    const unit: Room = {
-      id: newUnit.number,
-      number: newUnit.number,
-      floor: parseInt(newUnit.floor),
-      type: newUnit.type,
-      size: newUnit.size || "400 sq ft",
-      status: "available",
+    setIsSubmitting(true)
+    try {
+      const result = await createUnit(newUnit)
+      if (result.success) {
+        setNewUnit({
+          unitNumber: "",
+          address: "",
+          unitType: "A",
+          unitSize: 400,
+          status: "AVAILABLE",
+          floor: 1,
+        })
+        setIsAddUnitOpen(false)
+        toast({
+          title: "Success",
+          description: result.message || "Unit created successfully!",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to create unit",
+          variant: "destructive",
+        })
+      }
+    } finally {
+      setIsSubmitting(false)
     }
-
-    setUnits([...units, unit])
-    setNewUnit({ number: "", floor: "", type: "", size: "" })
-    setIsAddUnitOpen(false)
   }
+
   return (
     <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
       <DialogTrigger asChild>
@@ -55,9 +81,9 @@ const DialogUnits = () => {
             <div className="space-y-2">
               <Label>Unit Number</Label>
               <Input
-                value={newUnit.number}
+                value={newUnit.unitNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewUnit((prev) => ({ ...prev, number: e.target.value }))
+                  setNewUnit((prev) => ({ ...prev, unitNumber: e.target.value }))
                 }
                 placeholder="101"
               />
@@ -65,50 +91,84 @@ const DialogUnits = () => {
             <div className="space-y-2">
               <Label>Floor</Label>
               <Select
-                value={newUnit.floor}
-                onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, floor: value }))}
+                value={newUnit.floor.toString()}
+                onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, floor: parseInt(value) }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select floor" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="1">Floor 1</SelectItem>
-                  <SelectItem value="2">Floor 2</SelectItem>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((floor) => (
+                    <SelectItem key={floor} value={floor.toString()}>
+                      Floor {floor}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
+            <Label>Address</Label>
+            <Input
+              value={newUnit.address}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewUnit((prev) => ({ ...prev, address: e.target.value }))
+              }
+              placeholder="Building A, 123 Street"
+            />
+          </div>
+          <div className="space-y-2">
             <Label>Unit Type</Label>
             <Select
-              value={newUnit.type}
-              onValueChange={(value: string) => setNewUnit((prev) => ({ ...prev, type: value }))}
+              value={newUnit.unitType}
+              onValueChange={(value: "A" | "B" | "C") => setNewUnit((prev) => ({ ...prev, unitType: value }))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="Studio">Studio</SelectItem>
-                <SelectItem value="1BR">1 Bedroom</SelectItem>
-                <SelectItem value="2BR">2 Bedroom</SelectItem>
+                <SelectItem value="A">Type A</SelectItem>
+                <SelectItem value="B">Type B</SelectItem>
+                <SelectItem value="C">Type C</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Size</Label>
+            <Label>Size (sq ft)</Label>
             <Input
-              value={newUnit.size}
+              value={newUnit.unitSize.toString()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUnit((prev) => ({ ...prev, size: e.target.value }))
+                setNewUnit((prev) => ({ ...prev, unitSize: parseInt(e.target.value) || 400 }))
               }
-              placeholder="400 sq ft"
+              placeholder="400"
+              type="number"
             />
           </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Select
+              value={newUnit.status}
+              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED") =>
+                setNewUnit((prev) => ({ ...prev, status: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="AVAILABLE">Available</SelectItem>
+                <SelectItem value="RESERVED">Reserved</SelectItem>
+                <SelectItem value="OCCUPIED">Occupied</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsAddUnitOpen(false)}>
+            <Button variant="outline" onClick={() => setIsAddUnitOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleAddUnit}>Add Unit</Button>
+            <Button onClick={handleAddUnit} disabled={isSubmitting}>
+              {isSubmitting ? "Adding..." : "Add Unit"}
+            </Button>
           </div>
         </div>
       </DialogContent>

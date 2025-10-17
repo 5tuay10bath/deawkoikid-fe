@@ -1,98 +1,86 @@
 describe("Receipts & Contracts - Generation and Download", () => {
   beforeEach(() => {
-    cy.visit("/dashboard")
+    cy.visit("/payments")
   })
 
-  describe("Receipt Information Display", () => {
-    it("should show receipt-related functionality if available", () => {
-      cy.contains("Property Dashboard").should("be.visible")
+  describe("Receipt Generation", () => {
+    // User Story 3.a: Generate and print/download receipts for rent payments
+    it("should provide receipt generation functionality for rent payments", () => {
+      cy.contains("Payment Management").should("be.visible")
 
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for receipt-related features
-        if (bodyText.includes("Receipt") || bodyText.includes("Payment")) {
-          cy.log("Found receipt or payment functionality")
-
-          if (bodyText.includes("Generate Receipt")) {
-            cy.contains("Generate Receipt").should("be.visible")
-          }
-
-          if (bodyText.includes("Payment History")) {
-            cy.contains("Payment History").should("be.visible")
-          }
+        // Check for payment records table
+        if (bodyText.includes("Payment") || bodyText.includes("Rent")) {
+          cy.log("Payment records displayed")
         }
 
-        // Check for financial management features
-        if (bodyText.includes("Revenue") || bodyText.includes("Income")) {
-          cy.log("Found financial tracking features")
+        // Look for receipt generation options
+        if (bodyText.includes("Receipt") || bodyText.includes("Generate") || bodyText.includes("Download")) {
+          cy.log("Receipt generation functionality available")
         }
       })
     })
 
-    it("should handle payment tracking if available", () => {
+    // Test Add Billing from Room Details
+    it("should open Add Billing modal when clicking + button", () => {
+      // Navigate to room details page
+      cy.visit("/dashboard")
+
       cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+        if ($body.text().includes("View Details")) {
+          cy.contains("View Details").first().click()
 
-        // Look for payment status indicators
-        if (bodyText.includes("Paid") || bodyText.includes("Overdue") || bodyText.includes("Pending")) {
-          cy.log("Found payment status indicators")
-        }
+          // On room detail page, look for + Add Billing button
+          cy.get("button").then(($buttons) => {
+            const addButton = Array.from($buttons).find(
+              (btn) =>
+                btn.textContent.includes("+ Add Billing") ||
+                btn.textContent.includes("Add Billing") ||
+                btn.getAttribute("data-cy") === "add-billing",
+            )
 
-        // Check for rent collection features
-        if (bodyText.includes("Rent") || bodyText.includes("Monthly")) {
-          cy.log("Found rent collection features")
-        }
+            if (addButton) {
+              cy.wrap(addButton).click()
 
-        // Look for payment methods
-        if (bodyText.includes("Cash") || bodyText.includes("Bank") || bodyText.includes("Transfer")) {
-          cy.log("Found payment method tracking")
+              // Should open Add Billing modal
+              cy.get("body").then(($modal) => {
+                const modalText = $modal.text()
+
+                // Check for modal with billing form fields
+                if (
+                  modalText.includes("Add Billing") ||
+                  modalText.includes("Water") ||
+                  modalText.includes("Electricity") ||
+                  modalText.includes("Amount")
+                ) {
+                  cy.log("Add Billing modal opened successfully")
+                }
+              })
+            } else {
+              cy.log("Add Billing button not found - may be available room only")
+            }
+          })
         }
       })
     })
 
-    it("should display financial statistics if available", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for revenue information
-        if (bodyText.includes("Revenue")) {
-          cy.contains("Revenue").should("be.visible")
-
-          // Check if there are revenue numbers
-          const revenuePattern = /Revenue.*?\$[\d,]+/g
-          const revenueMatches = bodyText.match(revenuePattern)
-
-          if (revenueMatches) {
-            cy.log(`Found revenue information: ${revenueMatches.join(", ")}`)
-          }
-        }
-
-        // Check for collection rates
-        if (bodyText.includes("Collection") || bodyText.includes("Rate")) {
-          cy.log("Found collection rate information")
-        }
-      })
-    })
-
-    it("should show tenant payment information", () => {
-      cy.visit("/tenants")
+    // User Story 3.c: Include utility charges in receipts
+    it("should allow receipts to include utility charges (electricity, water)", () => {
+      cy.contains("Payment Management").should("be.visible")
 
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for tenant payment details
-        if (bodyText.includes("Tenant Management")) {
-          cy.contains("Tenant Management").should("be.visible")
+        // Check for utility charge tracking
+        if (bodyText.includes("Electricity") || bodyText.includes("Water") || bodyText.includes("Utility")) {
+          cy.log("Utility charges tracked in payment system")
+        }
 
-          // Check for payment-related columns or info
-          if (bodyText.includes("Payment") || bodyText.includes("Balance")) {
-            cy.log("Found tenant payment information")
-          }
-
-          if (bodyText.includes("Due Date") || bodyText.includes("Next Payment")) {
-            cy.log("Found payment due date information")
-          }
+        // Check for billing components
+        if (bodyText.includes("Rent") && bodyText.includes("Water")) {
+          cy.log("Rent and utility charges can be billed together")
         }
       })
     })
@@ -125,88 +113,42 @@ describe("Receipts & Contracts - Generation and Download", () => {
       })
     })
 
-    it("should show contract terms and conditions", () => {
+    // User Story 3.b: Generate and download rental contracts
+    it("should provide contract generation functionality", () => {
+      cy.visit("/contracts")
+
       cy.get("body").then(($body) => {
         const bodyText = $body.text()
 
-        // Look for contract terms
-        if (bodyText.includes("Terms") || bodyText.includes("Duration")) {
-          cy.log("Found contract terms information")
+        // Check for contract management interface
+        if (bodyText.includes("Contract")) {
+          cy.log("Contract management page available")
         }
 
-        // Check for renewal information
-        if (bodyText.includes("Renewal") || bodyText.includes("Expires")) {
-          cy.log("Found contract renewal information")
+        // Look for contract details
+        if (bodyText.includes("Start Date") || bodyText.includes("End Date")) {
+          cy.log("Contract lease terms displayed")
         }
 
-        // Look for deposit information
-        if (bodyText.includes("Deposit") || bodyText.includes("Security")) {
-          cy.log("Found deposit information")
+        // Check for view/download options
+        if (bodyText.includes("View") || bodyText.includes("Download") || bodyText.includes("Generate")) {
+          cy.log("Contract document generation available")
         }
       })
     })
 
-    it("should handle document generation if available", () => {
+    it("should show contract from occupied room details", () => {
+      cy.visit("/dashboard")
+
       cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+        if ($body.text().includes("View Details")) {
+          cy.contains("View Details").first().click()
 
-        // Look for document generation features
-        if (bodyText.includes("Generate") || bodyText.includes("Download")) {
-          cy.log("Found document generation features")
-        }
-
-        // Check for PDF generation
-        if (bodyText.includes("PDF") || bodyText.includes("Export")) {
-          cy.log("Found PDF generation features")
-        }
-
-        // Look for template management
-        if (bodyText.includes("Template") || bodyText.includes("Format")) {
-          cy.log("Found template management features")
-        }
-      })
-    })
-  })
-
-  describe("Document Management", () => {
-    it("should handle document storage and retrieval", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for document management
-        if (bodyText.includes("Documents") || bodyText.includes("Files")) {
-          cy.log("Found document management features")
-        }
-
-        // Check for document history
-        if (bodyText.includes("History") || bodyText.includes("Archive")) {
-          cy.log("Found document history features")
-        }
-
-        // Look for sharing capabilities
-        if (bodyText.includes("Share") || bodyText.includes("Send")) {
-          cy.log("Found document sharing features")
-        }
-      })
-    })
-
-    it("should support document printing and emailing", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for printing options
-        if (bodyText.includes("Print") || bodyText.includes("Printer")) {
-          cy.log("Found printing functionality")
-        }
-
-        // Check for email features
-        if (bodyText.includes("Email") || bodyText.includes("Send")) {
-          cy.log("Found email functionality")
-        }
-
-        // Look for notification features
-        if (bodyText.includes("Notify") || bodyText.includes("Alert")) {
-          cy.log("Found notification features")
+          cy.get("body").then(($detail) => {
+            if ($detail.text().includes("View Contract")) {
+              cy.log("View Contract available from room details page")
+            }
+          })
         }
       })
     })

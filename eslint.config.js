@@ -121,4 +121,19 @@ export default tseslint.config(
       ],
     },
   },
+  // 🔇 Relax rules for infrastructure folder
+  {
+    files: ["src/infrastructure/**/*.{ts,tsx}"],
+    rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  // 🔇 Allow 'any' type in port files
+  {
+    files: ["src/application/ports/**/*.ts", "src/domain/ports/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 )

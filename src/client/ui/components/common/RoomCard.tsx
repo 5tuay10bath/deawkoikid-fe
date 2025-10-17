@@ -1,12 +1,25 @@
 import { Calendar, User, DollarSign } from "lucide-react"
 import { format } from "date-fns"
-import type { Room } from "@infrastructure/mockData/mockData"
 import { Badge } from "./Badge"
 import { Card, CardContent, CardHeader, CardTitle } from "./card"
 import { Button } from "./Button"
 
+interface RoomData {
+  id: string
+  number: string
+  floor: number
+  status: "available" | "occupied" | "reserved" | "maintenance" | "checkout-pending"
+  tenant?: {
+    name: string
+    checkIn: Date
+    checkOut: Date
+    rentAmount: number
+    billingCycle: "monthly" | "yearly"
+  }
+}
+
 interface RoomCardProps {
-  room: Room
+  room: RoomData
   onCheckIn?: (roomId: string) => void
   onViewDetails?: (roomId: string) => void
 }
@@ -19,6 +32,10 @@ const statusConfig = {
   occupied: {
     color: "bg-red-500 text-white",
     label: "Occupied",
+  },
+  reserved: {
+    color: "bg-orange-500 text-white",
+    label: "Reserved",
   },
   maintenance: {
     color: "bg-yellow-500 text-white",
@@ -71,13 +88,11 @@ export function RoomCard({ room, onCheckIn, onViewDetails }: RoomCardProps) {
           )}
 
           <div className="pt-2">
-            {room.status === "available" && (
+            {room.status === "reserved" ? (
               <Button size="sm" className="w-full" onClick={() => onCheckIn?.(room.id)} data-cy="check-in-button">
                 Check In
               </Button>
-            )}
-
-            {room.status !== "available" && (
+            ) : (
               <Button
                 size="sm"
                 variant="outline"

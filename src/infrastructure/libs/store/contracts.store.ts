@@ -1,8 +1,11 @@
 import { create } from "zustand/react"
 
-import { mockDB, type Contract } from "src/infrastructure/mockData/mockData"
 import type { ContractsModel } from "@domain/models/contracts.model"
+import type { CreateContractDto } from "@infrastructure/inbound/dtos/createContract.dto"
+import type { UpdateContractDto } from "@infrastructure/inbound/dtos/updateContract.dto"
 import { GetContractsFactory } from "@infrastructure/inbound/factories/getContracts.factory"
+import { CreateContractFactory } from "@infrastructure/inbound/factories/createContract.factory"
+import { UpdateContractFactory } from "@infrastructure/inbound/factories/updateContract.factory"
 
 type ContractTemplate = {
   name: string
@@ -10,32 +13,31 @@ type ContractTemplate = {
 }
 
 type ContractState = {
-  contracts: Contract[]
-  contractsTest: ContractsModel[]
+  contracts: ContractsModel[]
   searchTerm: string
   isTemplateOpen: boolean
   isViewOpen: boolean
-  selectedContract: Contract | null
+  selectedContract: ContractsModel | null
   template: ContractTemplate
-  setContractsTest: (contracts: ContractsModel[]) => void
-  setContracts: (contracts: Contract[]) => void
+  setContracts: (contracts: ContractsModel[]) => void
   setSearchTerm: (term: string) => void
   setIsTemplateOpen: (isOpen: boolean) => void
   setIsViewOpen: (isOpen: boolean) => void
-  setSelectedContract: (contract: Contract | null) => void
+  setSelectedContract: (contract: ContractsModel | null) => void
   setTemplate: (template: ContractTemplate) => void
   updateTemplate: (updates: Partial<ContractTemplate>) => void
 }
 
 interface ContractAction {
   getContracts: () => Promise<void>
+  createContract: (dto: CreateContractDto) => Promise<{ success: boolean; message?: string }>
+  updateContract: (dto: UpdateContractDto) => Promise<{ success: boolean; message?: string }>
 }
 
 type ContractStore = ContractState & ContractAction
 
 export const useContractStore = create<ContractStore>((set, get) => ({
-  contracts: mockDB.getContracts(),
-  contractsTest: [],
+  contracts: [],
   searchTerm: "",
   isTemplateOpen: false,
   isViewOpen: false,
@@ -73,7 +75,6 @@ This agreement is governed by local rental laws.
 Landlord Signature: ___________________ Date: ___________
 Tenant Signature: ____________________ Date: ___________`,
   },
-  setContractsTest: (contracts) => set({ contractsTest: contracts }),
   setContracts: (contracts) => set({ contracts }),
   setSearchTerm: (term) => set({ searchTerm: term }),
   setIsTemplateOpen: (isOpen) => set({ isTemplateOpen: isOpen }),
@@ -86,12 +87,40 @@ Tenant Signature: ____________________ Date: ___________`,
     try {
       const result = await GetContractsFactory().handler({})
       if (result.isRight()) {
-        set({ contractsTest: result.value })
-      } else if (result.isLeft()) {
-        console.error(result.value)
+        set({ contracts: result.value })
       }
-    } catch (error) {
-      console.error(error)
+    } catch {
+      // Error handling
+    }
+  },
+
+  createContract: async (dto: CreateContractDto) => {
+    try {
+      const result = await CreateContractFactory().handler(dto)
+      if (result.isRight()) {
+        await get().getContracts()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        return { success: false, message: "Failed to create contract" }
+      }
+      return { success: false }
+    } catch {
+      return { success: false, message: "An error occurred" }
+    }
+  },
+
+  updateContract: async (dto: UpdateContractDto) => {
+    try {
+      const result = await UpdateContractFactory().handler(dto)
+      if (result.isRight()) {
+        await get().getContracts()
+        return { success: true, message: result.value.message }
+      } else if (result.isLeft()) {
+        return { success: false, message: "Failed to update contract" }
+      }
+      return { success: false }
+    } catch {
+      return { success: false, message: "An error occurred" }
     }
   },
 }))

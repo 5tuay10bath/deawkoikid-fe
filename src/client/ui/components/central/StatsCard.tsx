@@ -15,6 +15,14 @@ type StatsCardProps = {
 
 export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: StatsCardProps) {
   const { valueColor = "text-gray-900", iconColor = "text-blue-500" } = color
+
+  const formattedValue =
+    typeof value === "number"
+      ? prefix === "$"
+        ? value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : value.toLocaleString("en-US", { maximumFractionDigits: 0 })
+      : value
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -23,7 +31,7 @@ export function StatsCard({ label, value, icon: Icon, prefix, color = {} }: Stat
             <p className="text-muted-foreground text-sm">{label}</p>
             <p className={`text-2xl font-bold ${valueColor}`}>
               {prefix}
-              {value}
+              {formattedValue}
             </p>
           </div>
           {Icon && <Icon className={`h-8 w-8 ${iconColor}`} />}
@@ -37,7 +45,7 @@ interface DashboardStatCardProps {
   title: string
   value: string | number
   description: string
-  icon: LucideIcon
+  icon?: LucideIcon
   valueColor?: string
   iconColor?: string
   "data-cy"?: string
@@ -56,7 +64,7 @@ export function DashboardStatCard({
     <Card data-cy={dataCy}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className={`h-4 w-4 ${iconColor}`} />
+        {Icon && <Icon className={`h-4 w-4 ${iconColor}`} />}
       </CardHeader>
       <CardContent>
         <div className={`text-2xl font-bold ${valueColor}`}>{value}</div>
