@@ -6,6 +6,7 @@ import { Button } from "../components/common/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Badge } from "../components/common/Badge"
 import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
+import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
 import { AddBillingDialog, CheckOutDialog } from "../components/roomDetailCom/Dialog"
 import RoomReceiptDialog from "../components/roomDetailCom/ReceiptDialog"
 import RoomContractDialog from "../components/roomDetailCom/ContractDialog"
@@ -17,6 +18,7 @@ export default function RoomDetails() {
   const [isContractOpen, setIsContractOpen] = useState(false)
 
   const { dashboard, getDashboard } = useDashboardStore()
+  const { setRoom } = useRoomDetailStore()
 
   const BACK_TO_DASHBOARD = "flex items-center gap-2"
   const DASHBOARD_PATH = "/dashboard"
@@ -29,6 +31,13 @@ export default function RoomDetails() {
 
   // Find the unit from dashboard array by roomId
   const unit = dashboard.find((item) => item.id === roomId)
+
+  // Set room to store when unit is found
+  useEffect(() => {
+    if (unit) {
+      setRoom(unit)
+    }
+  }, [unit, setRoom])
 
   const statusConfig = {
     available: { color: "bg-green-500 text-white", label: "Available" },

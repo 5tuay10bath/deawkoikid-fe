@@ -1,13 +1,23 @@
 import { Edit } from "lucide-react"
+import { useState } from "react"
 
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import type { UnitPageModel } from "@domain/models/unitPage.model"
 
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
+import EditUnitDialog from "./EditUnitDialog"
 
 const TableUnits = () => {
   const { units, searchTerm } = useUnitStore()
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [selectedUnit, setSelectedUnit] = useState<UnitPageModel | null>(null)
+
+  const handleEditClick = (unit: UnitPageModel) => {
+    setSelectedUnit(unit)
+    setIsEditOpen(true)
+  }
 
   const filteredUnits = units.filter(
     (unit) =>
@@ -32,40 +42,45 @@ const TableUnits = () => {
   }
 
   return (
-    <Table data-cy="units-table">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Unit Number</TableHead>
-          <TableHead>Floor</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Size</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {filteredUnits.map((unit) => (
-          <TableRow key={unit.id} data-cy={`unit-row-${unit.unitNumber}`}>
-            <TableCell className="font-medium" data-cy="unit-number">
-              {unit.unitNumber}
-            </TableCell>
-            <TableCell data-cy="unit-floor">{unit.floor}</TableCell>
-            <TableCell data-cy="unit-type">{unit.unitType}</TableCell>
-            <TableCell data-cy="unit-size">{unit.unitSize} sq ft</TableCell>
-            <TableCell>
-              <Badge className={getStatusConfig(unit.status).color} data-cy={`unit-status-${unit.status}`}>
-                {getStatusConfig(unit.status).label}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <Button variant="ghost" size="sm" data-cy="edit-unit-button">
-                <Edit className="h-4 w-4" />
-              </Button>
-            </TableCell>
+    <>
+      <Table data-cy="units-table">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Unit Number</TableHead>
+            <TableHead>Floor</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Size</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {filteredUnits.map((unit) => (
+            <TableRow key={unit.id} data-cy={`unit-row-${unit.unitNumber}`}>
+              <TableCell className="font-medium" data-cy="unit-number">
+                {unit.unitNumber}
+              </TableCell>
+              <TableCell data-cy="unit-floor">{unit.floor}</TableCell>
+              <TableCell data-cy="unit-type">{unit.unitType}</TableCell>
+              <TableCell data-cy="unit-size">{unit.unitSize} sq ft</TableCell>
+              <TableCell>
+                <Badge className={getStatusConfig(unit.status).color} data-cy={`unit-status-${unit.status}`}>
+                  {getStatusConfig(unit.status).label}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" data-cy="edit-unit-button" onClick={() => handleEditClick(unit)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Edit Unit Dialog */}
+      <EditUnitDialog isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} unit={selectedUnit} />
+    </>
   )
 }
 

@@ -3,11 +3,20 @@ import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
 import { format } from "date-fns"
 import { Download, Eye, Edit } from "lucide-react"
+import { useState } from "react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
 import type { ContractsModel } from "@domain/models/contracts.model"
+import EditContractDialog from "./EditContractDialog"
 
 const ContractsTable = () => {
   const { contracts, searchTerm, setSelectedContract, setIsViewOpen } = useContractStore()
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [selectedContractForEdit, setSelectedContractForEdit] = useState<ContractsModel | null>(null)
+
+  const handleEditClick = (contract: ContractsModel) => {
+    setSelectedContractForEdit(contract)
+    setIsEditOpen(true)
+  }
   const filteredContracts = contracts.filter(
     (contract) =>
       contract.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -31,48 +40,55 @@ const ContractsTable = () => {
     setIsViewOpen(true)
   }
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Tenant</TableHead>
-          <TableHead>Unit</TableHead>
-          <TableHead>Start Date</TableHead>
-          <TableHead>End Date</TableHead>
-          <TableHead>Rent</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {filteredContracts.map((contract) => (
-          <TableRow key={contract.id}>
-            <TableCell className="font-medium">{contract.user.fullName}</TableCell>
-            <TableCell>{contract.unit.unitNumber}</TableCell>
-            <TableCell>{format(contract.startDate, "MMM dd, yyyy")}</TableCell>
-            <TableCell>{format(contract.endDate, "MMM dd, yyyy")}</TableCell>
-            <TableCell>
-              ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
-            </TableCell>
-            <TableCell>
-              <Badge className={getStatusConfig(contract.status).color}>{getStatusConfig(contract.status).label}</Badge>
-            </TableCell>
-            <TableCell>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="sm" onClick={() => handleViewContract(contract)}>
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Download className="h-4 w-4" />
-                </Button>
-              </div>
-            </TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tenant</TableHead>
+            <TableHead>Unit</TableHead>
+            <TableHead>Start Date</TableHead>
+            <TableHead>End Date</TableHead>
+            <TableHead>Rent</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {filteredContracts.map((contract) => (
+            <TableRow key={contract.id}>
+              <TableCell className="font-medium">{contract.user.fullName}</TableCell>
+              <TableCell>{contract.unit.unitNumber}</TableCell>
+              <TableCell>{format(contract.startDate, "MMM dd, yyyy")}</TableCell>
+              <TableCell>{format(contract.endDate, "MMM dd, yyyy")}</TableCell>
+              <TableCell>
+                ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
+              </TableCell>
+              <TableCell>
+                <Badge className={getStatusConfig(contract.status).color}>
+                  {getStatusConfig(contract.status).label}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => handleViewContract(contract)}>
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleEditClick(contract)}>
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Edit Contract Dialog */}
+      <EditContractDialog isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} contract={selectedContractForEdit} />
+    </>
   )
 }
 

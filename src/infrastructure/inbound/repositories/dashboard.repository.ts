@@ -1,5 +1,6 @@
 import type { IDashboardRepository } from "@application/ports/dashboard.repository.port"
 import type { CheckInDto } from "../dtos/checkIn.dto"
+import type { CheckOutDto } from "../dtos/checkOut.dto"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { DashboardModel } from "@domain/models/dashboard.model"
@@ -35,7 +36,26 @@ export class DashboardRepository implements IDashboardRepository {
 
   async checkIn(dto: CheckInDto): Promise<IDashboardRepository.checkIn> {
     try {
-      const url = `/dashboard/${dto.id}`
+      const url = `/dashboard/check-in/${dto.id}`
+
+      const { data } = await axiosInstance.put(url)
+
+      const result: ApiResponse = {
+        status: data.status,
+        message: data.message,
+        timestamp: data.timestamp,
+      }
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async checkOut(dto: CheckOutDto): Promise<IDashboardRepository.checkOut> {
+    try {
+      const url = `/dashboard/check-out/${dto.id}`
 
       const { data } = await axiosInstance.put(url)
 
