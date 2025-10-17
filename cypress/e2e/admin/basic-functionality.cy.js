@@ -14,26 +14,6 @@ describe("Basic App Functionality", () => {
     })
   })
 
-  it("should show room cards on dashboard", () => {
-    cy.visit("/dashboard")
-
-    // Check for room elements - flexible matching
-    cy.get("body").then(($body) => {
-      const bodyText = $body.text()
-
-      // Look for room indicators
-      if (bodyText.includes("Room") || bodyText.includes("Unit")) {
-        cy.log("Found room/unit cards on dashboard")
-      }
-
-      // Check for status badges
-      const hasStatus = bodyText.includes("Available") || bodyText.includes("Occupied") || bodyText.includes("Reserved")
-      if (hasStatus) {
-        cy.log("Found room status indicators")
-      }
-    })
-  })
-
   it("should allow direct navigation to pages", () => {
     // Test direct navigation instead of clicking links
     cy.visit("/tenants")

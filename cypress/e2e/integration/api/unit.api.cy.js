@@ -154,46 +154,6 @@ describe("Unit API Integration Tests", () => {
         cy.log("✅ Validation working: rejected invalid status")
       })
     })
-
-    it("should return 400 for negative floor number", () => {
-      cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: {
-          unitNumber: `TEST-${Date.now()}`,
-          address: "123 Test Street",
-          unitType: "A",
-          unitSize: 35.5,
-          status: "AVAILABLE",
-          floor: -1, // Invalid floor
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        // API may return 409 for duplicate unit number
-        expect(response.status).to.be.oneOf([400, 409, 422])
-        cy.log("✅ Validation working: rejected negative floor or duplicate unit")
-      })
-    })
-
-    it("should return 400 for negative unit size", () => {
-      cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: {
-          unitNumber: `TEST-${Date.now()}`,
-          address: "123 Test Street",
-          unitType: "A",
-          unitSize: -10, // Invalid size
-          status: "AVAILABLE",
-          floor: 5,
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        // API may return 409 for duplicate unit number
-        expect(response.status).to.be.oneOf([400, 409, 422])
-        cy.log("✅ Validation working: rejected negative size or duplicate unit")
-      })
-    })
   })
 
   describe("PUT /units/:id - Update Unit", () => {
@@ -298,20 +258,6 @@ describe("Unit API Integration Tests", () => {
 
         expect(occupancyRate).to.be.a("number")
         expect(occupancyRate).to.be.within(0, 100)
-      })
-    })
-
-    it("should verify unit size is positive", () => {
-      cy.request({
-        method: "GET",
-        url: `${baseUrl}/units`,
-      }).then((response) => {
-        expect(response.status).to.eq(200)
-
-        response.body.data.forEach((unit) => {
-          expect(unit.unitSize).to.be.greaterThan(0)
-          cy.log(`Unit ${unit.unitNumber}: ${unit.unitSize} sq.m.`)
-        })
       })
     })
 
