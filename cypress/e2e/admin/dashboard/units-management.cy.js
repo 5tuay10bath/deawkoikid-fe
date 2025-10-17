@@ -1,6 +1,8 @@
 describe("Unit Management - Data Tables and Actions", () => {
   beforeEach(() => {
     cy.visit("/units")
+    // Wait for table to be populated with data
+    cy.get("table tbody tr", { timeout: 20000 }).should("exist")
   })
 
   it("should display units management page with table", () => {

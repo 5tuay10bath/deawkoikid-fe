@@ -1,6 +1,9 @@
 describe("Tenant Management - Assign Tenants to Units", () => {
   beforeEach(() => {
     cy.visit("/dashboard")
+    // Wait for dashboard to load room cards
+    cy.contains("Property Dashboard", { timeout: 20000 }).should("be.visible")
+    cy.wait(2000) // Wait for data to fully load
   })
 
   // User Story 1.a & 1.b: Check-in functionality

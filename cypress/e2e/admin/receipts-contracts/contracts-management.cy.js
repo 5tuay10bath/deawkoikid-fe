@@ -1,6 +1,8 @@
 describe("Contract Management - Data and Actions", () => {
   beforeEach(() => {
     cy.visit("/contracts")
+    // Wait for table to be populated with data
+    cy.get("table tbody tr", { timeout: 20000 }).should("exist")
   })
 
   it("should display contracts management page", () => {

@@ -3,6 +3,8 @@ describe("Maintenance & Supplies - Task Tracking and Management", () => {
     cy.visit("/maintenance")
     // Click on Maintenance Tasks tab (default tab, but click to ensure)
     cy.contains("Maintenance Tasks").click()
+    // Wait for table to be populated with data
+    cy.get("table tbody tr", { timeout: 20000 }).should("exist")
   })
 
   describe("Maintenance Task Tracking", () => {

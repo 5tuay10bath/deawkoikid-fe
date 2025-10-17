@@ -1,6 +1,9 @@
 describe("Dashboard - Room Availability Overview", () => {
   beforeEach(() => {
     cy.visit("/dashboard")
+    // Wait for dashboard to load
+    cy.contains("Property Dashboard", { timeout: 20000 }).should("be.visible")
+    cy.wait(2000) // Wait for data to fully load
   })
 
   // User Story 2.a: Dashboard displays all 24 rooms' availability (12 per floor, 2 floors)

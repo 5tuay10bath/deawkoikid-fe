@@ -1,6 +1,8 @@
 describe("Receipts & Contracts - Generation and Download", () => {
   beforeEach(() => {
     cy.visit("/payments")
+    // Wait for table to be populated with data
+    cy.get("table tbody tr", { timeout: 20000 }).should("exist")
   })
 
   describe("Receipt Generation", () => {

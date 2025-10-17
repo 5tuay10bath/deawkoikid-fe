@@ -3,6 +3,8 @@ describe("Maintenance & Supplies - Supply Management", () => {
     cy.visit("/maintenance")
     // Click on Supplies & Inventory tab
     cy.contains("Supplies & Inventory").click()
+    // Wait for table to be populated with data
+    cy.get("table tbody tr", { timeout: 20000 }).should("exist")
   })
 
   describe("Supply Information Display", () => {
