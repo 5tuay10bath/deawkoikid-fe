@@ -1,6 +1,8 @@
 describe("Payment Management - Data and Actions", () => {
   beforeEach(() => {
     cy.visit("/payments")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   it("should display payments management page", () => {

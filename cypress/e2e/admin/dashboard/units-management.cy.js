@@ -1,6 +1,8 @@
 describe("Unit Management - Data Tables and Actions", () => {
   beforeEach(() => {
     cy.visit("/units")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   it("should display units management page with table", () => {

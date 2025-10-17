@@ -1,6 +1,7 @@
 describe("Receipts & Contracts - Generation and Download", () => {
   beforeEach(() => {
     cy.visit("/payments")
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   describe("Receipt Generation", () => {

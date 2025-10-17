@@ -1,6 +1,8 @@
 describe("Tenant Management - Data Tables", () => {
   beforeEach(() => {
     cy.visit("/tenants")
+    // Wait for loading to finish
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
   })
 
   // User Story 2.b: Tables show tenant lease data and allow editing
