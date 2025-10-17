@@ -52,7 +52,6 @@ jobs:
       - name: Pull & run backend container
         run: |
           docker pull "$BE_IMAGE"
-          # 🔥 join network เดียวกับ postgres service
           NET=$(docker network ls --format '{{.Name}}' | grep "github_network" || docker network ls --format '{{.Name}}' | head -n 1)
           echo "Detected network: $NET"
           docker run -d --name be \
