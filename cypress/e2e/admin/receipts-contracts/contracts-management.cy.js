@@ -21,7 +21,7 @@ describe("Contract Management - Data and Actions", () => {
     })
   })
 
-  // Test Add Contract functionality
+  // NOTE: For Add Contract - only verify modal opens, no actual form submission
   it("should open Add Contract modal when clicking + button", () => {
     cy.contains("Contract Management").should("be.visible")
 
