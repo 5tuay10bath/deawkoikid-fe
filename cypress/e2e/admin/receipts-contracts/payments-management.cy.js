@@ -21,7 +21,7 @@ describe("Payment Management - Data and Actions", () => {
     })
   })
 
-  // Test Add Payment functionality
+  // NOTE: For Add Payment - only verify modal opens, no actual form submission
   it("should open Add Payment modal when clicking + button", () => {
     cy.contains("Payment Management").should("be.visible")
 

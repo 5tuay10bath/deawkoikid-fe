@@ -7,61 +7,43 @@ describe("Maintenance & Supplies - Task Tracking and Management", () => {
 
   describe("Maintenance Task Tracking", () => {
     // User Story 4.a: Track maintenance tasks (light bulb, air-con, plumbing)
-    it("should display maintenance task tracking system", () => {
+    it("should display maintenance task tracking system with table", () => {
       cy.contains("Maintenance Managemen").should("be.visible")
 
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+      // Verify table exists
+      cy.get("table").should("exist")
 
-        // Check for maintenance tasks table/list
-        if (bodyText.includes("Task") || bodyText.includes("Description") || bodyText.includes("Status")) {
-          cy.log("Maintenance task tracking interface found")
-        }
+      // Verify table has headers
+      cy.get("table thead th").should("have.length.greaterThan", 0)
 
-        // Look for task types mentioned in user story
-        const taskTypes = ["light bulb", "air-con", "plumbing", "repair", "service"]
-        const foundTypes = taskTypes.filter((type) => bodyText.toLowerCase().includes(type))
-        if (foundTypes.length > 0) {
-          cy.log(`Found maintenance task types: ${foundTypes.join(", ")}`)
-        }
+      // Verify table has data rows
+      cy.get("table tbody tr").should("have.length.greaterThan", 0)
+
+      // Verify columns include essential information
+      cy.get("table thead").within(() => {
+        cy.contains(/title|task|description/i).should("exist")
+        cy.contains(/status|priority/i).should("exist")
       })
+
+      cy.log("✅ Maintenance task tracking table verified")
     })
 
-    // Test Add Maintenance Task functionality
-    it("should open Add Maintenance modal when clicking + button", () => {
+    // NOTE: For Add Maintenance - only verify modal opens, no actual form submission
+    it("should open Add Maintenance modal and verify form", () => {
       cy.contains("Maintenance Managemen").should("be.visible")
 
-      // Look for + button (blue Add button)
-      cy.get("button").then(($buttons) => {
-        const addButton = Array.from($buttons).find(
-          (btn) =>
-            btn.textContent.includes("+") ||
-            btn.textContent.includes("Add Maintenance") ||
-            btn.getAttribute("data-cy") === "add-maintenance",
-        )
+      // Click the blue Add button
+      cy.get('button[class*="bg-blue"]').filter(":visible").first().click()
 
-        if (addButton) {
-          cy.wrap(addButton).click()
+      // Wait for modal to appear
+      cy.get('div[role="dialog"]', { timeout: 5000 }).should("be.visible")
 
-          // Should open Add Maintenance modal
-          cy.get("body").then(($body) => {
-            const bodyText = $body.text()
-
-            // Check for modal with maintenance form fields
-            if (
-              bodyText.includes("Add Maintenance") ||
-              bodyText.includes("Task") ||
-              bodyText.includes("Description") ||
-              bodyText.includes("Unit") ||
-              bodyText.includes("Priority")
-            ) {
-              cy.log("Add Maintenance modal opened successfully")
-            }
-          })
-        } else {
-          cy.log("Add Maintenance button not found")
-        }
-      })
+      // Verify modal is properly displayed (modal opening is the test requirement)
+      cy.get('div[role="dialog"]')
+        .should("be.visible")
+        .then(() => {
+          cy.log("✅ Add Maintenance modal opened successfully")
+        })
     })
 
     // User Story 4.b: Log maintenance activities per unit
