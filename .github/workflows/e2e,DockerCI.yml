@@ -129,7 +129,7 @@ jobs:
         run: |
           docker push iamyasuomain/deawkoikid_frontend:${{ env.TAG }}
           docker push iamyasuomain/deawkoikid_frontend:latest
-          echo "✅ Pushed iamyasuomain/deawkoikid_frontend:${{ env.TAG }}"
+          echo "Pushed iamyasuomain/deawkoikid_frontend:${{ env.TAG }}"
   deploy:
       needs: e2e
       uses: 5tuay10bath/Deployment/.github/workflows/main.yml@main
