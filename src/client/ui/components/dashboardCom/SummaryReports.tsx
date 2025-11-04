@@ -87,15 +87,12 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
 
     setIsExporting(true)
     try {
-      // Apply PDF styles to tables temporarily
       const tables = reportRef.current.querySelectorAll("table")
       const containers = reportRef.current.querySelectorAll(".overflow-x-auto")
       const cells = reportRef.current.querySelectorAll("th, td")
 
-      // Store original styles
       const originalStyles: { element: Element; className: string; style: string }[] = []
 
-      // Apply PDF styles
       tables.forEach((table) => {
         originalStyles.push({
           element: table,
@@ -178,7 +175,6 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
           const sourceY = (yOffset / imgHeight) * canvas.height
           const sourceHeight = (currentPageHeight / imgHeight) * canvas.height
 
-          // Create a temporary canvas for this page section
           const tempCanvas = document.createElement("canvas")
           const tempCtx = tempCanvas.getContext("2d")
           tempCanvas.width = canvas.width
@@ -189,7 +185,6 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
 
           pdf.addImage(pageImgData, "PNG", margin, contentStartY, imgWidth, currentPageHeight)
 
-          // Add page number
           pdf.setFontSize(10)
           pdf.text(`Page ${pageNumber}`, pdfWidth - margin, pdfHeight - 10, { align: "right" })
 
@@ -198,17 +193,14 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
           pageNumber++
         }
       } else {
-        // Single page - center content
         const yPosition = contentStartY + (availableHeight - imgHeight) / 2
         pdf.addImage(imgData, "PNG", margin, yPosition, imgWidth, imgHeight)
       }
 
-      // Save with better filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split("T")[0]
       const fileName = `${reportType}-report-${timestamp}.pdf`
       pdf.save(fileName)
 
-      // Restore original styles
       originalStyles.forEach(({ element, className, style }) => {
         element.className = className
         if (style) {
@@ -218,50 +210,15 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
         }
       })
     } catch {
-      // Silent error handling for PDF generation
+      // error handling
     } finally {
       setIsExporting(false)
     }
   }
 
   const generateUnitSummary = (): UnitSummary[] => {
-    // If no real data, provide sample data for testing
     if (rooms.length === 0) {
-      return [
-        {
-          unitId: "sample-1",
-          unitNumber: "101",
-          floor: 1,
-          tenant: "John Smith",
-          status: "occupied",
-          totalRevenue: 15000,
-          waterUsage: 120,
-          electricUsage: 250,
-          lastPayment: "2025-11-01",
-        },
-        {
-          unitId: "sample-2",
-          unitNumber: "102",
-          floor: 1,
-          tenant: undefined,
-          status: "available",
-          totalRevenue: 0,
-          waterUsage: 0,
-          electricUsage: 0,
-          lastPayment: undefined,
-        },
-        {
-          unitId: "sample-3",
-          unitNumber: "201",
-          floor: 2,
-          tenant: "Mary Johnson",
-          status: "occupied",
-          totalRevenue: 18000,
-          waterUsage: 98,
-          electricUsage: 280,
-          lastPayment: "2025-10-28",
-        },
-      ]
+      return []
     }
 
     return rooms.map((room) => {
@@ -293,28 +250,7 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
     const occupiedRooms = rooms.filter((room) => room.tenant)
 
     if (occupiedRooms.length === 0) {
-      return [
-        {
-          tenantName: "John Smith",
-          unitNumber: "101",
-          floor: 1,
-          totalPaid: 45000,
-          averageWaterUsage: 115,
-          averageElectricUsage: 260,
-          contractStatus: "Active",
-          lastPaymentDate: "2025-11-01",
-        },
-        {
-          tenantName: "Mary Johnson",
-          unitNumber: "201",
-          floor: 2,
-          totalPaid: 54000,
-          averageWaterUsage: 92,
-          averageElectricUsage: 275,
-          contractStatus: "Active",
-          lastPaymentDate: "2025-10-28",
-        },
-      ]
+      return []
     }
 
     return occupiedRooms.map((room) => {
@@ -348,26 +284,8 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
   }
 
   const generateMonthlySummary = (): MonthlySummary[] => {
-    // If no real data, provide sample data for testing
     if (payments.length === 0) {
-      return [
-        {
-          month: "Oct 2025",
-          totalRevenue: 99000,
-          totalWaterUsage: 520,
-          totalElectricUsage: 1150,
-          occupancyRate: 85,
-          activeUnits: 8,
-        },
-        {
-          month: "Nov 2025",
-          totalRevenue: 108000,
-          totalWaterUsage: 480,
-          totalElectricUsage: 1230,
-          occupancyRate: 90,
-          activeUnits: 9,
-        },
-      ]
+      return []
     }
 
     const monthlyData: { [key: string]: MonthlySummary } = {}
@@ -405,6 +323,16 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
 
   const renderUnitReport = () => {
     const unitSummaries = generateUnitSummary()
+
+    if (unitSummaries.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Unit Data Available</h3>
+          <p className="text-gray-500">No rooms or units have been added to the system yet.</p>
+        </div>
+      )
+    }
 
     return (
       <div className="overflow-x-auto shadow-sm border border-gray-200 rounded-lg">
@@ -466,6 +394,16 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
 
   const renderTenantReport = () => {
     const tenantSummaries = generateTenantSummary()
+
+    if (tenantSummaries.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Tenant Data Available</h3>
+          <p className="text-gray-500">No tenants are currently occupying any units.</p>
+        </div>
+      )
+    }
 
     return (
       <div className="overflow-x-auto shadow-sm border border-gray-200 rounded-lg">
@@ -555,6 +493,16 @@ export function SummaryReports({ rooms, payments }: SummaryReportsProps) {
 
   const renderMonthlyReport = () => {
     const monthlySummaries = generateMonthlySummary()
+
+    if (monthlySummaries.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Monthly Data Available</h3>
+          <p className="text-gray-500">No payment records found to generate monthly summaries.</p>
+        </div>
+      )
+    }
 
     return (
       <div className="w-full">
