@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Building, Users, DollarSign, BarChart3 } from "lucide-react"
-import { Badge } from "../components/common/Badge"
-import { RoomCard } from "../components/common/RoomCard"
-import { DashboardStatCard } from "../components/central/StatsCard"
 import { CheckInDialog } from "../components/common/CheckInDialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/common/Tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
-import { UsageChart } from "../components/chart/UsageChart"
+import { DashboardStats, FloorSection, AnalyticsFilters, UsageSection } from "../components/dashboardCom"
 import type { DashboardModel } from "@domain/models/dashboard.model"
 import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
@@ -40,6 +35,33 @@ export default function Dashboard() {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
 
+  const [viewBy, setViewBy] = useState<"floor" | "room">("floor")
+  const [timeFrame, setTimeFrame] = useState<"month" | "year">("month")
+
+  const debounceTimeoutRef = useRef<number | null>(null)
+
+  const handleViewByChange = useCallback((value: string) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (value === "floor" || value === "room") {
+        setViewBy(value)
+      }
+    }, 100)
+  }, [])
+
+  const handleTimeFrameChange = useCallback((value: string) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current)
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      if (value === "month" || value === "year") {
+        setTimeFrame(value)
+      }
+    }, 100)
+  }, [])
+
   useEffect(() => {
     getDashboard()
     getPayments()
@@ -69,56 +91,136 @@ export default function Dashboard() {
 
   const availableFloors = [...new Set(dashboard.map((unit) => unit.floor))].sort((a, b) => a - b)
 
-  const processUsageDataByFloor = () => {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
-    const floorUsageData: Record<
-      number,
-      {
-        waterUsageData: Array<{ month: string; value: number }>
-        electricUsageData: Array<{ month: string; value: number }>
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current)
       }
-    > = {}
+    }
+  }, [])
 
-    availableFloors.forEach((floor) => {
-      const floorUnits = dashboard.filter((unit) => unit.floor === floor)
-      const floorUnitIds = floorUnits.map((unit) => unit.id)
+  // Process usage data based on selected view and timeframe
+  const processUsageData = () => {
+    const timePeriods =
+      timeFrame === "month"
+        ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        : ["2021", "2022", "2023", "2024", "2025"]
 
-      const waterUsageData = months.map((month) => {
-        if (payments.length > 0) {
-          const monthPayments = payments.filter((payment) => {
-            const paymentMonth = new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
-            const unitInFloor = floorUnitIds.some((unitId) => payment.contract?.unit?.id === unitId)
-            return paymentMonth === month && unitInFloor
-          })
-
-          const totalWaterUsage = monthPayments.reduce((sum, payment) => sum + (payment.waterUsage || 0), 0)
-          return { month, value: totalWaterUsage > 0 ? totalWaterUsage : Math.floor(Math.random() * 40) + 60 }
+    if (viewBy === "floor") {
+      const floorUsageData: Record<
+        number,
+        {
+          waterUsageData: Array<{ month: string; value: number }>
+          electricUsageData: Array<{ month: string; value: number }>
         }
-        return { month, value: Math.floor(Math.random() * 40) + 60 }
+      > = {}
+
+      availableFloors.forEach((floor) => {
+        const floorUnits = dashboard.filter((unit) => unit.floor === floor)
+        const floorUnitIds = floorUnits.map((unit) => unit.id)
+
+        const waterUsageData = timePeriods.map((period) => {
+          if (payments.length > 0) {
+            const periodPayments = payments.filter((payment) => {
+              const paymentPeriod =
+                timeFrame === "month"
+                  ? new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
+                  : new Date(payment.billingMonth).getFullYear().toString()
+              const unitInFloor = floorUnitIds.some((unitId) => payment.contract?.unit?.id === unitId)
+              return paymentPeriod === period && unitInFloor
+            })
+
+            const totalWaterUsage = periodPayments.reduce((sum, payment) => sum + (payment.waterUsage || 0), 0)
+            return { month: period, value: totalWaterUsage > 0 ? totalWaterUsage : Math.floor(Math.random() * 40) + 60 }
+          }
+          return { month: period, value: Math.floor(Math.random() * 40) + 60 }
+        })
+
+        const electricUsageData = timePeriods.map((period) => {
+          if (payments.length > 0) {
+            const periodPayments = payments.filter((payment) => {
+              const paymentPeriod =
+                timeFrame === "month"
+                  ? new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
+                  : new Date(payment.billingMonth).getFullYear().toString()
+              const unitInFloor = floorUnitIds.some((unitId) => payment.contract?.unit?.id === unitId)
+              return paymentPeriod === period && unitInFloor
+            })
+
+            const totalElectricUsage = periodPayments.reduce((sum, payment) => sum + (payment.electricUsage || 0), 0)
+            return {
+              month: period,
+              value: totalElectricUsage > 0 ? totalElectricUsage : Math.floor(Math.random() * 50) + 80,
+            }
+          }
+          return { month: period, value: Math.floor(Math.random() * 50) + 80 }
+        })
+
+        floorUsageData[floor] = { waterUsageData, electricUsageData }
       })
 
-      const electricUsageData = months.map((month) => {
-        if (payments.length > 0) {
-          const monthPayments = payments.filter((payment) => {
-            const paymentMonth = new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
-            const unitInFloor = floorUnitIds.some((unitId) => payment.contract?.unit?.id === unitId)
-            return paymentMonth === month && unitInFloor
-          })
-
-          const totalElectricUsage = monthPayments.reduce((sum, payment) => sum + (payment.electricUsage || 0), 0)
-          return { month, value: totalElectricUsage > 0 ? totalElectricUsage : Math.floor(Math.random() * 50) + 80 }
+      return { type: "floor" as const, data: floorUsageData }
+    } else {
+      // Group by room
+      const roomUsageData: Record<
+        string,
+        {
+          waterUsageData: Array<{ month: string; value: number }>
+          electricUsageData: Array<{ month: string; value: number }>
+          unitNumber: string
+          floor: number
         }
-        return { month, value: Math.floor(Math.random() * 50) + 80 }
+      > = {}
+
+      dashboard.forEach((unit) => {
+        const waterUsageData = timePeriods.map((period) => {
+          if (payments.length > 0) {
+            const periodPayments = payments.filter((payment) => {
+              const paymentPeriod =
+                timeFrame === "month"
+                  ? new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
+                  : new Date(payment.billingMonth).getFullYear().toString()
+              return paymentPeriod === period && payment.contract?.unit?.id === unit.id
+            })
+
+            const totalWaterUsage = periodPayments.reduce((sum, payment) => sum + (payment.waterUsage || 0), 0)
+            return { month: period, value: totalWaterUsage > 0 ? totalWaterUsage : Math.floor(Math.random() * 15) + 20 }
+          }
+          return { month: period, value: Math.floor(Math.random() * 15) + 20 }
+        })
+
+        const electricUsageData = timePeriods.map((period) => {
+          if (payments.length > 0) {
+            const periodPayments = payments.filter((payment) => {
+              const paymentPeriod =
+                timeFrame === "month"
+                  ? new Date(payment.billingMonth).toLocaleDateString("en", { month: "short" })
+                  : new Date(payment.billingMonth).getFullYear().toString()
+              return paymentPeriod === period && payment.contract?.unit?.id === unit.id
+            })
+
+            const totalElectricUsage = periodPayments.reduce((sum, payment) => sum + (payment.electricUsage || 0), 0)
+            return {
+              month: period,
+              value: totalElectricUsage > 0 ? totalElectricUsage : Math.floor(Math.random() * 25) + 30,
+            }
+          }
+          return { month: period, value: Math.floor(Math.random() * 25) + 30 }
+        })
+
+        roomUsageData[unit.id] = {
+          waterUsageData,
+          electricUsageData,
+          unitNumber: unit.unitNumber,
+          floor: unit.floor,
+        }
       })
 
-      floorUsageData[floor] = { waterUsageData, electricUsageData }
-    })
-
-    return floorUsageData
+      return { type: "room" as const, data: roomUsageData }
+    }
   }
 
-  const floorUsageData = processUsageDataByFloor()
+  const usageData = processUsageData()
 
   return (
     <div className="space-y-6">
@@ -135,118 +237,54 @@ export default function Dashboard() {
 
         <TabsContent value="dashboard" className="space-y-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-cy="dashboard-stats">
-            <DashboardStatCard
-              title="Total Units"
-              value={totalRooms.toString()}
-              description="Across 2 floors"
-              icon={Building}
-              data-cy="total-units-stat"
-            />
-
-            <DashboardStatCard
-              title="Occupied"
-              value={occupiedRooms}
-              description={`${availableRooms} available`}
-              icon={Users}
-              valueColor="text-red-500"
-              data-cy="occupied-units-stat"
-            />
-
-            <DashboardStatCard
-              title="Monthly Revenue"
-              value={`$${totalRevenue.toLocaleString()}`}
-              description="From occupied units"
-              icon={DollarSign}
-              valueColor="text-green-500"
-              data-cy="revenue-stat"
-            />
-
-            <DashboardStatCard
-              title="Reserved"
-              value={reservedRooms}
-              description="Units under reservation"
-              valueColor="text-orange-500"
-              data-cy="maintenance-stat"
-            />
-
-            <DashboardStatCard
-              title="Pending"
-              value={pendingRooms}
-              description="Pending"
-              valueColor="text-blue-500"
-              data-cy="maintenance-stat"
-            />
-          </div>
+          <DashboardStats
+            totalRooms={totalRooms}
+            occupiedRooms={occupiedRooms}
+            availableRooms={availableRooms}
+            reservedRooms={reservedRooms}
+            pendingRooms={pendingRooms}
+            totalRevenue={totalRevenue}
+          />
 
           {/* Room Grid by Floor */}
           {[1, 2].map((floor) => (
-            <div key={floor} className="space-y-4" data-cy={`floor-${floor}`}>
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-semibold">Floor {floor}</h2>
-                <Badge variant="outline">
-                  {rooms.filter((r) => r.floor === floor && r.status === "available").length} available
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                {rooms
-                  .filter((room) => room.floor === floor)
-                  .map((room) => (
-                    <RoomCard key={room.id} room={room} onCheckIn={handleCheckIn} onViewDetails={handleViewDetails} />
-                  ))}
-              </div>
-            </div>
+            <FloorSection
+              key={floor}
+              floor={floor}
+              rooms={rooms}
+              onCheckIn={handleCheckIn}
+              onViewDetails={handleViewDetails}
+            />
           ))}
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <div className="flex items-center gap-2 mb-6">
-            <BarChart3 className="h-6 w-6 text-blue-600" />
-            <div>
-              <h2 className="text-xl font-bold">Usage Analytics</h2>
-              <p className="text-muted-foreground">Water and electricity usage insights by floor</p>
-            </div>
-          </div>
+          <AnalyticsFilters
+            viewBy={viewBy}
+            timeFrame={timeFrame}
+            onViewByChange={handleViewByChange}
+            onTimeFrameChange={handleTimeFrameChange}
+          />
 
           {/* Water Usage Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Water Usage</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {availableFloors.map((floor) => (
-                <Card key={`water-floor-${floor}`}>
-                  <CardHeader>
-                    <CardTitle className="text-center text-lg">Water usage floor {floor}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <UsageChart data={floorUsageData[floor]?.waterUsageData || []} title="" color="#3b82f6" unit=" L" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <UsageSection
+            title="Water Usage"
+            usageData={usageData}
+            availableFloors={availableFloors}
+            usageType="water"
+            color="#3b82f6"
+            unit=" L"
+          />
 
           {/* Electric Usage Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Electric Usage</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {availableFloors.map((floor) => (
-                <Card key={`electric-floor-${floor}`}>
-                  <CardHeader>
-                    <CardTitle className="text-center text-lg">Electric usage floor {floor}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <UsageChart
-                      data={floorUsageData[floor]?.electricUsageData || []}
-                      title=""
-                      color="#fbbf24"
-                      unit=" kWh"
-                    />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <UsageSection
+            title="Electric Usage"
+            usageData={usageData}
+            availableFloors={availableFloors}
+            usageType="electric"
+            color="#fbbf24"
+            unit=" kWh"
+          />
         </TabsContent>
       </Tabs>
 

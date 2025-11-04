@@ -15,7 +15,6 @@ axiosInstance.interceptors.request.use(
       ...newConfig.headers,
     } as AxiosRequestHeaders
 
-    // Only add API key if it exists
     if (import.meta.env.VITE_PUBLIC_X_API_KEY) {
       newConfig.headers["x-api-key"] = import.meta.env.VITE_PUBLIC_X_API_KEY
     }
