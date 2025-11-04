@@ -2,7 +2,13 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { CheckInDialog } from "../components/common/CheckInDialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/common/Tabs"
-import { DashboardStats, FloorSection, AnalyticsFilters, UsageSection } from "../components/dashboardCom"
+import {
+  DashboardStats,
+  FloorSection,
+  AnalyticsFilters,
+  UsageSection,
+  SummaryReports,
+} from "../components/dashboardCom"
 import type { DashboardModel } from "@domain/models/dashboard.model"
 import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
@@ -99,7 +105,6 @@ export default function Dashboard() {
     }
   }, [])
 
-  // Process usage data based on selected view and timeframe
   const processUsageData = () => {
     const timePeriods =
       timeFrame === "month"
@@ -233,6 +238,7 @@ export default function Dashboard() {
         <TabsList>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard" className="space-y-6">
@@ -285,6 +291,10 @@ export default function Dashboard() {
             color="#fbbf24"
             unit=" kWh"
           />
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-6">
+          <SummaryReports rooms={rooms} payments={payments} />
         </TabsContent>
       </Tabs>
 
