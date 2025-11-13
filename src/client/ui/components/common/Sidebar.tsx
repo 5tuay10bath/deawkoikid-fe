@@ -1,6 +1,9 @@
-import { LayoutDashboard, Building2, Users, CreditCard, FileText, Wrench, Menu, X } from "lucide-react"
+import { LayoutDashboard, Building2, Users, CreditCard, FileText, Wrench, Menu, X, LogOut } from "lucide-react"
 import React, { useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../stores/auth.store"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./Dialog"
+import { Button } from "./Button"
 
 import { cn } from "src/infrastructure/libs/cn/cn"
 
@@ -34,6 +37,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onToggle, childre
           "fixed left-0 top-0 z-40 h-full border-r border-gray-200 bg-gray-50 p-4 transition-transform md:hidden",
           "w-1/2",
           isOpen ? "translate-x-0" : "-translate-x-full",
+          "relative", // เพื่อให้ absolute positioning ของ user profile ทำงาน
+          "pb-24", // เพิ่ม padding bottom สำหรับ user profile section
         )}
       >
         {children}
@@ -77,6 +82,33 @@ const NavItem = ({
 
 const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const { fullName, userEmail, logout } = useAuthStore()
+  const navigate = useNavigate()
+
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true)
+  }
+
+  const handleLogoutConfirm = () => {
+    logout()
+    setShowLogoutDialog(false)
+    navigate("/login")
+  }
+
+  const handleLogoutCancel = () => {
+    setShowLogoutDialog(false)
+  }
+
+  const getInitials = (name: string | null) => {
+    if (!name) return "U"
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2)
+  }
 
   const sidebarContent = (
     <>
@@ -99,6 +131,65 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
         <NavItem to="/contracts" label="Contracts" collapsed={collapsed} icon={<FileText className="h-5 w-5" />} />
         <NavItem to="/maintenance" label="Maintenance" collapsed={collapsed} icon={<Wrench className="h-5 w-5" />} />
       </ul>
+
+      {/* User Profile & Logout - ด้านล่าง */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-gray-50 p-4">
+        {!collapsed ? (
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-300 text-sm font-semibold text-gray-700">
+              {getInitials(fullName)}
+            </div>
+
+            {/* User Info */}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-gray-900">{fullName || "User"}</p>
+              <p className="truncate text-xs text-gray-500">{userEmail || "email@example.com"}</p>
+            </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogoutClick}
+              className="flex-shrink-0 rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-red-600"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
+          </div>
+        ) : (
+          /* Collapsed View - แสดงแค่ Avatar */
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300 text-sm font-semibold text-gray-700">
+              {getInitials(fullName)}
+            </div>
+            <button
+              onClick={handleLogoutClick}
+              className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-red-600"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+            <DialogDescription>Are you sure you want to logout from your account?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleLogoutCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleLogoutConfirm} className="bg-red-600 hover:bg-red-700">
+              Logout
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 
@@ -115,6 +206,8 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
           "sticky top-0 h-screen border-r border-gray-200 bg-gray-50 p-4 transition-all",
           "hidden md:block", // Hide on mobile, show on medium screens and up
           collapsed ? "w-16 md:w-20" : "w-64 md:w-72 lg:w-80", // Responsive widths
+          "relative", // เพื่อให้ absolute positioning ของ user profile ทำงาน
+          "pb-24", // เพิ่ม padding bottom สำหรับ user profile section
         )}
       >
         {sidebarContent}
