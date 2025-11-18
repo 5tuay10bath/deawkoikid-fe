@@ -40,16 +40,14 @@ export default function RoomDetails() {
   }, [unit, setRoom])
 
   const statusConfig = {
-    available: { color: "bg-green-500 text-white", label: "Available" },
-    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
-    maintenance: { color: "bg-yellow-500 text-white", label: "Maintenance" },
-    "checkout-pending": { color: "bg-blue-500 text-white", label: "Check-out Pending" },
+    AVAILABLE: { color: "bg-green-500 text-white", label: "Available" },
+    OCCUPIED: { color: "bg-red-500 text-white", label: "Occupied" },
+    RESERVED: { color: "bg-orange-500 text-white", label: "Reserved" },
+    PENDING: { color: "bg-blue-500 text-white", label: "Pending" },
   } as const
 
   const getStatusConfig = (status: string) => {
-    const normalizedStatus = status.toLowerCase()
-    return statusConfig[normalizedStatus as keyof typeof statusConfig] || statusConfig.available
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig.AVAILABLE
   }
 
   if (!unit) {

@@ -17,10 +17,19 @@ export const CheckInDialog = ({ isOpen, onClose, unit }: CheckInDialogProps) => 
   const [isLoading, setIsLoading] = useState(false)
 
   const handleCheckIn = async () => {
-    if (!unit?.contract?.id) {
+    if (!unit) {
       toast({
         title: "Error",
-        description: "Contract information not found",
+        description: "Unit information not found",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!unit.contract?.id) {
+      toast({
+        title: "Error",
+        description: "Contract information not found. Please ensure a contract exists for this unit.",
         variant: "destructive",
       })
       return

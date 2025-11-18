@@ -27,13 +27,9 @@ export default function Payments() {
   const [isExporting, setIsExporting] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const totalRevenue = payments
-    .filter((p) => p.status.toUpperCase() === "PAID")
-    .reduce((sum, p) => sum + p.totalAmount, 0)
+  const totalRevenue = payments.filter((p) => p.status === "PAID").reduce((sum, p) => sum + p.totalAmount, 0)
 
-  const pendingAmount = payments
-    .filter((p) => p.status.toUpperCase() !== "PAID")
-    .reduce((sum, p) => sum + p.totalAmount, 0)
+  const pendingAmount = payments.filter((p) => p.status !== "PAID").reduce((sum, p) => sum + p.totalAmount, 0)
 
   const handleExportClick = () => {
     if (payments.length === 0) {

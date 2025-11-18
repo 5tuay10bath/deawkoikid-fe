@@ -19,15 +19,16 @@ const DialogTenants = () => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined)
   const [newTenant, setNewTenant] = useState<CreateTenantDto>({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
     password: "",
-    active: true,
-    birthDate: new Date(),
+    role: "TENANT",
     identificationNumber: "",
+    birthDate: undefined,
     emergencyContactName: "",
     emergencyContactPhone: "",
   })
@@ -51,13 +52,13 @@ const DialogTenants = () => {
 
     setIsSubmitting(true)
     try {
-      // Format birthDate to YYYY-MM-DD
-      const formattedTenant = {
+      // Format birthDate to ISO string if exists
+      const payload: CreateTenantDto = {
         ...newTenant,
-        birthDate: format(newTenant.birthDate, "yyyy-MM-dd") as unknown as Date,
+        birthDate: birthDate ? format(birthDate, "yyyy-MM-dd") : undefined,
       }
 
-      const result = await createTenant(formattedTenant)
+      const result = await createTenant(payload)
       if (result.success) {
         // Reset form
         setNewTenant({
@@ -66,12 +67,13 @@ const DialogTenants = () => {
           phone: "",
           email: "",
           password: "",
-          active: true,
-          birthDate: new Date(),
+          role: "TENANT",
           identificationNumber: "",
+          birthDate: undefined,
           emergencyContactName: "",
           emergencyContactPhone: "",
         })
+        setBirthDate(undefined)
         setIsOpen(false)
         toast({
           title: "Success",
@@ -97,7 +99,7 @@ const DialogTenants = () => {
           Add Tenant
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle>Add New Tenant</DialogTitle>
         </DialogHeader>
@@ -153,17 +155,21 @@ const DialogTenants = () => {
           </div>
 
           <div className="space-y-2">
-            <Label>Status</Label>
+            <Label>Role</Label>
             <Select
-              value={newTenant.active ? "active" : "inactive"}
-              onValueChange={(value: string) => setNewTenant((prev) => ({ ...prev, active: value === "active" }))}
+              value={newTenant.role}
+              onValueChange={(value: "USER" | "ADMIN" | "TENANT" | "STAFF") =>
+                setNewTenant((prev) => ({ ...prev, role: value }))
+              }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="TENANT">Tenant</SelectItem>
+                <SelectItem value="USER">User</SelectItem>
+                <SelectItem value="STAFF">Staff</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -175,16 +181,11 @@ const DialogTenants = () => {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newTenant.birthDate ? format(newTenant.birthDate, "PPP") : "Pick a date"}
+                    {birthDate ? format(birthDate, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="bg-white w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={newTenant.birthDate}
-                    onSelect={(date) => setNewTenant((prev) => ({ ...prev, birthDate: date || new Date() }))}
-                    initialFocus
-                  />
+                  <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} initialFocus />
                 </PopoverContent>
               </Popover>
             </div>

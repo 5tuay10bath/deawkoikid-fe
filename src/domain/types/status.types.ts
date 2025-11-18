@@ -1,0 +1,5 @@
+export type UnitStatus = "AVAILABLE" | "RESERVED" | "OCCUPIED" | "PENDING"
+export type PaymentStatus = "UNPAID" | "PAID" | "OVERDUE"
+export type ContractStatus = "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED"
+export type MaintenanceStatus = "REPORTED" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
+export type UserRole = "USER" | "TENANT" | "ADMIN" | "STAFF"

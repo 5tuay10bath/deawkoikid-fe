@@ -1,8 +1,9 @@
 export interface CreateMaintenanceDto {
   unitId: string
   title: string
-  description: string
-  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+  description?: string
+  price?: number
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
   maintenanceType:
     | "ELECTRIC"
     | "WATER"
@@ -16,7 +17,8 @@ export interface CreateMaintenanceDto {
     | "PAINT"
     | "CEMENT_WOOD"
     | "OTHER"
-  assignedToId?: string
+  assignedToId: string
   reportedById: string
-  scheduledAt: Date
+  scheduledAt?: string // ISO 8601 format
+  estimatedFinishTime?: string // ISO 8601 format
 }

@@ -87,7 +87,7 @@ const DialogContracts = () => {
           Add Contract
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Contract</DialogTitle>
         </DialogHeader>
