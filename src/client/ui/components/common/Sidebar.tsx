@@ -34,11 +34,10 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onToggle, childre
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-full border-r border-gray-200 bg-gray-50 p-4 transition-transform md:hidden",
+          "fixed left-0 top-0 z-40 h-screen border-r border-gray-200 bg-gray-50 transition-transform md:hidden",
           "w-1/2",
           isOpen ? "translate-x-0" : "-translate-x-full",
-          "relative", // เพื่อให้ absolute positioning ของ user profile ทำงาน
-          "pb-24", // เพิ่ม padding bottom สำหรับ user profile section
+          "flex flex-col overflow-hidden", // flex column layout
         )}
       >
         {children}
@@ -111,29 +110,35 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
   }
 
   const sidebarContent = (
-    <>
-      {!collapsed && (
-        <div className="px-2 pb-3 text-2xl font-extrabold tracking-tight text-blue-600">Property Manager</div>
-      )}
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Header and Navigation */}
+      <div className="p-4">
+        {!collapsed && (
+          <div className="px-2 pb-3 text-2xl font-extrabold tracking-tight text-blue-600">Property Manager</div>
+        )}
 
-      {!collapsed && <div className="px-2 py-1 text-sm font-bold text-gray-400">Navigation</div>}
+        {!collapsed && <div className="px-2 py-1 text-sm font-bold text-gray-400">Navigation</div>}
 
-      <ul className="mt-2 space-y-1">
-        <NavItem
-          to="/dashboard"
-          label="Dashboard"
-          collapsed={collapsed}
-          icon={<LayoutDashboard className="h-5 w-5" />}
-        />
-        <NavItem to="/units" label="Units" collapsed={collapsed} icon={<Building2 className="h-5 w-5" />} />
-        <NavItem to="/tenants" label="Tenants" collapsed={collapsed} icon={<Users className="h-5 w-5" />} />
-        <NavItem to="/payments" label="Payments" collapsed={collapsed} icon={<CreditCard className="h-5 w-5" />} />
-        <NavItem to="/contracts" label="Contracts" collapsed={collapsed} icon={<FileText className="h-5 w-5" />} />
-        <NavItem to="/maintenance" label="Maintenance" collapsed={collapsed} icon={<Wrench className="h-5 w-5" />} />
-      </ul>
+        <ul className="mt-2 space-y-1">
+          <NavItem
+            to="/dashboard"
+            label="Dashboard"
+            collapsed={collapsed}
+            icon={<LayoutDashboard className="h-5 w-5" />}
+          />
+          <NavItem to="/units" label="Units" collapsed={collapsed} icon={<Building2 className="h-5 w-5" />} />
+          <NavItem to="/tenants" label="Tenants" collapsed={collapsed} icon={<Users className="h-5 w-5" />} />
+          <NavItem to="/payments" label="Payments" collapsed={collapsed} icon={<CreditCard className="h-5 w-5" />} />
+          <NavItem to="/contracts" label="Contracts" collapsed={collapsed} icon={<FileText className="h-5 w-5" />} />
+          <NavItem to="/maintenance" label="Maintenance" collapsed={collapsed} icon={<Wrench className="h-5 w-5" />} />
+        </ul>
+      </div>
 
-      {/* User Profile & Logout - ด้านล่าง */}
-      <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-gray-50 p-4">
+      {/* Spacer - Push user profile to bottom */}
+      <div className="flex-1"></div>
+
+      {/* User Profile & Logout - ด้านล่างสุด */}
+      <div className="flex-shrink-0 border-t border-gray-200 bg-white p-4">
         {!collapsed ? (
           <div className="flex items-center gap-3">
             {/* Avatar */}
@@ -190,7 +195,7 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 
   return (
@@ -203,11 +208,10 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "sticky top-0 h-screen border-r border-gray-200 bg-gray-50 p-4 transition-all",
+          "sticky top-0 h-screen border-r border-gray-200 bg-gray-50 transition-all",
           "hidden md:block", // Hide on mobile, show on medium screens and up
           collapsed ? "w-16 md:w-20" : "w-64 md:w-72 lg:w-80", // Responsive widths
-          "relative", // เพื่อให้ absolute positioning ของ user profile ทำงาน
-          "pb-24", // เพิ่ม padding bottom สำหรับ user profile section
+          "flex flex-col overflow-hidden", // flex column layout
         )}
       >
         {sidebarContent}

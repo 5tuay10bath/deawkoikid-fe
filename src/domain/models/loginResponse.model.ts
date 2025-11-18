@@ -1,8 +1,10 @@
+import type { UserRole } from "../types/status.types"
+
 export interface LoginResponseData {
   token: string
   email: string
   fullName: string
-  role: "USER" | "ADMIN"
+  role: UserRole
   message: string
 }
 

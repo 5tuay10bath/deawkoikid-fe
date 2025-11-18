@@ -36,7 +36,7 @@ export default function Contracts() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatsCard
           label="Active Contracts"
-          value={contracts.filter((c) => c.status.toUpperCase() === "ACTIVE").length}
+          value={contracts.filter((c) => c.status === "ACTIVE").length}
           icon={FileText}
           color={{
             valueColor: "text-emerald-500",

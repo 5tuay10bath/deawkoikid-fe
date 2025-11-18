@@ -117,8 +117,8 @@ Tenant Signature: ____________________ Date: ___________`,
       if (result.isRight()) {
         set({ createUnits: result.value })
       }
-    } catch {
-      console.error("Failed to fetch create units")
+    } catch (error) {
+      console.error("Failed to fetch create units:", error)
     }
   },
 

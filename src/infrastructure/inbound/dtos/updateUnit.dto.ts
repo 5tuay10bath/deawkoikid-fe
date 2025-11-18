@@ -3,7 +3,5 @@ export interface UpdateUnitDto {
   unitNumber: string
   unitType: "A" | "B" | "C"
   unitSize: number
-  floor: number
-  address: string
-  status: "AVAILABLE" | "OCCUPIED" | "RESERVED" | "PENDING"
+  floor: string // UUID
 }

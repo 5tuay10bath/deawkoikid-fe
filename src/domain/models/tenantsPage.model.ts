@@ -1,3 +1,5 @@
+import type { UserRole } from "../types/status.types"
+
 export interface TenantsPageModel {
   id: string
   fullName: string
@@ -5,7 +7,7 @@ export interface TenantsPageModel {
   email: string
   identificationNumber: string
   profileImageUrl: string | null
-  role: "USER" | "TENANT" | "ADMIN" | "STAFF"
+  role: UserRole
   birthDate: string
   active: boolean
   emergencyContactName: string | null

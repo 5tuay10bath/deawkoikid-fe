@@ -1,10 +1,13 @@
+import type { UnitStatus } from "../types/status.types"
+import type { UnitType } from "../types/enums.types"
+
 export interface UnitPageModel {
   id: string
   address: string
   unitNumber: string
-  unitType: "A" | "B" | "C"
+  unitType: UnitType
   unitSize: number
-  status: "available" | "reserved" | "occupied" | "pending"
+  unitStatus: UnitStatus
   floor: number
   latestAirconService: Date
 }

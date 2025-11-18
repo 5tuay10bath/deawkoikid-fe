@@ -16,7 +16,7 @@ export class AuthRepository implements IAuthRepository {
 
   async register(dto: RegisterDto): Promise<IAuthRepository.register> {
     try {
-      const url = `/public/api/register`
+      const url = `/public/register`
 
       const { data } = await axiosInstance.post(url, dto)
 
@@ -34,7 +34,7 @@ export class AuthRepository implements IAuthRepository {
 
   async login(dto: LoginDto): Promise<IAuthRepository.login> {
     try {
-      const url = `/public/api/login`
+      const url = `/public/login`
 
       const { data } = await axiosInstance.post(url, dto)
 

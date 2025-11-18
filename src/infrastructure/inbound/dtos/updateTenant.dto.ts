@@ -3,8 +3,10 @@ export interface UpdateTenantDto {
   firstName: string
   lastName: string
   phone: string
-  birthDate: Date
-  active: boolean
-  emergencyContactName: string
-  emergencyContactPhone: string
+  email: string
+  role?: "USER" | "ADMIN" | "TENANT" | "STAFF"
+  identificationNumber: string
+  birthDate?: string // ISO date string
+  emergencyContactName?: string
+  emergencyContactPhone?: string
 }

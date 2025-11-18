@@ -16,7 +16,7 @@ const EditTemplateDialog = () => {
           Edit Template
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Contract Template</DialogTitle>
         </DialogHeader>

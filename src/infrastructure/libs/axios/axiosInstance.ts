@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash"
 import type { AxiosRequestHeaders } from "./types"
 
 const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}`,
+  baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}/api`,
 })
 
 axiosInstance.interceptors.request.use(

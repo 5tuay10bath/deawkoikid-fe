@@ -1,5 +1,6 @@
 import type { ApartmentConfigModel } from "./apartmentConfig.model"
 import type { ContractsModel } from "./contracts.model"
+import type { PaymentStatus } from "../types/status.types"
 
 export interface PaymentsModel {
   id: string
@@ -8,7 +9,7 @@ export interface PaymentsModel {
   billingMonth: Date
   electricUsage: number
   waterUsage: number
-  status: "UNPAID" | "PAID" | "OVERDUE"
+  status: PaymentStatus
   dueDate: Date
   totalAmount: number
   paidDate: Date | null
