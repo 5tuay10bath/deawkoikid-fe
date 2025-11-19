@@ -1,5 +1,6 @@
 import { BarChart3 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../common/Select"
+import DialogCSV from "./Dialog"
 
 interface AnalyticsFiltersProps {
   viewBy: "floor" | "room"
@@ -47,7 +48,7 @@ export function AnalyticsFilters({ viewBy, timeFrame, onViewByChange, onTimeFram
           </Select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <span className="text-sm font-medium">Period:</span>
           <Select value={timeFrame} onValueChange={onTimeFrameChange}>
             <SelectTrigger
@@ -71,6 +72,7 @@ export function AnalyticsFilters({ viewBy, timeFrame, onViewByChange, onTimeFram
               </SelectItem>
             </SelectContent>
           </Select>
+          <DialogCSV></DialogCSV>
         </div>
       </div>
     </div>
