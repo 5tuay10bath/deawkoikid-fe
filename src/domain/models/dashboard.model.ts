@@ -12,4 +12,5 @@ export interface DashboardModel {
   floor: number
   latestAirconService: Date
   contract?: ContractsModel | null
+  contracts?: ContractsModel[] | null
 }
