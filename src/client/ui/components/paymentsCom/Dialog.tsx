@@ -80,7 +80,7 @@ const DialogPayments = () => {
           Add Payment
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-white">
         <DialogHeader>
           <DialogTitle>Create Payment</DialogTitle>
         </DialogHeader>

@@ -1,5 +1,7 @@
 import type { TenantsPageModel } from "./tenantsPage.model"
 import type { UnitPageModel } from "./unitPage.model"
+import type { MaintenanceStatus } from "../types/status.types"
+import type { MaintenanceType, MaintenancePriority } from "../types/enums.types"
 
 export interface MaintenanceModel {
   id: string
@@ -7,23 +9,11 @@ export interface MaintenanceModel {
   title: string
   description: string
   price: number
-  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
-  maintenanceType:
-    | "ELECTRIC"
-    | "WATER"
-    | "PHONE"
-    | "AIR_CONDITIONAL"
-    | "FURNITURE"
-    | "FIRE_ALARM_SYSTEM"
-    | "WATER_LEAKAGE"
-    | "FLOOR_WALL"
-    | "BATHROOM"
-    | "PAINT"
-    | "CEMENT_WOOD"
-    | "OTHER"
+  priority: MaintenancePriority
+  maintenanceType: MaintenanceType
   assignedTo: TenantsPageModel | null
   reportedBy: TenantsPageModel
-  status: "REPORTED" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
+  status: MaintenanceStatus
   scheduledAt: Date | null
   startedAt: Date | null
   completedAt: Date | null

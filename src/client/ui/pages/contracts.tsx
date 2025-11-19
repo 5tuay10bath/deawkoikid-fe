@@ -8,9 +8,10 @@ import ViewDialog from "../components/contractsCom/ViewDialog"
 import EditTemplateDialog from "../components/contractsCom/EditTemplateDialog"
 import DialogContracts from "../components/contractsCom/Dialog"
 import { useEffect } from "react"
+import { TableLoading } from "../components/common/TableLoading"
 
 export default function Contracts() {
-  const { contracts, searchTerm, setSearchTerm, getContracts } = useContractStore()
+  const { contracts, searchTerm, isLoading, setSearchTerm, getContracts } = useContractStore()
 
   useEffect(() => {
     getContracts()
@@ -35,7 +36,7 @@ export default function Contracts() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatsCard
           label="Active Contracts"
-          value={contracts.filter((c) => c.status.toUpperCase() === "ACTIVE").length}
+          value={contracts.filter((c) => c.status === "ACTIVE").length}
           icon={FileText}
           color={{
             valueColor: "text-emerald-500",
@@ -92,9 +93,7 @@ export default function Contracts() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <ContractsTable />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <ContractsTable />}</CardContent>
       </Card>
 
       {/* Contract Viewer */}

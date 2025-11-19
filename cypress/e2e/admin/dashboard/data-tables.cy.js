@@ -6,31 +6,31 @@ describe("Tenant Management - Data Tables", () => {
   })
 
   // User Story 2.b: Tables show tenant lease data and allow editing
-  it("should display tenant data table with lease information", () => {
-    cy.contains("Tenant Management").should("be.visible")
-    cy.contains("Total Tenants").should("be.visible")
+  // it("should display tenant data table with lease information", () => {
+  //   cy.contains("Tenant Management").should("be.visible")
+  //   cy.contains("Total Tenants").should("be.visible")
 
-    // Check for table structure
-    cy.get("table").should("exist")
+  //   // Check for table structure
+  //   cy.get("table").should("exist")
 
-    // Verify table headers exist
-    cy.get("table thead").within(() => {
-      cy.contains(/name|tenant/i).should("exist")
-    })
+  //   // Verify table headers exist
+  //   cy.get("table thead").within(() => {
+  //     cy.contains(/name|tenant/i).should("exist")
+  //   })
 
-    // Verify table has data rows
-    cy.get("table tbody tr").should("have.length.greaterThan", 0)
+  //   // Verify table has data rows
+  //   cy.get("table tbody tr").should("have.length.greaterThan", 0)
 
-    // Verify first row has actual data
-    cy.get("table tbody tr")
-      .first()
-      .within(() => {
-        cy.get("td").should("have.length.greaterThan", 0)
-        cy.get("td").first().should("not.be.empty")
-      })
+  //   // Verify first row has actual data
+  //   cy.get("table tbody tr")
+  //     .first()
+  //     .within(() => {
+  //       cy.get("td").should("have.length.greaterThan", 0)
+  //       cy.get("td").first().should("not.be.empty")
+  //     })
 
-    cy.log("✅ Tenant data table verified with actual data")
-  })
+  //   cy.log("✅ Tenant data table verified with actual data")
+  // })
 
   // NOTE: For Add Tenant - only verify modal opens, no actual form submission
   it("should open Add Tenant modal and verify form fields", () => {

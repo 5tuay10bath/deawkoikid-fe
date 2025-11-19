@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash"
 import type { AxiosRequestHeaders } from "./types"
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_PUBLIC_API_ENDPOINT,
+  baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}/api`,
 })
 
 axiosInstance.interceptors.request.use(
@@ -15,7 +15,6 @@ axiosInstance.interceptors.request.use(
       ...newConfig.headers,
     } as AxiosRequestHeaders
 
-    // Only add API key if it exists
     if (import.meta.env.VITE_PUBLIC_X_API_KEY) {
       newConfig.headers["x-api-key"] = import.meta.env.VITE_PUBLIC_X_API_KEY
     }

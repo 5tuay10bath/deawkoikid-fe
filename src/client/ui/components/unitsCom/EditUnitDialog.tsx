@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import type { UpdateUnitDto } from "@infrastructure/inbound/dtos/updateUnit.dto"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
 import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
@@ -17,32 +18,58 @@ interface EditUnitDialogProps {
   unit: UnitPageModel | null
 }
 
+interface Floor {
+  id: string
+  floorNumber: number
+}
+
 const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
   const { updateUnit } = useUnitStore()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [floors, setFloors] = useState<Floor[]>([])
   const [editUnit, setEditUnit] = useState<Omit<UpdateUnitDto, "id">>({
     unitNumber: "",
-    address: "",
     unitType: "A",
     unitSize: 400,
-    unitStatus: "AVAILABLE",
-    floor: 1,
+    floor: "",
   })
+
+  const fetchFloors = async () => {
+    try {
+      const { data } = await axiosInstance.get("/floors")
+      setFloors(data.data || [])
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to load floors",
+        variant: "destructive",
+      })
+    }
+  }
+
+  // Fetch floors when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchFloors()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   // Update form when unit prop changes
   useEffect(() => {
     if (unit) {
+      // Find floor ID from floor number (temporary solution until backend provides floor ID)
+      const floorId = floors.find((f) => f.floorNumber === unit.floor)?.id || ""
+
       setEditUnit({
         unitNumber: unit.unitNumber,
-        address: unit.address,
         unitType: unit.unitType as "A" | "B" | "C",
         unitSize: unit.unitSize,
-        unitStatus: unit.status as "AVAILABLE" | "OCCUPIED" | "RESERVED",
-        floor: unit.floor,
+        floor: floorId,
       })
     }
-  }, [unit])
+  }, [unit, floors])
 
   const handleUpdateUnit = async () => {
     if (!unit?.id) {
@@ -54,10 +81,10 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
       return
     }
 
-    if (!editUnit.unitNumber || !editUnit.address) {
+    if (!editUnit.unitNumber || !editUnit.floor) {
       toast({
         title: "Error",
-        description: "Please fill in unit number and address",
+        description: "Please fill in unit number and floor",
         variant: "destructive",
       })
       return
@@ -108,18 +135,18 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
               />
             </div>
             <div className="space-y-2">
-              <Label>Floor</Label>
+              <Label>Floor *</Label>
               <Select
-                value={editUnit.floor.toString()}
-                onValueChange={(value: string) => setEditUnit((prev) => ({ ...prev, floor: parseInt(value) }))}
+                value={editUnit.floor}
+                onValueChange={(value: string) => setEditUnit((prev) => ({ ...prev, floor: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select floor" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((floor) => (
-                    <SelectItem key={floor} value={floor.toString()}>
-                      Floor {floor}
+                  {floors.map((floor) => (
+                    <SelectItem key={floor.id} value={floor.id}>
+                      Floor {floor.floorNumber}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -127,17 +154,7 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Address</Label>
-            <Input
-              value={editUnit.address}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEditUnit((prev) => ({ ...prev, address: e.target.value }))
-              }
-              placeholder="Building A, 123 Street"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Unit Type</Label>
+            <Label>Unit Type *</Label>
             <Select
               value={editUnit.unitType}
               onValueChange={(value: "A" | "B" | "C") => setEditUnit((prev) => ({ ...prev, unitType: value }))}
@@ -153,33 +170,16 @@ const EditUnitDialog = ({ isOpen, onClose, unit }: EditUnitDialogProps) => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Size (sq ft)</Label>
+            <Label>Size (sq ft) *</Label>
             <Input
               value={editUnit.unitSize.toString()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEditUnit((prev) => ({ ...prev, unitSize: parseInt(e.target.value) || 400 }))
+                setEditUnit((prev) => ({ ...prev, unitSize: parseFloat(e.target.value) || 400 }))
               }
               placeholder="400"
               type="number"
+              step="0.01"
             />
-          </div>
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={editUnit.unitStatus}
-              onValueChange={(value: "AVAILABLE" | "RESERVED" | "OCCUPIED") =>
-                setEditUnit((prev) => ({ ...prev, unitStatus: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="AVAILABLE">Available</SelectItem>
-                <SelectItem value="RESERVED">Reserved</SelectItem>
-                <SelectItem value="OCCUPIED">Occupied</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose} disabled={isSubmitting}>

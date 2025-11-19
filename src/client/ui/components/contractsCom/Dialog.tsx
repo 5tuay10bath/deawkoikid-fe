@@ -1,5 +1,5 @@
 import { CalendarIcon, Plus } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { format } from "date-fns"
 
 import type { CreateContractDto } from "@infrastructure/inbound/dtos/createContract.dto"
@@ -16,13 +16,13 @@ import { Checkbox } from "../common/Checkbox"
 import { useToast } from "../hooks/useToast"
 
 const DialogContracts = () => {
-  const { createContract } = useContractStore()
+  const { createContract, createUnits, createUsers, getCreateUnits, getCreateUsers } = useContractStore()
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [newContract, setNewContract] = useState<CreateContractDto>({
     unitId: "",
-    email: "",
+    userId: "",
     rentType: "MONTHLY",
     rentAmount: 0,
     waterBillingType: "PER_UNIT",
@@ -31,11 +31,18 @@ const DialogContracts = () => {
     endDate: new Date(),
   })
 
+  useEffect(() => {
+    if (isOpen) {
+      getCreateUnits()
+      getCreateUsers()
+    }
+  }, [isOpen, getCreateUnits, getCreateUsers])
+
   const handleAddContract = async () => {
-    if (!newContract.unitId || !newContract.email) {
+    if (!newContract.unitId || !newContract.userId) {
       toast({
         title: "Error",
-        description: "Please fill in Unit ID and Email",
+        description: "Please fill in Unit ID and User ID",
         variant: "destructive",
       })
       return
@@ -45,10 +52,9 @@ const DialogContracts = () => {
     try {
       const result = await createContract(newContract)
       if (result.success) {
-        // Reset form
         setNewContract({
           unitId: "",
-          email: "",
+          userId: "",
           rentType: "MONTHLY",
           rentAmount: 0,
           waterBillingType: "PER_UNIT",
@@ -81,28 +87,47 @@ const DialogContracts = () => {
           Add Contract
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Contract</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Unit ID *</Label>
-              <Input
+              <Label>Unit *</Label>
+              <Select
                 value={newContract.unitId}
-                onChange={(e) => setNewContract((prev) => ({ ...prev, unitId: e.target.value }))}
-                placeholder="unit-id-123"
-              />
+                onValueChange={(value: string) => setNewContract((prev) => ({ ...prev, unitId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {createUnits.map((unit) => (
+                    <SelectItem key={unit.id} value={unit.id}>
+                      {unit.address}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label>Email *</Label>
-              <Input
-                type="email"
-                value={newContract.email}
-                onChange={(e) => setNewContract((prev) => ({ ...prev, email: e.target.value }))}
-                placeholder="tenant@example.com"
-              />
+              <Label>User *</Label>
+              <Select
+                value={newContract.userId}
+                onValueChange={(value: string) => setNewContract((prev) => ({ ...prev, userId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select user" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {createUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

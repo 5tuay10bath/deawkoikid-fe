@@ -11,6 +11,7 @@ type TenantState = {
   tenants: TenantsPageModel[]
   searchTerm: string
   statusFilter: string
+  isLoading: boolean
   setSearchTerm: (term: string) => void
   setStatusFilter: (status: string) => void
   setTenants: (tenants: TenantsPageModel[]) => void
@@ -28,11 +29,13 @@ export const useTenantStore = create<TenantStore>((set, get) => ({
   tenants: [],
   searchTerm: "",
   statusFilter: "all",
+  isLoading: false,
   setSearchTerm: (term) => set({ searchTerm: term }),
   setStatusFilter: (status) => set({ statusFilter: status }),
   setTenants: (tenants) => set({ tenants }),
 
   getTenants: async () => {
+    set({ isLoading: true })
     try {
       const result = await GetTenantsPageFactory().handler({})
       if (result.isRight()) {
@@ -42,6 +45,8 @@ export const useTenantStore = create<TenantStore>((set, get) => ({
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      set({ isLoading: false })
     }
   },
 

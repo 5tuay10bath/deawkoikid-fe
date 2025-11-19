@@ -8,13 +8,13 @@ export class PaymentsMapper {
       .id(paymentsEntity.id)
       .contract(paymentsEntity.contract)
       .apartmentConfig(paymentsEntity.apartmentConfig)
-      .billingMonth(paymentsEntity.billingMonth)
+      .billingMonth(new Date(paymentsEntity.billingMonth))
       .electricUsage(paymentsEntity.electricUsage)
       .waterUsage(paymentsEntity.waterUsage)
       .status(paymentsEntity.status as "UNPAID" | "PAID" | "OVERDUE")
-      .dueDate(paymentsEntity.dueDate)
+      .dueDate(new Date(paymentsEntity.dueDate))
       .totalAmount(paymentsEntity.totalAmount)
-      .paidDate(paymentsEntity.paidDate)
+      .paidDate(paymentsEntity.paidDate ? new Date(paymentsEntity.paidDate) : null)
       .build()
   }
 

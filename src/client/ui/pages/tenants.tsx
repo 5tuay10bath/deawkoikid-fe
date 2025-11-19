@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/common/c
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/common/Select"
 import TableTenants from "../components/tenantsCom/Table"
 import DialogTenants from "../components/tenantsCom/Dialog"
+import { TableLoading } from "../components/common/TableLoading"
 import { useEffect } from "react"
 
 export default function Tenants() {
-  const { tenants, searchTerm, statusFilter, setSearchTerm, setStatusFilter, getTenants } = useTenantStore()
+  const { tenants, searchTerm, statusFilter, isLoading, setSearchTerm, setStatusFilter, getTenants } = useTenantStore()
 
   useEffect(() => {
     getTenants()
@@ -82,9 +83,7 @@ export default function Tenants() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <TableTenants />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <TableTenants />}</CardContent>
       </Card>
     </div>
   )

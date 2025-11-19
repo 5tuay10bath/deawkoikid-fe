@@ -19,22 +19,24 @@ const NewTaskDialog = () => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [newTask, setNewTask] = useState<CreateMaintenanceDto>({
+  const [scheduledAt, setScheduledAt] = useState<Date | undefined>()
+  const [estimatedFinishTime, setEstimatedFinishTime] = useState<Date | undefined>()
+  const [newTask, setNewTask] = useState<Omit<CreateMaintenanceDto, "scheduledAt" | "estimatedFinishTime">>({
     unitId: "",
     title: "",
     description: "",
+    price: 0,
     priority: "MEDIUM",
     maintenanceType: "OTHER",
     assignedToId: "",
     reportedById: "",
-    scheduledAt: new Date(),
   })
 
   const handleCreateTask = async () => {
-    if (!newTask.title || !newTask.unitId || !newTask.reportedById) {
+    if (!newTask.title || !newTask.unitId || !newTask.assignedToId || !newTask.reportedById) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields (Title, Unit ID, Reported By)",
+        description: "Please fill in all required fields (Title, Unit ID, Assigned To, Reported By)",
         variant: "destructive",
       })
       return
@@ -42,18 +44,25 @@ const NewTaskDialog = () => {
 
     setIsSubmitting(true)
     try {
-      const result = await createMaintenance(newTask)
+      const maintenanceData: CreateMaintenanceDto = {
+        ...newTask,
+        scheduledAt: scheduledAt ? format(scheduledAt, "yyyy-MM-dd'T'HH:mm:ssXXX") : undefined,
+        estimatedFinishTime: estimatedFinishTime ? format(estimatedFinishTime, "yyyy-MM-dd'T'HH:mm:ssXXX") : undefined,
+      }
+      const result = await createMaintenance(maintenanceData)
       if (result.success) {
         setNewTask({
           unitId: "",
           title: "",
           description: "",
+          price: 0,
           priority: "MEDIUM",
           maintenanceType: "OTHER",
           assignedToId: "",
           reportedById: "",
-          scheduledAt: new Date(),
         })
+        setScheduledAt(undefined)
+        setEstimatedFinishTime(undefined)
         setIsOpen(false)
         toast({
           title: "Success",
@@ -159,11 +168,22 @@ const NewTaskDialog = () => {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Price</Label>
+            <Input
+              type="number"
+              value={newTask.price}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+              placeholder="0.00"
+              step="0.01"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Assigned To ID (Optional)</Label>
+              <Label>Assigned To ID</Label>
               <Input
-                value={newTask.assignedToId || ""}
+                value={newTask.assignedToId}
                 onChange={(e) => setNewTask((prev) => ({ ...prev, assignedToId: e.target.value }))}
                 placeholder="staff-id-123"
               />
@@ -178,24 +198,45 @@ const NewTaskDialog = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Scheduled Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {newTask.scheduledAt ? format(newTask.scheduledAt, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="bg-white w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={newTask.scheduledAt}
-                  onSelect={(date) => setNewTask((prev) => ({ ...prev, scheduledAt: date || new Date() }))}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Scheduled Date (Optional)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {scheduledAt ? format(scheduledAt, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="bg-white w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={scheduledAt}
+                    onSelect={(date) => setScheduledAt(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2">
+              <Label>Estimated Finish Time (Optional)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {estimatedFinishTime ? format(estimatedFinishTime, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="bg-white w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={estimatedFinishTime}
+                    onSelect={(date) => setEstimatedFinishTime(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
 
           <div className="flex gap-3">

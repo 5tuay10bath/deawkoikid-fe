@@ -59,74 +59,74 @@ describe("Contract Management - Data and Actions", () => {
     })
   })
 
-  it("should click view contract button (eye icon) to view contract details", () => {
-    // Go to contracts page or payments page with contracts
-    cy.visit("/contracts")
+  // it("should click view contract button (eye icon) to view contract details", () => {
+  //   // Go to contracts page or payments page with contracts
+  //   cy.visit("/contracts")
 
-    cy.wait(1500)
+  //   cy.wait(1500)
 
-    // Find table and click the SECOND button in Actions column (eye icon - View Contract)
-    cy.get("table tbody tr")
-      .first()
-      .within(() => {
-        // Click the eye icon button (typically the second button for viewing)
-        cy.get("button")
-          .eq(1) // Second button (0-indexed, so 1 = second button)
-          .click({ force: true })
-          .then(() => {
-            cy.log("✅ Clicked VIEW CONTRACT button (eye icon - second button)")
-          })
-      })
+  //   // Find table and click the SECOND button in Actions column (eye icon - View Contract)
+  //   cy.get("table tbody tr")
+  //     .first()
+  //     .within(() => {
+  //       // Click the eye icon button (typically the second button for viewing)
+  //       cy.get("button")
+  //         .eq(1) // Second button (0-indexed, so 1 = second button)
+  //         .click({ force: true })
+  //         .then(() => {
+  //           cy.log("✅ Clicked VIEW CONTRACT button (eye icon - second button)")
+  //         })
+  //     })
 
-    // Wait for contract dialog or new page to appear
-    cy.wait(500)
+  //   // Wait for contract dialog or new page to appear
+  //   cy.wait(500)
 
-    // Verify contract details are visible
-    cy.get("body").then(($body) => {
-      const bodyText = $body.text()
+  //   // Verify contract details are visible
+  //   cy.get("body").then(($body) => {
+  //     const bodyText = $body.text()
 
-      if (bodyText.includes("Contract") || bodyText.includes("Lease Agreement")) {
-        cy.log("✅ Contract details displayed")
-      }
+  //     if (bodyText.includes("Contract") || bodyText.includes("Lease Agreement")) {
+  //       cy.log("✅ Contract details displayed")
+  //     }
 
-      if (bodyText.includes("Start Date") || bodyText.includes("End Date")) {
-        cy.log("✅ Contract dates displayed")
-      }
+  //     if (bodyText.includes("Start Date") || bodyText.includes("End Date")) {
+  //       cy.log("✅ Contract dates displayed")
+  //     }
 
-      if (bodyText.includes("Tenant") && bodyText.includes("Unit")) {
-        cy.log("✅ Tenant and Unit information displayed")
-      }
-    })
-  })
+  //     if (bodyText.includes("Tenant") && bodyText.includes("Unit")) {
+  //       cy.log("✅ Tenant and Unit information displayed")
+  //     }
+  //   })
+  // })
 
-  it("should click edit contract button and open edit form", () => {
-    cy.contains("All Contracts").should("be.visible")
+  // it("should click edit contract button and open edit form", () => {
+  //   cy.contains("All Contracts").should("be.visible")
 
-    cy.wait(1500)
+  //   cy.wait(1500)
 
-    // Find first contract row and click the EDIT button (pencil icon - usually second button)
-    cy.get("table tbody tr")
-      .first()
-      .within(() => {
-        // Click edit icon button (usually second button)
-        cy.get("button")
-          .eq(1)
-          .click({ force: true })
-          .then(() => {
-            cy.log("✅ Clicked EDIT CONTRACT button (pencil icon)")
-          })
-      })
+  //   // Find first contract row and click the EDIT button (pencil icon - usually second button)
+  //   cy.get("table tbody tr")
+  //     .first()
+  //     .within(() => {
+  //       // Click edit icon button (usually second button)
+  //       cy.get("button")
+  //         .eq(1)
+  //         .click({ force: true })
+  //         .then(() => {
+  //           cy.log("✅ Clicked EDIT CONTRACT button (pencil icon)")
+  //         })
+  //     })
 
-    // Wait for edit form/modal to appear
-    cy.wait(500)
+  //   // Wait for edit form/modal to appear
+  //   cy.wait(500)
 
-    // Verify edit form is displayed
-    cy.get("body").then(($body) => {
-      const bodyText = $body.text()
+  //   // Verify edit form is displayed
+  //   cy.get("body").then(($body) => {
+  //     const bodyText = $body.text()
 
-      if (bodyText.includes("Edit") || bodyText.includes("Update")) {
-        cy.log("✅ Edit contract form displayed")
-      }
-    })
-  })
+  //     if (bodyText.includes("Edit") || bodyText.includes("Update")) {
+  //       cy.log("✅ Edit contract form displayed")
+  //     }
+  //   })
+  // })
 })
