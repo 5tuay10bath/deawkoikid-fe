@@ -19,6 +19,7 @@ export class DashboardMapper {
       .unitNumber(dashboardEntity.unitNumber)
       .unitType(dashboardEntity.unitType)
       .unitSize(dashboardEntity.unitSize)
+      .contracts(dashboardEntity.contracts || null)
       .unitStatus(typeof status === "string" ? status.toUpperCase() : status)
       .floor(Number(floor))
       .latestAirconService(new Date(dashboardEntity.latestAirconService))
