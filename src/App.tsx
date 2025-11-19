@@ -19,6 +19,7 @@ import Home from "@client/ui/pages/home"
 import Login from "@client/ui/pages/login"
 import SignUp from "@client/ui/pages/signUp"
 import UserDashboard from "@client/ui/pages/userDashboard"
+import Buildings from "@client/ui/pages/building"
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -97,6 +98,16 @@ export default function App() {
             <ProtectedRoute requiredRole="ADMIN">
               <AdminLayout>
                 <Dashboard />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buildings"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminLayout>
+                <Buildings />
               </AdminLayout>
             </ProtectedRoute>
           }

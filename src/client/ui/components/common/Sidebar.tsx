@@ -1,4 +1,15 @@
-import { LayoutDashboard, Building2, Users, CreditCard, FileText, Wrench, Menu, X, LogOut } from "lucide-react"
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  CreditCard,
+  FileText,
+  Wrench,
+  Menu,
+  X,
+  LogOut,
+  Building,
+} from "lucide-react"
 import React, { useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useAuthStore } from "../../stores/auth.store"
@@ -126,6 +137,7 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
             collapsed={collapsed}
             icon={<LayoutDashboard className="h-5 w-5" />}
           />
+          <NavItem to="/buildings" label="Buildings" collapsed={collapsed} icon={<Building className="h-5 w-5" />} />
           <NavItem to="/units" label="Units" collapsed={collapsed} icon={<Building2 className="h-5 w-5" />} />
           <NavItem to="/tenants" label="Tenants" collapsed={collapsed} icon={<Users className="h-5 w-5" />} />
           <NavItem to="/payments" label="Payments" collapsed={collapsed} icon={<CreditCard className="h-5 w-5" />} />

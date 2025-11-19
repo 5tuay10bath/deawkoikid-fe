@@ -5,6 +5,8 @@ import { Input } from "../components/common/Input"
 import { Label } from "../components/common/Label"
 import { useToast } from "../components/hooks/useToast"
 import { useAuthStore } from "../stores/auth.store"
+import { cookieUtils } from "@shared/utils/cookie.utils"
+import { jwtUtils } from "@shared/utils/jwt.utils"
 
 export default function Login() {
   const navigate = useNavigate()
@@ -18,6 +20,18 @@ export default function Login() {
 
   // Handle success/error messages
   useEffect(() => {
+    const token = cookieUtils.getAuthToken()
+    if (token != null) {
+      const role: string | null = token ? jwtUtils.getRoleFromToken(token) : null
+      if (role === "USER") {
+        navigate("/user/dashboard", { replace: true })
+        return
+      }
+      if (role === "ADMIN") {
+        navigate("/dashboard", { replace: true })
+        return
+      }
+    }
     if (successMessage) {
       toast({
         title: "Success",
@@ -35,7 +49,7 @@ export default function Login() {
       })
       clearMessages()
     }
-  }, [successMessage, error, toast, clearMessages])
+  }, [successMessage, error, toast, clearMessages, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
