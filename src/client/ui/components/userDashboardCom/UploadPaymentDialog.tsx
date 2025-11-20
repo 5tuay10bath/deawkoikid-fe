@@ -20,61 +20,58 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
-  // Get presigned URL when modal opens
+  const API_BASE_URL = import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || "http://localhost:8080"
+
   useEffect(() => {
-    if (isOpen) {
-      fetchPresignedUrl()
-    } else {
-      // Reset state when modal closes
+    if (!isOpen) {
       setSelectedFile(null)
       setPresignedUrl(null)
       setUploadSuccess(false)
     }
   }, [isOpen])
 
-  const fetchPresignedUrl = async () => {
+  const fetchPresignedUrl = async (fileExtension: string) => {
     setIsLoadingUrl(true)
     try {
       const datetime = format(new Date(), "yyyyMMddHHmmss")
-      const response = await axios.get(
-        `http://localhost:8080/api/public/presigned-url/download?filePath=img/receipt/${datetime}`,
-      )
+      const filePath = `img/receipt/${datetime}${fileExtension}`
+      const response = await axios.get(`${API_BASE_URL}/api/public/presigned-url/upload?filePath=${filePath}`)
 
       if (response.data) {
         setPresignedUrl(response.data)
-        toast({
-          title: "Ready to upload",
-          description: "You can now select a file to upload",
-        })
       }
-    } catch (error) {
-      console.error("Error fetching presigned URL:", error)
+    } catch {
       toast({
         title: "Error",
         description: "Failed to prepare upload. Please try again.",
         variant: "destructive",
       })
-      onClose()
+      setSelectedFile(null)
     } finally {
       setIsLoadingUrl(false)
     }
   }
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select a file smaller than 10MB",
-          variant: "destructive",
-        })
-        return
-      }
+    if (!file) return
 
-      setSelectedFile(file)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select a file smaller than 10MB",
+        variant: "destructive",
+      })
+      return
     }
+
+    const fileName = file.name
+    const lastDot = fileName.lastIndexOf(".")
+    const fileExtension = lastDot !== -1 ? fileName.substring(lastDot) : ""
+
+    setSelectedFile(file)
+
+    await fetchPresignedUrl(fileExtension)
   }
 
   const handleUpload = async () => {
@@ -89,12 +86,8 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
 
     setIsUploading(true)
     try {
-      // Upload file to S3 using presigned URL with PUT method
-      // ⚠️ สำคัญ: ไม่ส่ง Content-Type ถ้า Backend ไม่ได้กำหนดไว้ตอนสร้าง presigned URL
-      // หรือต้องส่งให้ตรงกับที่ Backend กำหนดไว้ทุกตัวอักษร
       await axios.put(presignedUrl, selectedFile, {
         headers: {
-          // ลอง comment บรรทัดนี้ถ้ายังเจอ 403
           "Content-Type": selectedFile.type || "application/octet-stream",
         },
       })
@@ -109,13 +102,7 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
       setTimeout(() => {
         onClose()
       }, 1500)
-    } catch (error) {
-      console.error("Error uploading file:", error)
-      if (axios.isAxiosError(error)) {
-        console.error("Response status:", error.response?.status)
-        console.error("Response data:", error.response?.data)
-        console.error("Request headers:", error.config?.headers)
-      }
+    } catch {
       toast({
         title: "Upload failed",
         description: "Failed to upload file. Please try again.",
@@ -176,10 +163,14 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
 
             {/* Action buttons */}
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose} disabled={isUploading} className="flex-1">
+              <Button variant="outline" onClick={onClose} disabled={isUploading || isLoadingUrl} className="flex-1">
                 Cancel
               </Button>
-              <Button onClick={handleUpload} disabled={!selectedFile || isUploading} className="flex-1">
+              <Button
+                onClick={handleUpload}
+                disabled={!selectedFile || !presignedUrl || isUploading || isLoadingUrl}
+                className="flex-1"
+              >
                 {isUploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -81,9 +81,11 @@ const ContractsTable = () => {
                   {/* <Button variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
                   </Button> */}
-                  <Button variant="ghost" size="sm" onClick={() => setUploadContractId(contract.id)}>
-                    <Upload className="h-4 w-4" />
-                  </Button>
+                  {contract.status === "DRAFT" && (
+                    <Button variant="ghost" size="sm" onClick={() => setUploadContractId(contract.id)}>
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>

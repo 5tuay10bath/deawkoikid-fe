@@ -22,60 +22,63 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
-  // Get presigned URL when modal opens
+  const API_BASE_URL = import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || "http://localhost:8080"
+
+  // Reset state when modal closes
   useEffect(() => {
-    if (isOpen && id) {
-      fetchPresignedUrl()
-    } else {
-      // Reset state when modal closes
+    if (!isOpen) {
       setSelectedFile(null)
       setPresignedUrl(null)
       setUploadSuccess(false)
     }
-  }, [isOpen, id])
+  }, [isOpen])
 
-  const fetchPresignedUrl = async () => {
+  const fetchPresignedUrl = async (fileExtension: string) => {
     setIsLoadingUrl(true)
     try {
       const datetime = format(new Date(), "yyyyMMddHHmmss")
-      const filePath = `img/${type}/${datetime}_${id}`
-      const response = await axios.get(`http://localhost:8080/api/public/presigned-url/download?filePath=${filePath}`)
+      const filePath = `img/${type}/${datetime}_${id}${fileExtension}`
+      const response = await axios.get(`${API_BASE_URL}/api/public/presigned-url/upload?filePath=${filePath}`)
 
       if (response.data) {
         setPresignedUrl(response.data)
-        toast({
-          title: "Ready to upload",
-          description: "You can now select a file to upload",
-        })
       }
-    } catch (error) {
-      console.error("Error fetching presigned URL:", error)
+    } catch {
       toast({
         title: "Error",
         description: "Failed to prepare upload. Please try again.",
         variant: "destructive",
       })
-      onClose()
+      setSelectedFile(null)
     } finally {
       setIsLoadingUrl(false)
     }
   }
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select a file smaller than 10MB",
-          variant: "destructive",
-        })
-        return
-      }
+    if (!file) return
 
-      setSelectedFile(file)
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select a file smaller than 10MB",
+        variant: "destructive",
+      })
+      return
     }
+
+    // Get file extension
+    const fileName = file.name
+    const lastDot = fileName.lastIndexOf(".")
+    const fileExtension = lastDot !== -1 ? fileName.substring(lastDot) : ""
+
+    // Set file first
+    setSelectedFile(file)
+
+    // Then fetch presigned URL with correct file extension
+    await fetchPresignedUrl(fileExtension)
   }
 
   const handleUpload = async () => {
@@ -90,12 +93,17 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
 
     setIsUploading(true)
     try {
-      // Upload file to S3 using presigned URL with PUT method
+      // Upload file to S3 using presigned URL with PUT method and binary body
       await axios.put(presignedUrl, selectedFile, {
         headers: {
           "Content-Type": selectedFile.type || "application/octet-stream",
         },
       })
+
+      // If contract type, update contract status
+      if (type === "contracts") {
+        await axios.put(`${API_BASE_URL}/api/contracts/status/${id}`)
+      }
 
       setUploadSuccess(true)
       toast({
@@ -107,13 +115,7 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
       setTimeout(() => {
         onClose()
       }, 1500)
-    } catch (error) {
-      console.error("Error uploading file:", error)
-      if (axios.isAxiosError(error)) {
-        console.error("Response status:", error.response?.status)
-        console.error("Response data:", error.response?.data)
-        console.error("Request headers:", error.config?.headers)
-      }
+    } catch {
       toast({
         title: "Upload failed",
         description: "Failed to upload file. Please try again.",
@@ -176,10 +178,14 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
 
             {/* Action buttons */}
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose} disabled={isUploading} className="flex-1">
+              <Button variant="outline" onClick={onClose} disabled={isUploading || isLoadingUrl} className="flex-1">
                 Cancel
               </Button>
-              <Button onClick={handleUpload} disabled={!selectedFile || isUploading} className="flex-1">
+              <Button
+                onClick={handleUpload}
+                disabled={!selectedFile || !presignedUrl || isUploading || isLoadingUrl}
+                className="flex-1"
+              >
                 {isUploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
