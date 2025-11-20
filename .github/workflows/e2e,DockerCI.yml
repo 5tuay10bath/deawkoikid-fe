@@ -35,7 +35,7 @@ jobs:
       BE_IMAGE: docker.io/iamyasuomain/deawkoikid_backend:latest
       BE_PORT: 8080
 
-      CYPRESS_BASE_URL: http://localhost:3000
+      CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
       CI: "true"
 
     steps:
@@ -103,7 +103,7 @@ jobs:
           NODE_ENV: test
 
       - name: Wait for frontend
-        run: npx wait-on http://localhost:3000/fivetuay10bath-frontend
+        run: npx wait-on http://localhost:3000 --timeout 60000
 
       - name: Cache Cypress binary
         uses: actions/cache@v4
