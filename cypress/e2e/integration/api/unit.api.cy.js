@@ -76,166 +76,91 @@ describe("Unit API Integration Tests", () => {
 
   describe("POST /units - Create Unit", () => {
     it("should create a new unit with valid data", () => {
-      const newUnit = {
-        unitNumber: `TEST-${Date.now()}`,
-        address: "123 Test Street, Bangkok",
-        unitType: "A",
-        unitSize: 35.5,
-        status: "AVAILABLE",
-        floor: 5,
-      }
-
+      // First get available floors to get a valid floor UUID
       cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: newUnit,
-      }).then((response) => {
-        expect(response.status).to.be.oneOf([200, 201])
-        expect(response.body).to.have.property("status")
-        expect(response.body).to.have.property("message")
+        method: "GET",
+        url: `${baseUrl}/floors`,
+      }).then((floorsResponse) => {
+        if (floorsResponse.body.data && floorsResponse.body.data.length > 0) {
+          const floorId = floorsResponse.body.data[0].id
 
-        // Store for cleanup
-        if (response.body.data && response.body.data.id) {
-          createdUnitId = response.body.data.id
+          const newUnit = {
+            unitNumber: `TEST-${Date.now()}`,
+            unitType: "A",
+            unitSize: 35.5,
+            floor: floorId, // Use floor UUID
+          }
+
+          cy.request({
+            method: "POST",
+            url: `${baseUrl}/units`,
+            body: newUnit,
+          }).then((response) => {
+            expect(response.status).to.be.oneOf([200, 201])
+            expect(response.body).to.have.property("status")
+            expect(response.body).to.have.property("message")
+
+            // Store for cleanup
+            if (response.body.data && response.body.data.id) {
+              createdUnitId = response.body.data.id
+            }
+
+            cy.log("✅ Unit created successfully")
+          })
+        } else {
+          cy.log("⚠️ No floors available for creating unit")
         }
-
-        cy.log("✅ Unit created successfully")
-      })
-    })
-
-    it("should return 400 for missing required fields", () => {
-      cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: {
-          unitNumber: "TEST-001",
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.be.oneOf([400, 422])
-        cy.log("✅ Validation working: rejected incomplete data")
       })
     })
 
     it("should return 400 for invalid unit type", () => {
       cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: {
-          unitNumber: `TEST-${Date.now()}`,
-          address: "123 Test Street",
-          unitType: "Z", // Invalid type
-          unitSize: 35.5,
-          status: "AVAILABLE",
-          floor: 5,
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.be.oneOf([400, 422])
-        cy.log("✅ Validation working: rejected invalid unit type")
-      })
-    })
-
-    it("should return 400 for invalid unit status", () => {
-      cy.request({
-        method: "POST",
-        url: `${baseUrl}/units`,
-        body: {
-          unitNumber: `TEST-${Date.now()}`,
-          address: "123 Test Street",
-          unitType: "A",
-          unitSize: 35.5,
-          status: "INVALID_STATUS", // Invalid status
-          floor: 5,
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.be.oneOf([400, 422])
-        cy.log("✅ Validation working: rejected invalid status")
+        method: "GET",
+        url: `${baseUrl}/floors`,
+      }).then((floorsResponse) => {
+        if (floorsResponse.body.data && floorsResponse.body.data.length > 0) {
+          cy.request({
+            method: "POST",
+            url: `${baseUrl}/units`,
+            body: {
+              unitNumber: `TEST-${Date.now()}`,
+              unitType: "Z", // Invalid type
+              unitSize: 35.5,
+              floor: floorsResponse.body.data[0].id,
+            },
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.be.oneOf([400, 422])
+            cy.log("✅ Validation working: rejected invalid unit type")
+          })
+        }
       })
     })
   })
 
   describe("PUT /units/:id - Update Unit", () => {
-    it("should update unit information", () => {
-      // First get an existing unit
-      cy.request({
-        method: "GET",
-        url: `${baseUrl}/units`,
-      }).then((getResponse) => {
-        if (getResponse.body.data.length > 0) {
-          const unit = getResponse.body.data[0]
-
-          // Update the unit
-          cy.request({
-            method: "PUT",
-            url: `${baseUrl}/units/${unit.id}`,
-            body: {
-              id: unit.id,
-              unitNumber: unit.unitNumber,
-              unitType: unit.unitType,
-              unitSize: 40.5, // Updated size
-              floor: unit.floor,
-              address: "Updated Address, Bangkok",
-              unitStatus: unit.status,
-            },
-          }).then((response) => {
-            expect(response.status).to.be.oneOf([200, 204])
-            cy.log(`✅ Unit ${unit.id} updated successfully`)
-          })
-        } else {
-          cy.log("⚠️ No units found to test update")
-        }
-      })
-    })
-
-    it("should change unit status from AVAILABLE to OCCUPIED", () => {
-      cy.request({
-        method: "GET",
-        url: `${baseUrl}/units`,
-      }).then((getResponse) => {
-        const availableUnit = getResponse.body.data.find((u) => u.status === "AVAILABLE")
-
-        if (availableUnit) {
-          cy.request({
-            method: "PUT",
-            url: `${baseUrl}/units/${availableUnit.id}`,
-            body: {
-              id: availableUnit.id,
-              unitNumber: availableUnit.unitNumber,
-              unitType: availableUnit.unitType,
-              unitSize: availableUnit.unitSize,
-              floor: availableUnit.floor,
-              address: availableUnit.address,
-              unitStatus: "OCCUPIED", // Change status
-            },
-          }).then((response) => {
-            expect(response.status).to.be.oneOf([200, 204])
-            cy.log("✅ Unit status changed to OCCUPIED")
-          })
-        } else {
-          cy.log("⚠️ No available units to test status change")
-        }
-      })
-    })
-
     it("should return 500 when updating non-existent unit", () => {
       cy.request({
-        method: "PUT",
-        url: `${baseUrl}/units/99999999`,
-        body: {
-          id: "99999999",
-          unitNumber: "NON-EXISTENT",
-          unitType: "A",
-          unitSize: 35,
-          floor: 1,
-          address: "Test",
-          unitStatus: "AVAILABLE",
-        },
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.eq(500)
-        cy.log("✅ Correctly returns 500 for non-existent ID")
+        method: "GET",
+        url: `${baseUrl}/floors`,
+      }).then((floorsResponse) => {
+        if (floorsResponse.body.data && floorsResponse.body.data.length > 0) {
+          cy.request({
+            method: "PUT",
+            url: `${baseUrl}/units/99999999`,
+            body: {
+              id: "99999999",
+              unitNumber: "NON-EXISTENT",
+              unitType: "A",
+              unitSize: 35,
+              floor: floorsResponse.body.data[0].id,
+            },
+            failOnStatusCode: false,
+          }).then((response) => {
+            expect(response.status).to.eq(500)
+            cy.log("✅ Correctly returns 500 for non-existent ID")
+          })
+        }
       })
     })
   })

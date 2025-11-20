@@ -1,86 +1,49 @@
 describe("Unit Management - Data Tables and Actions", () => {
-  beforeEach(() => {
+  it("should login and test all unit management functionality", () => {
+    // Login once at the beginning
+    cy.visit("/login")
+    cy.wait(500)
+
+    cy.get('[data-cy="email-input"]', { timeout: 10000 })
+      .should("be.visible")
+      .clear({ force: true })
+      .type("admin@apt.com", { force: true })
+
+    cy.get('[data-cy="password-input"]').clear({ force: true }).type("admin", { force: true })
+
+    cy.get('[data-cy="login-button"]').click({ force: true })
+
+    cy.url().should("not.include", "/login", { timeout: 10000 })
+    cy.getCookie("auth_token").should("exist")
+
+    // Test 1: Open Add Unit modal and verify form fields
     cy.visit("/units")
-    // Wait for loading to finish
     cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
-  })
 
-  // it("should display units management page with table", () => {
-  //   cy.contains("Unit Management").should("be.visible")
-  //   cy.contains("All Units").should("be.visible")
-
-  //   // Verify units table exists
-  //   cy.get("table").should("exist")
-
-  //   // Verify table has headers
-  //   cy.get("table thead").should("exist")
-  //   cy.get("table thead th").should("have.length.greaterThan", 0)
-
-  //   // Verify table has data rows
-  //   cy.get("table tbody tr").should("have.length.greaterThan", 0)
-
-  //   // Verify first row has data
-  //   cy.get("table tbody tr")
-  //     .first()
-  //     .within(() => {
-  //       cy.get("td").should("have.length.greaterThan", 2)
-  //       cy.get("td").first().should("not.be.empty")
-  //     })
-
-  //   cy.log("✅ Units table verified with actual data")
-  // })
-
-  // it("should display unit information columns correctly", () => {
-  //   cy.get("table thead").within(() => {
-  //     // Verify essential columns exist
-  //     cy.contains(/unit|number/i).should("exist")
-  //     cy.contains(/floor/i).should("exist")
-  //     cy.contains(/status/i).should("exist")
-  //   })
-
-  //   // Verify data in first row matches column headers
-  //   cy.get("table tbody tr")
-  //     .first()
-  //     .within(() => {
-  //       // Unit number should exist
-  //       cy.get("td").first().should("not.be.empty")
-
-  //       // Floor should be a number
-  //       cy.contains(/\d+/).should("exist")
-
-  //       // Status should be one of valid statuses
-  //       cy.contains(/available|occupied|reserved|maintenance/i).should("exist")
-  //     })
-
-  //   cy.log("✅ Unit information columns verified")
-  // })
-
-  // NOTE: For Add Unit - only verify modal opens, no actual form submission
-  it("should open Add Unit modal and verify form fields", () => {
     cy.contains("Unit Management").should("be.visible")
-
-    // Find and click the blue Add button
     cy.get('button[class*="bg-blue"]').filter(":visible").first().click()
-
-    // Wait for modal to appear
     cy.get('div[role="dialog"]', { timeout: 5000 }).should("be.visible")
-
-    // Verify modal is properly displayed (modal opening is the test requirement)
     cy.get('div[role="dialog"]')
       .should("be.visible")
       .then(() => {
         cy.log("✅ Add Unit modal opened successfully")
       })
-  })
 
-  it("should show unit statistics", () => {
-    // Verify we're on units page
+    // Close modal
+    cy.get("body").then(($body) => {
+      if ($body.find('[role="dialog"]').length > 0) {
+        cy.get("body").type("{esc}")
+        cy.wait(500)
+      }
+    })
+
+    // Test 2: Show unit statistics
+    cy.visit("/units")
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
+
     cy.url().should("include", "/unit")
-
-    // Verify table exists (core requirement)
     cy.get("table").should("exist")
 
-    // Verify unit statistics exist (flexible check)
     cy.get("body").then(($body) => {
       const bodyText = $body.text()
       const hasStats = bodyText.match(/total|available|occupied|units/i)
