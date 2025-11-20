@@ -2,6 +2,7 @@ import axios, { type AxiosRequestConfig } from "axios"
 import { cloneDeep } from "lodash"
 
 import type { AxiosRequestHeaders } from "./types"
+import { DEAWKOIKID_API_BASE_URL } from "../../../config/env"
 
 const axiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}/api`,
