@@ -1,5 +1,5 @@
 import React from "react"
-import DialogUnits from "../components/unitsCom/Dialog"
+import DialogBuildings from "../components/buildingsCom/Dialog"
 
 export default function Buildings() {
   return (
@@ -8,7 +8,7 @@ export default function Buildings() {
         <div>
           <h1 className="text-3xl font-bold">Building Management</h1>
         </div>
-        <DialogUnits />
+        <DialogBuildings />
       </div>
     </div>
   )
