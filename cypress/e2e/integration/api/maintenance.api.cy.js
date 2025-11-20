@@ -1,5 +1,5 @@
 describe("Maintenance API Integration Tests", () => {
-  const baseUrl = Cypress.env("apiUrl") || "http://localhost:8080"
+  const baseUrl = Cypress.env("apiUrl") || "http://localhost:8080/api"
   let createdMaintenanceId = null
 
   // Clean up after all tests
