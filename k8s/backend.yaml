@@ -36,7 +36,7 @@ spec:
       containers:
         - name: app
           image: iamyasuomain/deawkoikid_backend:latest
-          imagePullPolicy: Always    
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
@@ -58,7 +58,7 @@ spec:
             - name: JWT_SECRET
               value: mySuperSecretKeyForJWT12345
             - name: JWT_EXPIRATION
-              value: "86400000"  
+              value: "86400000"
           resources:
             requests:
               cpu: "100m"

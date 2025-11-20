@@ -6,7 +6,7 @@ metadata:
 data:
   001_database.sql: |
     CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-    
+
     CREATE TABLE IF NOT EXISTS units (
       id                      UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
       unit_number             VARCHAR(10)     NOT NULL,
@@ -152,7 +152,6 @@ data:
     -- ALTER TABLE maintenance_reports
     --     ADD CONSTRAINT maintenance_reports_reported_by_fkey
     --         FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE CASCADE ;
-
 
   002_data.sql: |
     CREATE EXTENSION IF NOT EXISTS "pgcrypto";
