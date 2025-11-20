@@ -5,6 +5,9 @@
 
 describe("Authentication", () => {
   it("should login successfully and verify dashboard access", () => {
+    // Intercept login API call to debug
+    cy.intercept("POST", "**/api/auth/login").as("loginRequest")
+
     // Visit login page
     cy.visit("/login")
     cy.wait(500)
@@ -20,8 +23,11 @@ describe("Authentication", () => {
     // Submit login
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    // Wait for API call to complete
-    cy.wait(2000)
+    // Wait for API call to complete and verify response
+    cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
+      cy.log(`Login API Status: ${interception.response.statusCode}`)
+      expect(interception.response.statusCode).to.eq(200)
+    })
 
     // Wait for redirect with longer timeout for CI
     cy.url({ timeout: 30000 }).should("not.include", "/login")
