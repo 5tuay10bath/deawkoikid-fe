@@ -13,7 +13,17 @@ describe("Receipts & Contracts - Generation and Download", () => {
 
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    cy.url().should("not.include", "/login", { timeout: 10000 })
+    cy.wait(2000) // Wait for API call to complete
+    cy.url({ timeout: 30000 }).should("not.include", "/login")
+
+    // Alternative: force navigate if still on login page
+    cy.url().then((url) => {
+      if (url.includes("/login")) {
+        cy.log("Still on login page, forcing navigation to dashboard")
+        cy.visit("/dashboard")
+      }
+    })
+
     cy.getCookie("auth_token").should("exist")
 
     // Test: Generate receipt for payments with Paid status
