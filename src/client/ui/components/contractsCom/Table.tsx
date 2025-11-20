@@ -2,16 +2,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
 import { format } from "date-fns"
-import { Download, Eye, Edit } from "lucide-react"
+import { Eye, Edit, Upload } from "lucide-react"
 import { useState } from "react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
 import type { ContractsModel } from "@domain/models/contracts.model"
 import EditContractDialog from "./EditContractDialog"
+import UploadFileDialog from "../common/UploadFileDialog"
 
 const ContractsTable = () => {
   const { contracts, searchTerm, setSelectedContract, setIsViewOpen } = useContractStore()
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [selectedContractForEdit, setSelectedContractForEdit] = useState<ContractsModel | null>(null)
+  const [uploadContractId, setUploadContractId] = useState<string | null>(null)
 
   const handleEditClick = (contract: ContractsModel) => {
     setSelectedContractForEdit(contract)
@@ -76,9 +78,14 @@ const ContractsTable = () => {
                   <Button variant="ghost" size="sm" onClick={() => handleEditClick(contract)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  {/* <Button variant="ghost" size="sm">
                     <Download className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
+                  {contract.status === "DRAFT" && (
+                    <Button variant="ghost" size="sm" onClick={() => setUploadContractId(contract.id)}>
+                      <Upload className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
@@ -88,6 +95,16 @@ const ContractsTable = () => {
 
       {/* Edit Contract Dialog */}
       <EditContractDialog isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} contract={selectedContractForEdit} />
+
+      {/* Upload File Dialog */}
+      {uploadContractId && (
+        <UploadFileDialog
+          isOpen={!!uploadContractId}
+          onClose={() => setUploadContractId(null)}
+          type="contracts"
+          id={uploadContractId}
+        />
+      )}
     </>
   )
 }
