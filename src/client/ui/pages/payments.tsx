@@ -1,6 +1,6 @@
 import { Search, Receipt, DollarSign, Download } from "lucide-react"
 
-import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
+import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
 import jsPDF from "jspdf"
 
 import { Button } from "../components/common/Button"

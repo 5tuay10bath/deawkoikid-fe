@@ -2,7 +2,7 @@ import { Plus } from "lucide-react"
 import React, { useState, useEffect } from "react"
 
 import type { CreateUnitDto } from "@infrastructure/inbound/dtos/createUnit.dto"
-import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { useUnitStore } from "@infrastructure/libs/store/units.store"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 
 import { Button } from "../common/Button"

@@ -5,7 +5,7 @@ import { useAuthStore } from "../../stores/auth.store"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./Dialog"
 import { Button } from "./Button"
 
-import { cn } from "src/infrastructure/libs/cn/cn"
+import { cn } from "@infrastructure/libs/cn/cn"
 
 type Props = {
   collapsed?: boolean

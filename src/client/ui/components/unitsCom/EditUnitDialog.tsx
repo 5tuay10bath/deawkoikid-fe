@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 
 import type { UpdateUnitDto } from "@infrastructure/inbound/dtos/updateUnit.dto"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
-import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { useUnitStore } from "@infrastructure/libs/store/units.store"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 
 import { Button } from "../common/Button"

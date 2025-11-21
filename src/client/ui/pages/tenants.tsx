@@ -1,6 +1,6 @@
 import { Search, Users } from "lucide-react"
 
-import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
+import { useTenantStore } from "@infrastructure/libs/store/tenants.store"
 
 import { Button } from "../components/common/Button"
 import { StatsCard } from "../components/central/StatsCard"

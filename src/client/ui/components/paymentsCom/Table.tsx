@@ -3,7 +3,7 @@ import { Download, Receipt, Send } from "lucide-react"
 
 import type { PaymentsModel } from "@domain/models/payments.model"
 
-import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
+import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
 
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
