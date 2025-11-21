@@ -1,5 +1,7 @@
 import type { IBuildingRepository } from "@application/ports/building.repository.port"
 import type { CreateBuildingDto } from "../dtos/createBuilding.dto"
+import type { UpdateBuildingDto } from "../dtos/updateBuilding.dto"
+import type { UpdateFloorDto } from "../dtos/updateFloor.dto"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { BuildingModel } from "@domain/models/building.model"
@@ -43,6 +45,50 @@ export class BuildingRepository implements IBuildingRepository {
       const result: ApiResponse = {
         status: data.status || "success",
         message: data.message || "Building created successfully",
+        timestamp: data.timestamp || new Date().toISOString(),
+      }
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async updateBuilding(dto: UpdateBuildingDto): Promise<IBuildingRepository.updateBuilding> {
+    try {
+      const { id, name, codeName, description } = dto
+      const url = `/buildings/${id}`
+
+      const payload = { name, codeName, description }
+
+      const { data } = await axiosInstance.put(url, payload)
+
+      const result: ApiResponse = {
+        status: data.status || "success",
+        message: data.message || "Building updated successfully",
+        timestamp: data.timestamp || new Date().toISOString(),
+      }
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async updateFloor(dto: UpdateFloorDto): Promise<IBuildingRepository.updateFloor> {
+    try {
+      const { id, unitCount } = dto
+      const url = `/floors/${id}`
+
+      const payload = { unitCount }
+
+      const { data } = await axiosInstance.put(url, payload)
+
+      const result: ApiResponse = {
+        status: data.status || "success",
+        message: data.message || "Floor updated successfully",
         timestamp: data.timestamp || new Date().toISOString(),
       }
 

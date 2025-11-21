@@ -1,3 +1,10 @@
-import type { BuildingModel } from "@domain/models/building.model"
+import type { FloorEntity } from "./floor.entity"
 
-export interface BuildingEntity extends BuildingModel {}
+export interface BuildingEntity {
+  id: string
+  name: string
+  codeName: string
+  description: string
+  floorCount: number
+  floors?: FloorEntity[]
+}
