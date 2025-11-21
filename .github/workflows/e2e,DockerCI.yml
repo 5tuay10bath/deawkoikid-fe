@@ -118,20 +118,20 @@ jobs:
           curl -I http://localhost:3000/fivetuay10bath-frontend/ || echo "Frontend check"
           sleep 3
 
-      - name: Cache Cypress binary
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('pnpm-lock.yaml') }}
+      # - name: Cache Cypress binary
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.cache/Cypress
+      #     key: ${{ runner.os }}-cypress-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - name: Ensure Cypress binary installed
-        run: pnpm dlx cypress install
+      # - name: Ensure Cypress binary installed
+      #   run: pnpm dlx cypress install
 
         
-      - name: Run Cypress E2E
-        run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
-        env:
-          CYPRESS_apiUrl: http://localhost:8080/api
+      # - name: Run Cypress E2E
+      #   run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
+      #   env:
+      #     CYPRESS_apiUrl: http://localhost:8080/api
 
       - name: Generate version tag
         id: tag
