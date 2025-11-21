@@ -1,13 +1,12 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../common/Select"
 import { Textarea } from "../common/TextArea"
-import { Popover, PopoverContent, PopoverTrigger } from "../common/Popover"
-import { Calendar } from "../common/Calendar"
+import { DatePicker } from "../common/DatePicker"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
 import type { CreateMaintenanceDto } from "@infrastructure/inbound/dtos/createMaintenance.dto"
 import type { CreateSupplyDto } from "@infrastructure/inbound/dtos/createSupply.dto"
 import { Button } from "../common/Button"
-import { CalendarIcon, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Label } from "../common/Label"
 import { Input } from "../common/Input"
 import { format } from "date-fns"
@@ -19,8 +18,8 @@ const NewTaskDialog = () => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [scheduledAt, setScheduledAt] = useState<Date | undefined>()
-  const [estimatedFinishTime, setEstimatedFinishTime] = useState<Date | undefined>()
+  const [scheduledAt, setScheduledAt] = useState<Date | null>(null)
+  const [estimatedFinishTime, setEstimatedFinishTime] = useState<Date | null>(null)
   const [newTask, setNewTask] = useState<Omit<CreateMaintenanceDto, "scheduledAt" | "estimatedFinishTime">>({
     unitId: "",
     title: "",
@@ -61,8 +60,8 @@ const NewTaskDialog = () => {
           assignedToId: "",
           reportedById: "",
         })
-        setScheduledAt(undefined)
-        setEstimatedFinishTime(undefined)
+        setScheduledAt(null)
+        setEstimatedFinishTime(null)
         setIsOpen(false)
         toast({
           title: "Success",
@@ -199,44 +198,22 @@ const NewTaskDialog = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Scheduled Date (Optional)</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {scheduledAt ? format(scheduledAt, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="bg-white w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={scheduledAt}
-                    onSelect={(date) => setScheduledAt(date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="space-y-2">
-              <Label>Estimated Finish Time (Optional)</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {estimatedFinishTime ? format(estimatedFinishTime, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="bg-white w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={estimatedFinishTime}
-                    onSelect={(date) => setEstimatedFinishTime(date)}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+            <DatePicker
+              label="Scheduled Date (Optional)"
+              value={scheduledAt}
+              onChange={setScheduledAt}
+              placeholder="Select date"
+              allowClear
+              disabled={isSubmitting}
+            />
+            <DatePicker
+              label="Estimated Finish Time (Optional)"
+              value={estimatedFinishTime}
+              onChange={setEstimatedFinishTime}
+              placeholder="Select date"
+              allowClear
+              disabled={isSubmitting}
+            />
           </div>
 
           <div className="flex gap-3">
