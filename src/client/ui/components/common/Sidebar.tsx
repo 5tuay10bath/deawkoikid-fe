@@ -197,7 +197,7 @@ const Sidebar: React.FC<Props> = ({ collapsed = false }) => {
             <DialogTitle>Confirm Logout</DialogTitle>
             <DialogDescription>Are you sure you want to logout from your account?</DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="mt-4">
             <Button variant="outline" onClick={handleLogoutCancel}>
               Cancel
             </Button>

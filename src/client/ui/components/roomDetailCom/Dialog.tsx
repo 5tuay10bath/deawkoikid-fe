@@ -81,7 +81,7 @@ export const AddBillingDialog = () => {
   const { toast } = useToast()
 
   const handleAddAddon = () => {
-    if (!addonForm.type || !addonForm.amount) {
+    if (!addonForm.topic || !addonForm.price) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -89,10 +89,9 @@ export const AddBillingDialog = () => {
       })
       return
     }
-
     toast({
       title: "Add-on Charge Added",
-      description: `${addonForm.type} charge of $${addonForm.amount} added to tenant's bill`,
+      description: `${addonForm.topic} charge of $${addonForm.price} added to tenant's bill`,
     })
 
     setIsAddonOpen(false)
@@ -116,19 +115,19 @@ export const AddBillingDialog = () => {
             <Label htmlFor="addonType">Charge Type</Label>
             <Input
               id="addonType"
-              value={addonForm.type}
-              onChange={(e) => updateAddonForm({ type: e.target.value })}
+              value={addonForm.topic}
+              onChange={(e) => updateAddonForm({ topic: e.target.value })}
               placeholder="e.g., Electricity, Water, Maintenance"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="addonAmount">Amount ($)</Label>
+            <Label htmlFor="addonAmount">Price ($)</Label>
             <Input
               id="addonAmount"
               type="number"
-              value={addonForm.amount}
-              onChange={(e) => updateAddonForm({ amount: e.target.value })}
+              value={addonForm.price}
+              onChange={(e) => updateAddonForm({ price: e.target.value })}
               placeholder="50"
             />
           </div>
