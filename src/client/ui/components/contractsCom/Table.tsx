@@ -3,10 +3,11 @@ import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
 import { ConfirmDialog } from "../common/ConfirmDialog"
 import { format } from "date-fns"
-import { Eye, Edit, Upload, CheckCircle } from "lucide-react"
+import { Eye, Edit, Upload, CheckCircle, FileText } from "lucide-react"
 import { useState } from "react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
 import { useToast } from "../hooks/useToast"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { ContractsModel } from "@domain/models/contracts.model"
 import EditContractDialog from "./EditContractDialog"
 import UploadFileDialog from "../common/UploadFileDialog"
@@ -19,6 +20,7 @@ const ContractsTable = () => {
   const [uploadContractId, setUploadContractId] = useState<string | null>(null)
   const [isActivating, setIsActivating] = useState(false)
   const [confirmActivateId, setConfirmActivateId] = useState<string | null>(null)
+  const [loadingInvoiceId, setLoadingInvoiceId] = useState<string | null>(null)
 
   const handleEditClick = (contract: ContractsModel) => {
     setSelectedContractForEdit(contract)
@@ -50,6 +52,28 @@ const ContractsTable = () => {
       })
     }
   }
+
+  const handleCreateInvoice = async (contractId: string) => {
+    setLoadingInvoiceId(contractId)
+
+    try {
+      await axiosInstance.post(`/invoices/contract/${contractId}`)
+      toast({
+        title: "Success",
+        description: "Invoice created successfully",
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create invoice"
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoadingInvoiceId(null)
+    }
+  }
+
   const filteredContracts = contracts.filter(
     (contract) =>
       contract.user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -128,6 +152,19 @@ const ContractsTable = () => {
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     </Button>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleCreateInvoice(contract.id)}
+                    disabled={loadingInvoiceId === contract.id}
+                    title="Create Invoice"
+                  >
+                    {loadingInvoiceId === contract.id ? (
+                      <FileText className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileText className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
