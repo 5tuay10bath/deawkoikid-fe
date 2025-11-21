@@ -76,10 +76,9 @@ const MaintainTable = () => {
 
       setAssignableStaff(normalizedStaff)
     } catch (error) {
-      console.error(error)
       toast({
         title: "Error",
-        description: "Failed to load staff options.",
+        description: error.response.data.message,
         variant: "destructive",
       })
     } finally {
