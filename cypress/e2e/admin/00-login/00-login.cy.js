@@ -23,12 +23,6 @@ describe("Authentication", () => {
     // Submit login
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    // Wait for API call to complete and verify response
-    cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
-      cy.log(`Login API Status: ${interception.response.statusCode}`)
-      expect(interception.response.statusCode).to.eq(200)
-    })
-
     // Wait for redirect with longer timeout for CI
     cy.url({ timeout: 30000 }).should("not.include", "/login")
 

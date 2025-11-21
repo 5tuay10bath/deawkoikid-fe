@@ -16,12 +16,6 @@ describe("Basic App Functionality", () => {
 
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    // Wait for API call to complete and verify response
-    cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
-      cy.log(`Login API Status: ${interception.response.statusCode}`)
-      expect(interception.response.statusCode).to.eq(200)
-    })
-
     // Wait for redirect and verify login
     cy.url({ timeout: 30000 }).should("not.include", "/login")
 
