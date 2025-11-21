@@ -62,10 +62,10 @@ jobs:
             --env SPRING_DATASOURCE_USERNAME=app \
             --env SPRING_DATASOURCE_PASSWORD=password \
             --env JWT_SECRET_BASE64=${{ env.JWT_SECRET_BASE64 }} \
-            --AWS_ACCESS_KEY_ID=AKIAV2TD6FF5TVGZLXHK \
-            --AWS_SECRET_ACCESS_KEY=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 \
-            --AWS_REGION=ap-southeast- 1\
-            --AWS_BUCKET_NAME=web-devops1 \
+            --env AWS_ACCESS_KEY_ID=AKIAV2TD6FF5TVGZLXHK \
+            --env AWS_SECRET_ACCESS_KEY=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 \
+            --env AWS_REGION=ap-southeast-1 \
+            --env AWS_BUCKET_NAME=web-devops1 \
             "$BE_IMAGE"
             
       - name: Wait for backend health
