@@ -110,7 +110,7 @@ const DialogBuildings = () => {
           <DialogHeader className="shrink-0 px-4">
             <DialogTitle>{step === 1 ? "Create New Building" : "Floor Total Room Config"}</DialogTitle>
           </DialogHeader>
-          <div className="mt-4 flex-1 min-h-0 overflow-y-auto px-4">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4">
             {step === 1 ? (
               <div className="space-y-4">
                 <div className="space-y-2">
