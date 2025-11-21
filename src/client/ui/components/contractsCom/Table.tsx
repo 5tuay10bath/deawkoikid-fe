@@ -1,23 +1,54 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
+import { ConfirmDialog } from "../common/ConfirmDialog"
 import { format } from "date-fns"
-import { Eye, Edit, Upload } from "lucide-react"
+import { Eye, Edit, Upload, CheckCircle } from "lucide-react"
 import { useState } from "react"
 import { useContractStore } from "@infrastructure/libs/store/contracts.store"
+import { useToast } from "../hooks/useToast"
 import type { ContractsModel } from "@domain/models/contracts.model"
 import EditContractDialog from "./EditContractDialog"
 import UploadFileDialog from "../common/UploadFileDialog"
 
 const ContractsTable = () => {
-  const { contracts, searchTerm, setSelectedContract, setIsViewOpen } = useContractStore()
+  const { contracts, searchTerm, setSelectedContract, setIsViewOpen, activateContract } = useContractStore()
+  const { toast } = useToast()
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [selectedContractForEdit, setSelectedContractForEdit] = useState<ContractsModel | null>(null)
   const [uploadContractId, setUploadContractId] = useState<string | null>(null)
+  const [isActivating, setIsActivating] = useState(false)
+  const [confirmActivateId, setConfirmActivateId] = useState<string | null>(null)
 
   const handleEditClick = (contract: ContractsModel) => {
     setSelectedContractForEdit(contract)
     setIsEditOpen(true)
+  }
+
+  const handleActivateClick = (contractId: string) => {
+    setConfirmActivateId(contractId)
+  }
+
+  const handleConfirmActivate = async () => {
+    if (!confirmActivateId) return
+
+    setIsActivating(true)
+    const result = await activateContract({ id: confirmActivateId })
+    setIsActivating(false)
+    setConfirmActivateId(null)
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: result.message || "Contract activated successfully",
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || "Failed to activate contract",
+        variant: "destructive",
+      })
+    }
   }
   const filteredContracts = contracts.filter(
     (contract) =>
@@ -86,12 +117,36 @@ const ContractsTable = () => {
                       <Upload className="h-4 w-4" />
                     </Button>
                   )}
+                  {contract.status === "SIGNED" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleActivateClick(contract.id)}
+                      disabled={isActivating}
+                      title="Activate Contract"
+                    >
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </Button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {/* Confirm Activate Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmActivateId}
+        onClose={() => setConfirmActivateId(null)}
+        onConfirm={handleConfirmActivate}
+        title="Activate Contract"
+        description="Are you sure you want to activate this contract? This action will change the contract status to Active."
+        confirmText="Activate"
+        cancelText="Cancel"
+        isLoading={isActivating}
+        variant="default"
+      />
 
       {/* Edit Contract Dialog */}
       <EditContractDialog isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} contract={selectedContractForEdit} />
