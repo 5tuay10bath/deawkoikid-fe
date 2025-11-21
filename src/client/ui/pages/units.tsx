@@ -1,19 +1,20 @@
 import { Search, Building } from "lucide-react"
 
-import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { useUnitStore } from "@infrastructure/libs/store/units.store"
 
 import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import DialogUnits from "../components/unitsCom/Dialog"
 import TableUnits from "../components/unitsCom/Table"
+import { TableLoading } from "../components/common/TableLoading"
 import { useEffect } from "react"
 
 export default function Units() {
-  const { searchTerm, unitsTest, setSearchTerm, getUnits } = useUnitStore()
-  console.log("unitsTest", unitsTest)
+  const { searchTerm, isLoading, setSearchTerm, getUnits } = useUnitStore()
+
   useEffect(() => {
     getUnits()
-  }, [])
+  }, [getUnits])
 
   return (
     <div className="space-y-6">
@@ -46,9 +47,7 @@ export default function Units() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <TableUnits />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <TableUnits />}</CardContent>
       </Card>
     </div>
   )

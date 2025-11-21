@@ -11,17 +11,43 @@
 // Property Management Custom Commands
 
 /**
- * Login command for authentication
+ * Login command for authentication - Updated for CI/CD compatibility
  */
-Cypress.Commands.add("login", (username = "admin", password = "admin123") => {
-  cy.session([username, password], () => {
-    cy.visit("/login")
-    cy.get('[data-cy="username"]').type(username)
-    cy.get('[data-cy="password"]').type(password)
-    cy.get('[data-cy="login-button"]').click()
-    cy.url().should("include", "/dashboard")
-    cy.get('[data-cy="user-menu"]').should("be.visible")
-  })
+Cypress.Commands.add("login", (email = "admin@apt.com", password = "admin") => {
+  cy.session(
+    [email, password],
+    () => {
+      // Intercept login API call
+      cy.intercept("POST", "**/api/auth/login").as("loginRequest")
+
+      cy.visit("/login")
+      cy.wait(500)
+
+      // Fill in credentials
+      cy.get('[data-cy="email-input"]', { timeout: 10000 })
+        .should("be.visible")
+        .clear({ force: true })
+        .type(email, { force: true })
+
+      cy.get('[data-cy="password-input"]').clear({ force: true }).type(password, { force: true })
+
+      // Submit login
+      cy.get('[data-cy="login-button"]').click({ force: true })
+
+      // Wait for login API to complete
+      cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
+        cy.log(`Login API Response: ${interception.response.statusCode}`)
+        expect(interception.response.statusCode).to.eq(200)
+      })
+
+      // Verify redirect and auth
+      cy.url({ timeout: 30000 }).should("not.include", "/login")
+      cy.getCookie("auth_token").should("exist")
+    },
+    {
+      cacheAcrossSpecs: true,
+    },
+  )
 })
 
 /**

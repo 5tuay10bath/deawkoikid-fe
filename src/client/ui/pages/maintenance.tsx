@@ -6,9 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/common/c
 import { StatsCard } from "../components/central/StatsCard"
 import NewTaskDialog, { NewSupplyDialog } from "../components/maintenanceCom/Dialog"
 import MaintainTable, { SupplyTable } from "../components/maintenanceCom/Table"
+import { TableLoading } from "../components/common/TableLoading"
+import { useEffect } from "react"
 
 export default function Maintenance() {
-  const { tasks, supplies, searchTerm, setSearchTerm } = useMaintenanceStore()
+  const { tasks, supplies, searchTerm, isLoading, setSearchTerm, getMaintenanceTasks, getSupplies } =
+    useMaintenanceStore()
 
   const lowStockSupplies = supplies.filter((supply) => supply.quantity <= supply.minStock)
 
@@ -18,12 +21,17 @@ export default function Maintenance() {
     return (
       task.title.toLowerCase().includes(searchLower) ||
       task.description.toLowerCase().includes(searchLower) ||
-      task.unitNumber.toLowerCase().includes(searchLower) ||
-      task.assignedTo.toLowerCase().includes(searchLower) ||
+      task.unit.unitNumber.toLowerCase().includes(searchLower) ||
+      (task.assignedTo && task.assignedTo.fullName.toLowerCase().includes(searchLower)) ||
       task.priority.toLowerCase().includes(searchLower) ||
       task.status.toLowerCase().includes(searchLower)
     )
   })
+
+  useEffect(() => {
+    getMaintenanceTasks()
+    getSupplies()
+  }, [getMaintenanceTasks, getSupplies])
 
   return (
     <div className="space-y-6">
@@ -69,7 +77,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="Pending"
-              value={filteredTasks.filter((t) => t.status === "pending").length}
+              value={filteredTasks.filter((t) => t.status === "REPORTED" || t.status === "SCHEDULED").length}
               icon={Clock}
               color={{
                 valueColor: "text-amber-500",
@@ -79,7 +87,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="High Priority"
-              value={filteredTasks.filter((t) => t.priority === "high" || t.priority === "urgent").length}
+              value={filteredTasks.filter((t) => t.priority === "HIGH" || t.priority === "URGENT").length}
               icon={AlertTriangle}
               color={{
                 valueColor: "text-red-500",
@@ -89,7 +97,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="Completed"
-              value={filteredTasks.filter((t) => t.status === "completed").length}
+              value={filteredTasks.filter((t) => t.status === "COMPLETED").length}
               icon={Wrench}
               color={{
                 valueColor: "text-emerald-500",
@@ -105,9 +113,7 @@ export default function Maintenance() {
                 Maintenance Tasks
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <MaintainTable />
-            </CardContent>
+            <CardContent>{isLoading ? <TableLoading /> : <MaintainTable />}</CardContent>
           </Card>
         </TabsContent>
 

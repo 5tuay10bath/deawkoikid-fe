@@ -1,214 +1,70 @@
 describe("Receipts & Contracts - Generation and Download", () => {
-  beforeEach(() => {
-    cy.visit("/dashboard")
-  })
+  it("should login and test all receipt generation functionality", () => {
+    // Login once at the beginning
+    cy.visit("/login")
+    cy.wait(500)
 
-  describe("Receipt Information Display", () => {
-    it("should show receipt-related functionality if available", () => {
-      cy.contains("Property Dashboard").should("be.visible")
+    cy.get('[data-cy="email-input"]', { timeout: 10000 })
+      .should("be.visible")
+      .clear({ force: true })
+      .type("admin@apt.com", { force: true })
 
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+    cy.get('[data-cy="password-input"]').clear({ force: true }).type("admin", { force: true })
 
-        // Look for receipt-related features
-        if (bodyText.includes("Receipt") || bodyText.includes("Payment")) {
-          cy.log("Found receipt or payment functionality")
+    cy.get('[data-cy="login-button"]').click({ force: true })
 
-          if (bodyText.includes("Generate Receipt")) {
-            cy.contains("Generate Receipt").should("be.visible")
-          }
+    cy.wait(2000) // Wait for API call to complete
+    cy.url({ timeout: 30000 }).should("not.include", "/login")
 
-          if (bodyText.includes("Payment History")) {
-            cy.contains("Payment History").should("be.visible")
-          }
-        }
-
-        // Check for financial management features
-        if (bodyText.includes("Revenue") || bodyText.includes("Income")) {
-          cy.log("Found financial tracking features")
-        }
-      })
+    // Alternative: force navigate if still on login page
+    cy.url().then((url) => {
+      if (url.includes("/login")) {
+        cy.log("Still on login page, forcing navigation to dashboard")
+        cy.visit("/dashboard")
+      }
     })
 
-    it("should handle payment tracking if available", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+    cy.getCookie("auth_token").should("exist")
 
-        // Look for payment status indicators
-        if (bodyText.includes("Paid") || bodyText.includes("Overdue") || bodyText.includes("Pending")) {
-          cy.log("Found payment status indicators")
-        }
+    // Test: Generate receipt for payments with Paid status
+    cy.visit("/payments")
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
 
-        // Check for rent collection features
-        if (bodyText.includes("Rent") || bodyText.includes("Monthly")) {
-          cy.log("Found rent collection features")
-        }
+    cy.contains("Payment Management").should("be.visible")
 
-        // Look for payment methods
-        if (bodyText.includes("Cash") || bodyText.includes("Bank") || bodyText.includes("Transfer")) {
-          cy.log("Found payment method tracking")
-        }
-      })
-    })
+    cy.wait(1500)
 
-    it("should display financial statistics if available", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+    cy.get("body").then(($body) => {
+      if ($body.text().includes("Paid")) {
+        cy.contains("tr", /Paid/i)
+          .first()
+          .within(() => {
+            cy.get("button").first().click({ force: true })
+          })
 
-        // Look for revenue information
-        if (bodyText.includes("Revenue")) {
-          cy.contains("Revenue").should("be.visible")
+        cy.log("✅ Clicked receipt button for Paid payment")
 
-          // Check if there are revenue numbers
-          const revenuePattern = /Revenue.*?\$[\d,]+/g
-          const revenueMatches = bodyText.match(revenuePattern)
+        cy.wait(500)
+        cy.contains(/Generate Receipt|Payment Receipt/i, { timeout: 3000 }).should("be.visible")
 
-          if (revenueMatches) {
-            cy.log(`Found revenue information: ${revenueMatches.join(", ")}`)
-          }
-        }
+        cy.get("body").should("contain.text", "Tenant:")
+        cy.get("body").should("contain.text", "Unit:")
+        cy.get("body").should("contain.text", "Total Amount:")
 
-        // Check for collection rates
-        if (bodyText.includes("Collection") || bodyText.includes("Rate")) {
-          cy.log("Found collection rate information")
-        }
-      })
-    })
+        cy.log("✅ Receipt details verified")
 
-    it("should show tenant payment information", () => {
-      cy.visit("/tenants")
+        cy.contains("button", /Download/i).click({ force: true })
 
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
+        cy.wait(1000)
 
-        // Look for tenant payment details
-        if (bodyText.includes("Tenant Management")) {
-          cy.contains("Tenant Management").should("be.visible")
+        cy.contains(/success/i, { timeout: 5000 }).should("be.visible")
 
-          // Check for payment-related columns or info
-          if (bodyText.includes("Payment") || bodyText.includes("Balance")) {
-            cy.log("Found tenant payment information")
-          }
+        cy.log("✅ Receipt downloaded successfully with SUCCESS toast")
 
-          if (bodyText.includes("Due Date") || bodyText.includes("Next Payment")) {
-            cy.log("Found payment due date information")
-          }
-        }
-      })
-    })
-  })
-
-  describe("Contract Management", () => {
-    it("should handle contract-related functionality", () => {
-      cy.visit("/dashboard")
-
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for contract management features
-        if (bodyText.includes("Contract") || bodyText.includes("Lease")) {
-          cy.log("Found contract management features")
-
-          if (bodyText.includes("View Contract")) {
-            cy.contains("View Contract").should("be.visible")
-          }
-
-          if (bodyText.includes("Lease Agreement")) {
-            cy.contains("Lease Agreement").should("be.visible")
-          }
-        }
-
-        // Check for contract status
-        if (bodyText.includes("Active") || bodyText.includes("Expired") || bodyText.includes("Pending")) {
-          cy.log("Found contract status indicators")
-        }
-      })
-    })
-
-    it("should show contract terms and conditions", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for contract terms
-        if (bodyText.includes("Terms") || bodyText.includes("Duration")) {
-          cy.log("Found contract terms information")
-        }
-
-        // Check for renewal information
-        if (bodyText.includes("Renewal") || bodyText.includes("Expires")) {
-          cy.log("Found contract renewal information")
-        }
-
-        // Look for deposit information
-        if (bodyText.includes("Deposit") || bodyText.includes("Security")) {
-          cy.log("Found deposit information")
-        }
-      })
-    })
-
-    it("should handle document generation if available", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for document generation features
-        if (bodyText.includes("Generate") || bodyText.includes("Download")) {
-          cy.log("Found document generation features")
-        }
-
-        // Check for PDF generation
-        if (bodyText.includes("PDF") || bodyText.includes("Export")) {
-          cy.log("Found PDF generation features")
-        }
-
-        // Look for template management
-        if (bodyText.includes("Template") || bodyText.includes("Format")) {
-          cy.log("Found template management features")
-        }
-      })
-    })
-  })
-
-  describe("Document Management", () => {
-    it("should handle document storage and retrieval", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for document management
-        if (bodyText.includes("Documents") || bodyText.includes("Files")) {
-          cy.log("Found document management features")
-        }
-
-        // Check for document history
-        if (bodyText.includes("History") || bodyText.includes("Archive")) {
-          cy.log("Found document history features")
-        }
-
-        // Look for sharing capabilities
-        if (bodyText.includes("Share") || bodyText.includes("Send")) {
-          cy.log("Found document sharing features")
-        }
-      })
-    })
-
-    it("should support document printing and emailing", () => {
-      cy.get("body").then(($body) => {
-        const bodyText = $body.text()
-
-        // Look for printing options
-        if (bodyText.includes("Print") || bodyText.includes("Printer")) {
-          cy.log("Found printing functionality")
-        }
-
-        // Check for email features
-        if (bodyText.includes("Email") || bodyText.includes("Send")) {
-          cy.log("Found email functionality")
-        }
-
-        // Look for notification features
-        if (bodyText.includes("Notify") || bodyText.includes("Alert")) {
-          cy.log("Found notification features")
-        }
-      })
+        cy.contains("button", /Cancel/i).click({ force: true })
+      } else {
+        cy.log("⚠️ No paid payments found")
+      }
     })
   })
 })

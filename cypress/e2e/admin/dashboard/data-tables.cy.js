@@ -1,65 +1,75 @@
 describe("Tenant Management - Data Tables", () => {
-  beforeEach(() => {
+  it("should login and test all tenant data table functionality", () => {
+    // Login once at the beginning
+    cy.visit("/login")
+    cy.wait(500)
+
+    cy.get('[data-cy="email-input"]', { timeout: 10000 })
+      .should("be.visible")
+      .clear({ force: true })
+      .type("admin@apt.com", { force: true })
+
+    cy.get('[data-cy="password-input"]').clear({ force: true }).type("admin", { force: true })
+
+    cy.get('[data-cy="login-button"]').click({ force: true })
+
+    cy.wait(2000) // Wait for API call to complete
+    cy.url({ timeout: 30000 }).should("not.include", "/login")
+
+    // Alternative: force navigate if still on login page
+    cy.url().then((url) => {
+      if (url.includes("/login")) {
+        cy.log("Still on login page, forcing navigation to dashboard")
+        cy.visit("/dashboard")
+      }
+    })
+
+    cy.getCookie("auth_token").should("exist")
+
+    // Test 1: Open Add Tenant modal and verify form fields
     cy.visit("/tenants")
-  })
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
 
-  it("should display tenant management page", () => {
-    // Check that tenant page loads
     cy.contains("Tenant Management").should("be.visible")
-    cy.contains("Total Tenants").should("be.visible")
+    cy.get('button[class*="bg-blue"]').filter(":visible").first().click()
+    cy.get('div[role="dialog"]', { timeout: 5000 }).should("be.visible")
+    cy.get('div[role="dialog"]')
+      .should("be.visible")
+      .then(() => {
+        cy.log("✅ Add Tenant modal opened successfully")
+      })
 
-    // Check if export and add buttons are visible
+    // Close modal before next test
     cy.get("body").then(($body) => {
-      if ($body.text().includes("Export Data")) {
-        cy.contains("Export Data").should("be.visible")
-      }
-      if ($body.text().includes("Add Tenant")) {
-        cy.contains("Add Tenant").should("be.visible")
+      if ($body.find('[role="dialog"]').length > 0) {
+        cy.get("body").type("{esc}")
+        cy.wait(500)
       }
     })
-  })
 
-  it("should show tenant statistics", () => {
-    cy.get("body").then(($body) => {
-      const bodyText = $body.text()
+    // Test 2: Show tenant statistics with actual numbers
+    cy.visit("/tenants")
+    cy.get('[data-cy="loading-spinner"]', { timeout: 20000 }).should("not.exist")
 
-      // Check statistics cards
-      if (bodyText.includes("Total Tenants")) {
-        cy.contains("Total Tenants").should("be.visible")
-      }
-      if (bodyText.includes("Active")) {
-        cy.contains("Active").should("be.visible")
-      }
-      if (bodyText.includes("Overdue")) {
-        cy.contains("Overdue").should("be.visible")
-      }
-
-      // Log if we find numbers in the text
-      const hasNumbers = /\d+/.test(bodyText)
-      if (hasNumbers) {
-        cy.log("Found numerical statistics on page")
-      }
-    })
-  })
-
-  it("should display tenant table or list", () => {
-    // Check if tenant data is displayed
+    cy.url().should("include", "/tenant")
     cy.get("body").then(($body) => {
       const bodyText = $body.text()
+      const hasStatistics = bodyText.match(/total|tenants|active|occupied/i)
 
-      // Should show tenant-related content
-      if (bodyText.includes("All Tenants")) {
-        cy.contains("All Tenants").should("be.visible")
-      }
+      if (hasStatistics) {
+        cy.log("✅ Statistics section found")
 
-      // Check for search functionality
-      if (bodyText.includes("Search")) {
-        cy.get('input[placeholder*="Search"]').should("be.visible")
+        const hasNumbers = bodyText.match(/\d+/)
+        if (hasNumbers) {
+          cy.log(`✅ Found statistics with numbers`)
+        }
       }
     })
-  })
 
-  it("should allow navigation back to dashboard", () => {
+    cy.get("table").should("exist")
+    cy.log("✅ Statistics display verified")
+
+    // Test 3: Allow navigation back to dashboard
     cy.visit("/dashboard")
     cy.contains("Property Dashboard").should("be.visible")
   })

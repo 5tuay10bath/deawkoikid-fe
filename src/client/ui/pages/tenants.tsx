@@ -1,6 +1,6 @@
 import { Search, Users } from "lucide-react"
 
-import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
+import { useTenantStore } from "@infrastructure/libs/store/tenants.store"
 
 import { Button } from "../components/common/Button"
 import { StatsCard } from "../components/central/StatsCard"
@@ -8,9 +8,16 @@ import { Input } from "../components/common/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/common/Select"
 import TableTenants from "../components/tenantsCom/Table"
+import DialogTenants from "../components/tenantsCom/Dialog"
+import { TableLoading } from "../components/common/TableLoading"
+import { useEffect } from "react"
 
 export default function Tenants() {
-  const { tenants, searchTerm, statusFilter, setSearchTerm, setStatusFilter } = useTenantStore()
+  const { tenants, searchTerm, statusFilter, isLoading, setSearchTerm, setStatusFilter, getTenants } = useTenantStore()
+
+  useEffect(() => {
+    getTenants()
+  }, [getTenants])
 
   return (
     <div className="space-y-6">
@@ -24,7 +31,7 @@ export default function Tenants() {
           <Button variant="outline" data-cy="export-tenants">
             Export Data
           </Button>
-          <Button data-cy="add-tenant">Add Tenant</Button>
+          <DialogTenants />
         </div>
       </div>
 
@@ -33,20 +40,14 @@ export default function Tenants() {
 
         <StatsCard
           label="Active"
-          value={tenants.filter((t) => t.status === "active").length}
+          value={tenants.filter((t) => t.active).length}
           color={{ valueColor: "text-green-500" }}
         />
 
         <StatsCard
-          label="Overdue"
-          value={tenants.filter((t) => t.status === "overdue").length}
+          label="Inactive"
+          value={tenants.filter((t) => !t.active).length}
           color={{ valueColor: "text-red-500" }}
-        />
-
-        <StatsCard
-          label="Check-out Pending"
-          value={tenants.filter((t) => t.status === "checkout-pending").length}
-          color={{ valueColor: "text-blue-500" }}
         />
       </div>
 
@@ -82,9 +83,7 @@ export default function Tenants() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <TableTenants />
-        </CardContent>
+        <CardContent>{isLoading ? <TableLoading /> : <TableTenants />}</CardContent>
       </Card>
     </div>
   )

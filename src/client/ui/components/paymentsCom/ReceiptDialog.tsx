@@ -4,7 +4,7 @@ import { useRef } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
-import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
+import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
@@ -14,14 +14,6 @@ const ReceiptDialog = () => {
   const { isReceiptOpen, setIsReceiptOpen, selectedPayment } = usePaymentStore()
   const { toast } = useToast()
   const receiptRef = useRef<HTMLDivElement>(null)
-
-  const typeConfig = {
-    rent: "Rent",
-    utilities: "Utilities",
-    deposit: "Deposit",
-    maintenance: "Maintenance",
-    addon: "Addon",
-  }
 
   const handleDownloadReceipt = async () => {
     if (!receiptRef.current || !selectedPayment) return
@@ -70,7 +62,7 @@ const ReceiptDialog = () => {
   const handleSendReceipt = () => {
     toast({
       title: "Receipt Sent",
-      description: `Receipt has been sent to ${selectedPayment?.tenantName}`,
+      description: `Receipt has been sent to ${selectedPayment?.contract.user.fullName}`,
     })
     setIsReceiptOpen(false)
   }
@@ -93,25 +85,27 @@ const ReceiptDialog = () => {
               <div className="space-y-3">
                 <div className="flex justify-between py-2 border-b border-gray-100">
                   <span className="text-gray-600 font-medium">Tenant:</span>
-                  <span className="font-semibold text-gray-900">{selectedPayment.tenantName}</span>
+                  <span className="font-semibold text-gray-900">{selectedPayment.contract.user.fullName}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-100">
                   <span className="text-gray-600 font-medium">Unit:</span>
-                  <span className="font-semibold text-gray-900">{selectedPayment.unitNumber}</span>
+                  <span className="font-semibold text-gray-900">{selectedPayment.contract.unit.unitNumber}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600 font-medium">Payment Type:</span>
-                  <span className="font-semibold text-gray-900">{typeConfig[selectedPayment.type]}</span>
+                  <span className="text-gray-600 font-medium">Billing Month:</span>
+                  <span className="font-semibold text-gray-900">
+                    {format(selectedPayment.billingMonth, "MMMM yyyy")}
+                  </span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600 font-medium">Payment Date:</span>
+                  <span className="text-gray-600 font-medium">Due Date:</span>
                   <span className="font-semibold text-gray-900">
                     {format(selectedPayment.dueDate, "MMMM dd, yyyy")}
                   </span>
                 </div>
                 <div className="flex justify-between py-3 mt-4 bg-gray-50 rounded-lg px-4">
                   <span className="text-lg font-bold text-gray-900">Total Amount:</span>
-                  <span className="text-2xl font-bold text-emerald-600">${selectedPayment.amount.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-emerald-600">${selectedPayment.totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 

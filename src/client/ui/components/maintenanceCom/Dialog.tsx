@@ -4,48 +4,83 @@ import { Popover, PopoverContent, PopoverTrigger } from "../common/Popover"
 import { Calendar } from "../common/Calendar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
+import type { CreateMaintenanceDto } from "@infrastructure/inbound/dtos/createMaintenance.dto"
+import type { CreateSupplyDto } from "@infrastructure/inbound/dtos/createSupply.dto"
 import { Button } from "../common/Button"
 import { CalendarIcon, Plus } from "lucide-react"
 import { Label } from "../common/Label"
 import { Input } from "../common/Input"
 import { format } from "date-fns"
 import { useToast } from "../hooks/useToast"
-import { mockDB, type MaintenanceTask } from "@infrastructure/mockData/mockData"
+import { useState } from "react"
 
 const NewTaskDialog = () => {
-  const { isNewTaskOpen, setIsNewTaskOpen, newTask, updateNewTask, resetNewTask, addTask } = useMaintenanceStore()
+  const { createMaintenance } = useMaintenanceStore()
   const { toast } = useToast()
-  const handleCreateTask = () => {
-    if (!newTask.title || !newTask.unitNumber || !newTask.priority) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [scheduledAt, setScheduledAt] = useState<Date | undefined>()
+  const [estimatedFinishTime, setEstimatedFinishTime] = useState<Date | undefined>()
+  const [newTask, setNewTask] = useState<Omit<CreateMaintenanceDto, "scheduledAt" | "estimatedFinishTime">>({
+    unitId: "",
+    title: "",
+    description: "",
+    price: 0,
+    priority: "MEDIUM",
+    maintenanceType: "OTHER",
+    assignedToId: "",
+    reportedById: "",
+  })
+
+  const handleCreateTask = async () => {
+    if (!newTask.title || !newTask.unitId || !newTask.assignedToId || !newTask.reportedById) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields (Title, Unit ID, Assigned To, Reported By)",
         variant: "destructive",
       })
       return
     }
 
-    const task = mockDB.addMaintenanceTask({
-      title: newTask.title,
-      description: newTask.description,
-      unitNumber: newTask.unitNumber,
-      priority: newTask.priority as MaintenanceTask["priority"],
-      status: "pending",
-      assignedTo: newTask.assignedTo || "Unassigned",
-      dueDate: newTask.dueDate || new Date(),
-      type: (newTask.type as MaintenanceTask["type"]) || "general",
-    })
-
-    addTask(task)
-    toast({
-      title: "Task Created",
-      description: `Maintenance task "${newTask.title}" has been created`,
-    })
-    setIsNewTaskOpen(false)
-    resetNewTask()
+    setIsSubmitting(true)
+    try {
+      const maintenanceData: CreateMaintenanceDto = {
+        ...newTask,
+        scheduledAt: scheduledAt ? format(scheduledAt, "yyyy-MM-dd'T'HH:mm:ssXXX") : undefined,
+        estimatedFinishTime: estimatedFinishTime ? format(estimatedFinishTime, "yyyy-MM-dd'T'HH:mm:ssXXX") : undefined,
+      }
+      const result = await createMaintenance(maintenanceData)
+      if (result.success) {
+        setNewTask({
+          unitId: "",
+          title: "",
+          description: "",
+          price: 0,
+          priority: "MEDIUM",
+          maintenanceType: "OTHER",
+          assignedToId: "",
+          reportedById: "",
+        })
+        setScheduledAt(undefined)
+        setEstimatedFinishTime(undefined)
+        setIsOpen(false)
+        toast({
+          title: "Success",
+          description: result.message || "Maintenance task created successfully!",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to create maintenance task",
+          variant: "destructive",
+        })
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   return (
-    <Dialog open={isNewTaskOpen} onOpenChange={setIsNewTaskOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -61,68 +96,142 @@ const NewTaskDialog = () => {
             <Label>Task Title</Label>
             <Input
               value={newTask.title}
-              onChange={(e) => updateNewTask({ title: e.target.value })}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="Fix leaking faucet"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Unit Number</Label>
+              <Label>Unit ID</Label>
               <Input
-                value={newTask.unitNumber}
-                onChange={(e) => updateNewTask({ unitNumber: e.target.value })}
-                placeholder="101"
+                value={newTask.unitId}
+                onChange={(e) => setNewTask((prev) => ({ ...prev, unitId: e.target.value }))}
+                placeholder="unit-id-123"
               />
             </div>
             <div className="space-y-2">
               <Label>Priority</Label>
-              <Select value={newTask.priority} onValueChange={(value) => updateNewTask({ priority: value })}>
+              <Select
+                value={newTask.priority}
+                onValueChange={(value: "LOW" | "MEDIUM" | "HIGH" | "URGENT") =>
+                  setNewTask((prev) => ({ ...prev, priority: value }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent className="bg-white">
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="LOW">Low</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                  <SelectItem value="URGENT">Urgent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
+            <Label>Maintenance Type</Label>
+            <Select
+              value={newTask.maintenanceType}
+              onValueChange={(value: CreateMaintenanceDto["maintenanceType"]) =>
+                setNewTask((prev) => ({ ...prev, maintenanceType: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="ELECTRIC">Electric</SelectItem>
+                <SelectItem value="WATER">Water</SelectItem>
+                <SelectItem value="PHONE">Phone</SelectItem>
+                <SelectItem value="AIR_CONDITIONAL">Air Conditional</SelectItem>
+                <SelectItem value="FURNITURE">Furniture</SelectItem>
+                <SelectItem value="FIRE_ALARM_SYSTEM">Fire Alarm System</SelectItem>
+                <SelectItem value="WATER_LEAKAGE">Water Leakage</SelectItem>
+                <SelectItem value="FLOOR_WALL">Floor/Wall</SelectItem>
+                <SelectItem value="BATHROOM">Bathroom</SelectItem>
+                <SelectItem value="PAINT">Paint</SelectItem>
+                <SelectItem value="CEMENT_WOOD">Cement/Wood</SelectItem>
+                <SelectItem value="OTHER">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label>Description</Label>
             <Textarea
               value={newTask.description}
-              onChange={(e) => updateNewTask({ description: e.target.value })}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Describe the maintenance issue..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Price</Label>
+            <Input
+              type="number"
+              value={newTask.price}
+              onChange={(e) => setNewTask((prev) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+              placeholder="0.00"
+              step="0.01"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Assigned To</Label>
+              <Label>Assigned To ID</Label>
               <Input
-                value={newTask.assignedTo}
-                onChange={(e) => updateNewTask({ assignedTo: e.target.value })}
-                placeholder="Maintenance Person"
+                value={newTask.assignedToId}
+                onChange={(e) => setNewTask((prev) => ({ ...prev, assignedToId: e.target.value }))}
+                placeholder="staff-id-123"
               />
             </div>
             <div className="space-y-2">
-              <Label>Due Date</Label>
+              <Label>Reported By ID</Label>
+              <Input
+                value={newTask.reportedById}
+                onChange={(e) => setNewTask((prev) => ({ ...prev, reportedById: e.target.value }))}
+                placeholder="user-id-123"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Scheduled Date (Optional)</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newTask.dueDate ? format(newTask.dueDate, "PPP") : "Pick a date"}
+                    {scheduledAt ? format(scheduledAt, "PPP") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="bg-white w-auto p-0">
                   <Calendar
                     mode="single"
-                    selected={newTask.dueDate}
-                    onSelect={(date) => updateNewTask({ dueDate: date })}
+                    selected={scheduledAt}
+                    onSelect={(date) => setScheduledAt(date)}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="space-y-2">
+              <Label>Estimated Finish Time (Optional)</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {estimatedFinishTime ? format(estimatedFinishTime, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="bg-white w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={estimatedFinishTime}
+                    onSelect={(date) => setEstimatedFinishTime(date)}
                     initialFocus
                   />
                 </PopoverContent>
@@ -131,10 +240,12 @@ const NewTaskDialog = () => {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsNewTaskOpen(false)}>
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleCreateTask}>Create Task</Button>
+            <Button onClick={handleCreateTask} disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create Task"}
+            </Button>
           </div>
         </div>
       </DialogContent>
@@ -143,39 +254,56 @@ const NewTaskDialog = () => {
 }
 
 export const NewSupplyDialog = () => {
-  const { isNewSupplyOpen, setIsNewSupplyOpen, newSupply, updateNewSupply, resetNewSupply, addSupply } =
-    useMaintenanceStore()
+  const { createSupply } = useMaintenanceStore()
   const { toast } = useToast()
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [newSupply, setNewSupply] = useState<CreateSupplyDto>({
+    name: "",
+    category: "",
+    quantity: 0,
+    minStock: 0,
+  })
 
-  const handleAddSupply = () => {
-    if (!newSupply.name || !newSupply.quantity) {
+  const handleAddSupply = async () => {
+    if (!newSupply.name || !newSupply.category || newSupply.quantity <= 0) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Please fill in all required fields (Name, Category, Quantity)",
         variant: "destructive",
       })
       return
     }
 
-    const supply = mockDB.addSupply({
-      name: newSupply.name,
-      category: newSupply.category || "General",
-      quantity: parseInt(newSupply.quantity),
-      unit: newSupply.unit || "pieces",
-      minStock: parseInt(newSupply.minStock) || 0,
-      cost: parseFloat(newSupply.cost) || 0,
-    })
-
-    addSupply(supply)
-    toast({
-      title: "Supply Added",
-      description: `${newSupply.name} has been added to inventory`,
-    })
-    setIsNewSupplyOpen(false)
-    resetNewSupply()
+    setIsSubmitting(true)
+    try {
+      const result = await createSupply(newSupply)
+      if (result.success) {
+        // Reset form
+        setNewSupply({
+          name: "",
+          category: "",
+          quantity: 0,
+          minStock: 0,
+        })
+        setIsOpen(false)
+        toast({
+          title: "Success",
+          description: result.message || "Supply item added successfully!",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to add supply item",
+          variant: "destructive",
+        })
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   return (
-    <Dialog open={isNewSupplyOpen} onOpenChange={setIsNewSupplyOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -191,37 +319,27 @@ export const NewSupplyDialog = () => {
             <Label>Item Name</Label>
             <Input
               value={newSupply.name}
-              onChange={(e) => updateNewSupply({ name: e.target.value })}
+              onChange={(e) => setNewSupply((prev) => ({ ...prev, name: e.target.value }))}
               placeholder="Light Bulbs - LED 60W"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Category</Label>
+            <Input
+              value={newSupply.category}
+              onChange={(e) => setNewSupply((prev) => ({ ...prev, category: e.target.value }))}
+              placeholder="Electrical"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Category</Label>
-              <Input
-                value={newSupply.category}
-                onChange={(e) => updateNewSupply({ category: e.target.value })}
-                placeholder="Electrical"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Unit</Label>
-              <Input
-                value={newSupply.unit}
-                onChange={(e) => updateNewSupply({ unit: e.target.value })}
-                placeholder="pieces"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
               <Label>Quantity</Label>
               <Input
                 type="number"
                 value={newSupply.quantity}
-                onChange={(e) => updateNewSupply({ quantity: e.target.value })}
+                onChange={(e) => setNewSupply((prev) => ({ ...prev, quantity: parseInt(e.target.value) || 0 }))}
                 placeholder="25"
               />
             </div>
@@ -230,27 +348,19 @@ export const NewSupplyDialog = () => {
               <Input
                 type="number"
                 value={newSupply.minStock}
-                onChange={(e) => updateNewSupply({ minStock: e.target.value })}
+                onChange={(e) => setNewSupply((prev) => ({ ...prev, minStock: parseInt(e.target.value) || 0 }))}
                 placeholder="10"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Cost</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={newSupply.cost}
-                onChange={(e) => updateNewSupply({ cost: e.target.value })}
-                placeholder="8.99"
               />
             </div>
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsNewSupplyOpen(false)}>
+            <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleAddSupply}>Add Supply</Button>
+            <Button onClick={handleAddSupply} disabled={isSubmitting}>
+              {isSubmitting ? "Adding..." : "Add Supply"}
+            </Button>
           </div>
         </div>
       </DialogContent>

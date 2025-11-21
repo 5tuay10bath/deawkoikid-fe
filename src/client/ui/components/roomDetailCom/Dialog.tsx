@@ -1,4 +1,5 @@
 import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { useToast } from "../hooks/useToast"
@@ -7,21 +8,45 @@ import { Plus } from "lucide-react"
 import { Label } from "../common/Label"
 import { Input } from "../common/Input"
 import { Textarea } from "../common/TextArea"
+import { useState } from "react"
 
 export const CheckOutDialog = () => {
   const { room, isCheckOutOpen, setIsCheckOutOpen } = useRoomDetailStore()
+  const { checkOut } = useDashboardStore()
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { roomId } = useParams()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleCheckOut = () => {
-    toast({
-      title: "Check-out Initiated",
-      description: `Check-out process started for Room ${roomId}`,
-    })
-    setIsCheckOutOpen(false)
-    navigate("/")
+  const handleCheckOut = async () => {
+    if (!room?.contract?.id) {
+      toast({
+        title: "Error",
+        description: "Contract information not found",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    const result = await checkOut({ id: room.contract.id })
+    setIsLoading(false)
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: result.message || `Check-out completed for Room ${room.unitNumber}`,
+      })
+      setIsCheckOutOpen(false)
+      navigate("/dashboard")
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || "Failed to check out",
+        variant: "destructive",
+      })
+    }
   }
+
   return (
     <Dialog open={isCheckOutOpen} onOpenChange={setIsCheckOutOpen}>
       <DialogTrigger asChild>
@@ -35,14 +60,14 @@ export const CheckOutDialog = () => {
         </DialogHeader>
         <div className="space-y-4">
           <p>
-            Are you sure you want to check out {room?.tenant?.name} from Room {room?.number}?
+            Are you sure you want to check out {room?.contract?.user.fullName} from Room {room?.unitNumber}?
           </p>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsCheckOutOpen(false)}>
+            <Button variant="outline" onClick={() => setIsCheckOutOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleCheckOut}>
-              Confirm Check-out
+            <Button variant="destructive" onClick={handleCheckOut} disabled={isLoading}>
+              {isLoading ? "Processing..." : "Confirm Check-out"}
             </Button>
           </div>
         </div>
@@ -52,11 +77,14 @@ export const CheckOutDialog = () => {
 }
 
 export const AddBillingDialog = () => {
+  const { roomId } = useParams()
   const { isAddonOpen, addonForm, setIsAddonOpen, updateAddonForm, resetAddonForm } = useRoomDetailStore()
+  const { createExtraCharge } = useDashboardStore()
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleAddAddon = () => {
-    if (!addonForm.type || !addonForm.amount) {
+  const handleAddAddon = async () => {
+    if (!addonForm.topic || !addonForm.price) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -65,13 +93,38 @@ export const AddBillingDialog = () => {
       return
     }
 
-    toast({
-      title: "Add-on Charge Added",
-      description: `${addonForm.type} charge of $${addonForm.amount} added to tenant's bill`,
-    })
+    if (!roomId) {
+      toast({
+        title: "Error",
+        description: "Room ID not found",
+        variant: "destructive",
+      })
+      return
+    }
 
-    setIsAddonOpen(false)
-    resetAddonForm()
+    setIsLoading(true)
+    const result = await createExtraCharge({
+      id: roomId,
+      topic: addonForm.topic,
+      description: addonForm.description,
+      price: Number(addonForm.price),
+    })
+    setIsLoading(false)
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: result.message || "Extra charge added successfully",
+      })
+      setIsAddonOpen(false)
+      resetAddonForm()
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || "Failed to add extra charge",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -91,19 +144,19 @@ export const AddBillingDialog = () => {
             <Label htmlFor="addonType">Charge Type</Label>
             <Input
               id="addonType"
-              value={addonForm.type}
-              onChange={(e) => updateAddonForm({ type: e.target.value })}
+              value={addonForm.topic}
+              onChange={(e) => updateAddonForm({ topic: e.target.value })}
               placeholder="e.g., Electricity, Water, Maintenance"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="addonAmount">Amount ($)</Label>
+            <Label htmlFor="addonAmount">Price ($)</Label>
             <Input
               id="addonAmount"
               type="number"
-              value={addonForm.amount}
-              onChange={(e) => updateAddonForm({ amount: e.target.value })}
+              value={addonForm.price}
+              onChange={(e) => updateAddonForm({ price: e.target.value })}
               placeholder="50"
             />
           </div>
@@ -119,10 +172,12 @@ export const AddBillingDialog = () => {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsAddonOpen(false)}>
+            <Button variant="outline" onClick={() => setIsAddonOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={handleAddAddon}>Add Charge</Button>
+            <Button onClick={handleAddAddon} disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add Charge"}
+            </Button>
           </div>
         </div>
       </DialogContent>

@@ -1,13 +1,21 @@
+import type { TenantsPageModel } from "./tenantsPage.model"
+import type { UnitPageModel } from "./unitPage.model"
+import type { MaintenanceStatus } from "../types/status.types"
+import type { MaintenanceType, MaintenancePriority } from "../types/enums.types"
+
 export interface MaintenanceModel {
   id: string
-  unitNumber: string
-  type: "repair" | "inspection" | "cleaning" | "other"
+  unit: UnitPageModel
+  title: string
   description: string
-  status: "pending" | "in-progress" | "completed" | "cancelled"
-  priority: "low" | "medium" | "high" | "urgent"
-  requestDate: Date
-  scheduledDate: Date | null
-  completedDate: Date | null
-  assignedTo: string | null
-  cost: number
+  price: number
+  priority: MaintenancePriority
+  maintenanceType: MaintenanceType
+  assignedTo: TenantsPageModel | null
+  reportedBy: TenantsPageModel
+  status: MaintenanceStatus
+  scheduledAt: Date | null
+  startedAt: Date | null
+  completedAt: Date | null
+  cancelledAt: Date | null
 }

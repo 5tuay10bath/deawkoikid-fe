@@ -1,43 +1,67 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail } from "lucide-react"
+import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail, History } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "../components/common/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
 import { Badge } from "../components/common/Badge"
-import { mockDB } from "@infrastructure/mockData/mockData"
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { useRoomDetailStore } from "@infrastructure/libs/store/roomDetail.store"
 import { AddBillingDialog, CheckOutDialog } from "../components/roomDetailCom/Dialog"
+import RoomReceiptDialog from "../components/roomDetailCom/ReceiptDialog"
+import RoomContractDialog from "../components/roomDetailCom/ContractDialog"
 
 export default function RoomDetails() {
   const { roomId } = useParams()
   const navigate = useNavigate()
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false)
+  const [isContractOpen, setIsContractOpen] = useState(false)
 
-  const { room, setRoom } = useRoomDetailStore()
+  const { dashboard, getDashboard, extraCharges, getExtraCharges } = useDashboardStore()
+  const { setRoom } = useRoomDetailStore()
+
+  const BACK_TO_DASHBOARD = "flex items-center gap-2"
+  const DASHBOARD_PATH = "/dashboard"
 
   useEffect(() => {
-    if (roomId) {
-      const foundRoom = mockDB.getRooms().find((r) => r.id === roomId)
-      setRoom(foundRoom || null)
+    if (dashboard.length === 0) {
+      getDashboard()
     }
-  }, [roomId, setRoom])
+  }, [dashboard, getDashboard])
+
+  // Fetch extra charges when roomId is available
+  useEffect(() => {
+    if (roomId) {
+      getExtraCharges({ id: roomId })
+    }
+  }, [roomId, getExtraCharges])
+
+  // Find the unit from dashboard array by roomId
+  const unit = dashboard.find((item) => item.id === roomId)
+
+  // Set room to store when unit is found
+  useEffect(() => {
+    if (unit) {
+      setRoom(unit)
+    }
+  }, [unit, setRoom])
 
   const statusConfig = {
-    available: { color: "bg-green-500 text-white", label: "Available" },
-    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    maintenance: { color: "bg-yellow-500 text-white", label: "Maintenance" },
-    "checkout-pending": { color: "bg-blue-500 text-white", label: "Check-out Pending" },
+    AVAILABLE: { color: "bg-green-500 text-white", label: "Available" },
+    OCCUPIED: { color: "bg-red-500 text-white", label: "Occupied" },
+    RESERVED: { color: "bg-orange-500 text-white", label: "Reserved" },
+    PENDING: { color: "bg-blue-500 text-white", label: "Pending" },
   } as const
 
   const getStatusConfig = (status: string) => {
-    return statusConfig[status as keyof typeof statusConfig] || statusConfig.available
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig.AVAILABLE
   }
 
-  if (!room) {
+  if (!unit) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(DASHBOARD_PATH)} className={BACK_TO_DASHBOARD}>
             <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Button>
@@ -50,33 +74,16 @@ export default function RoomDetails() {
     )
   }
 
-  if (!room.tenant) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Room {room.number} Details</h1>
-            <p className="text-muted-foreground">This room is currently not occupied.</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate(DASHBOARD_PATH)} className={BACK_TO_DASHBOARD}>
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">Room {room.number} Details</h1>
-          <p className="text-muted-foreground">Floor {room.floor}</p>
+          <h1 className="text-2xl font-bold">Room {unit.unitNumber} Details</h1>
+          <p className="text-muted-foreground">Floor {unit.floor}</p>
         </div>
       </div>
 
@@ -87,7 +94,9 @@ export default function RoomDetails() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 Tenant Information
-                <Badge className={getStatusConfig(room.status).color}>{getStatusConfig(room.status).label}</Badge>
+                <Badge className={getStatusConfig(unit.unitStatus).color}>
+                  {getStatusConfig(unit.unitStatus).label}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -95,7 +104,7 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{room.tenant.name}</p>
+                    <p className="font-medium">{unit.contract?.user.fullName || "N/A"}</p>
                     <p className="text-sm text-muted-foreground">Tenant Name</p>
                   </div>
                 </div>
@@ -103,7 +112,7 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{room.tenant.email}</p>
+                    <p className="font-medium">{unit.contract?.user.email || "N/A"}</p>
                     <p className="text-sm text-muted-foreground">Email Address</p>
                   </div>
                 </div>
@@ -111,7 +120,7 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{room.tenant.phone}</p>
+                    <p className="font-medium">{unit.contract?.user.phone || "N/A"}</p>
                     <p className="text-sm text-muted-foreground">Phone Number</p>
                   </div>
                 </div>
@@ -119,7 +128,7 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{room.tenant.emergencyContact}</p>
+                    <p className="font-medium">{unit.contract?.user.emergencyContactName || "N/A"}</p>
                     <p className="text-sm text-muted-foreground">Emergency Contact</p>
                   </div>
                 </div>
@@ -136,7 +145,9 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{format(room.tenant.checkIn, "PPP")}</p>
+                    <p className="font-medium">
+                      {unit.contract?.startDate ? format(new Date(unit.contract.startDate), "PPP") : "N/A"}
+                    </p>
                     <p className="text-sm text-muted-foreground">Check-in Date</p>
                   </div>
                 </div>
@@ -144,7 +155,9 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">{format(room.tenant.checkOut, "PPP")}</p>
+                    <p className="font-medium">
+                      {unit.contract?.endDate ? format(new Date(unit.contract.endDate), "PPP") : "N/A"}
+                    </p>
                     <p className="text-sm text-muted-foreground">Check-out Date</p>
                   </div>
                 </div>
@@ -153,7 +166,9 @@ export default function RoomDetails() {
                   <DollarSign className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">
-                      ${room.tenant.rentAmount}/{room.tenant.billingCycle === "monthly" ? "month" : "year"}
+                      {unit.contract
+                        ? `$${unit.contract.rentAmount}/${unit.contract.rentType === "MONTHLY" ? "month" : "year"}`
+                        : "N/A"}
                     </p>
                     <p className="text-sm text-muted-foreground">Rent Amount</p>
                   </div>
@@ -162,37 +177,141 @@ export default function RoomDetails() {
                 <div className="flex items-center gap-3">
                   <DollarSign className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">${room.tenant.securityDeposit}</p>
+                    <p className="font-medium">N/A</p>
                     <p className="text-sm text-muted-foreground">Security Deposit</p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Contract History Section */}
+          {unit.contracts && unit.contracts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Contract History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {unit.contracts.map((contract, index) => (
+                    <div
+                      key={contract.id || index}
+                      className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-600" />
+                          <span className="font-medium text-gray-900">
+                            {contract.user?.fullName || "Unknown Tenant"}
+                          </span>
+                        </div>
+                        <Badge
+                          className={
+                            contract.status === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : contract.status === "EXPIRED"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-orange-100 text-orange-800"
+                          }
+                        >
+                          {contract.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>
+                            {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "N/A"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-900 font-medium col-span-2">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          <span>
+                            ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Extra Charges Section */}
+          {extraCharges && extraCharges.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Extra Charges
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {extraCharges.map((charge, index) => (
+                    <div
+                      key={charge.id || index}
+                      className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{charge.topic}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{charge.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-lg text-gray-900">${charge.price}</p>
+                          {charge.createdAt && (
+                            <p className="text-xs text-gray-500">
+                              {format(new Date(charge.createdAt), "MMM dd, yyyy")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Actions Panel */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <CheckOutDialog />
+        {/* Actions Panel - Only show if unit has a contract */}
+        {unit.contract && (
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <CheckOutDialog />
 
-              <AddBillingDialog />
+                <AddBillingDialog />
 
-              <Button variant="outline" className="w-full" onClick={() => navigate("/payments")}>
-                Generate Receipt
-              </Button>
+                <Button variant="outline" className="w-full" onClick={() => setIsReceiptOpen(true)}>
+                  Generate Receipt
+                </Button>
 
-              <Button variant="outline" className="w-full" onClick={() => navigate("/contracts")}>
-                View Contract
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+                <Button variant="outline" className="w-full" onClick={() => setIsContractOpen(true)}>
+                  View Contract
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
+
+      {/* Dialogs */}
+      <RoomReceiptDialog isOpen={isReceiptOpen} onClose={() => setIsReceiptOpen(false)} unit={unit} />
+      <RoomContractDialog isOpen={isContractOpen} onClose={() => setIsContractOpen(false)} unit={unit} />
     </div>
   )
 }

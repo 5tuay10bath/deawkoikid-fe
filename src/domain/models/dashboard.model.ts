@@ -1,9 +1,16 @@
+import type { ContractsModel } from "./contracts.model"
+import type { UnitStatus } from "../types/status.types"
+import type { UnitType } from "../types/enums.types"
+
 export interface DashboardModel {
-  id: number
-  totalUnits: number
-  occupiedUnits: number
-  availableUnits: number
-  totalRevenue: number
-  pendingMaintenance: number
-  overduePayments: number
+  id: string
+  address: string
+  unitNumber: string
+  unitType: UnitType
+  unitSize: number
+  unitStatus: UnitStatus
+  floor: number
+  latestAirconService: Date
+  contract?: ContractsModel | null
+  contracts?: ContractsModel[] | null
 }
