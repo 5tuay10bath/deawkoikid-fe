@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "../components/common/Avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/common/Dialog"
 import { Input } from "../components/common/Input"
 import { Textarea } from "../components/common/TextArea"
+import UploadFileDialog from "../components/common/UploadFileDialog"
 import { useToast } from "../components/hooks/useToast"
 import type { MaintenanceType } from "@domain/types/enums.types"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
@@ -40,6 +41,8 @@ export default function TenantDashboard() {
   const { toast } = useToast()
 
   const [isMaintenanceOpen, setIsMaintenanceOpen] = useState(false)
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [maintenanceForm, setMaintenanceForm] = useState<{
     title: string
@@ -114,6 +117,47 @@ export default function TenantDashboard() {
     }
   }
 
+  const handleUploadClick = async () => {
+    const authToken = cookieUtils.getAuthToken()
+    const userId: string | null = authToken ? jwtUtils.getIdFromToken(authToken) : null
+
+    if (!userId) {
+      toast({
+        title: "Authentication error",
+        description: "Unable to get user information.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      // Get invoices for this user
+      const response = await axiosInstance.get(`/public/invoices/${userId}`)
+      const invoices = response.data.data
+
+      if (!invoices || invoices.length === 0) {
+        toast({
+          title: "No invoices found",
+          description: "You don't have any invoices to upload proof for.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // Use the first invoice ID
+      const invoiceId = invoices[0].id
+      setSelectedInvoiceId(invoiceId)
+      setIsUploadOpen(true)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to fetch invoices"
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      })
+    }
+  }
+
   const quickActions = [
     {
       title: "Request maintenance",
@@ -125,7 +169,7 @@ export default function TenantDashboard() {
       title: "Upload payment proof",
       description: "Share your transfer slip or confirmation",
       icon: CreditCard,
-      action: () => navigate("/payments"),
+      action: handleUploadClick,
     },
     {
       title: "View invoices & receipts",
@@ -339,6 +383,14 @@ export default function TenantDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Upload Payment Proof Dialog */}
+      <UploadFileDialog
+        isOpen={isUploadOpen}
+        onClose={() => setIsUploadOpen(false)}
+        type="receipt"
+        id={selectedInvoiceId}
+      />
     </div>
   )
 }

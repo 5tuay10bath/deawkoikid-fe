@@ -1,11 +1,11 @@
-import { LogOut, Sparkles } from "lucide-react"
+import { LogOut, Sparkles, Upload } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { useAuthStore } from "../stores/auth.store"
 import { Button } from "../components/common/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/common/card"
 import { Avatar, AvatarFallback } from "../components/common/Avatar"
-import { Upload } from "lucide-react"
+
 import { useState } from "react"
 import UploadPaymentDialog from "../components/userDashboardCom/UploadPaymentDialog"
 
@@ -59,36 +59,39 @@ export default function UserDashboard() {
                   Logout
                 </Button>
               </div>
-        <div className="space-y-4">
-          <div className="rounded-lg bg-blue-50 p-6">
-            <h2 className="mb-2 text-xl font-semibold text-blue-900">Welcome!</h2>
-            <p className="text-blue-700">
-              <strong>Name:</strong> {fullName}
-            </p>
-            <p className="text-blue-700">
-              <strong>Email:</strong> {userEmail}
-            </p>
-            <p className="mt-4 text-sm text-blue-600"></p>
-          </div>
-
-          <div className="rounded-lg border border-gray-200 p-6">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <Button variant="outline" className="w-full" onClick={() => setIsUploadOpen(true)}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload Payment Proof
-                </Button>
+            </div>
+            <div className="space-y-4">
+              <div className="rounded-lg bg-blue-50 p-6">
+                <h2 className="mb-2 text-xl font-semibold text-blue-900">Welcome!</h2>
+                <p className="text-blue-700">
+                  <strong>Name:</strong> {fullName}
+                </p>
+                <p className="text-blue-700">
+                  <strong>Email:</strong> {userEmail}
+                </p>
+                <p className="mt-4 text-sm text-blue-600"></p>
               </div>
-              <Button variant="outline" className="w-full">
-                Payment History
-              </Button>
-              <Button variant="outline" className="w-full">
-                Maintenance Requests
-              </Button>
-              <Button variant="outline" className="w-full">
-                My Profile
-              </Button>
+
+              <div className="rounded-lg border border-gray-200 p-6">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <Button variant="outline" className="w-full" onClick={() => setIsUploadOpen(true)}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Payment Proof
+                    </Button>
+                  </div>
+                  <Button variant="outline" className="w-full">
+                    Payment History
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    Maintenance Requests
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    My Profile
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

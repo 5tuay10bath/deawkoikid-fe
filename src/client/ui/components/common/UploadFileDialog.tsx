@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Upload, Check, Loader2 } from "lucide-react"
-import { format } from "date-fns"
 import axios from "axios"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog"
 import { Button } from "./Button"
 import { useToast } from "../hooks/useToast"
@@ -9,7 +9,7 @@ import { useToast } from "../hooks/useToast"
 interface UploadFileDialogProps {
   isOpen: boolean
   onClose: () => void
-  type: "contracts" | "maintenance"
+  type: "contracts" | "maintenance" | "receipt"
   id: string
 }
 
@@ -21,8 +21,6 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
   const [isLoadingUrl, setIsLoadingUrl] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
-
-  const API_BASE_URL = import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || "http://localhost:8080"
 
   // Reset state when modal closes
   useEffect(() => {
@@ -36,12 +34,21 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
   const fetchPresignedUrl = async (fileExtension: string) => {
     setIsLoadingUrl(true)
     try {
-      const datetime = format(new Date(), "yyyyMMddHHmmss")
-      const filePath = `img/${type}/${datetime}_${id}${fileExtension}`
-      const response = await axios.get(`${API_BASE_URL}/api/public/presigned-url/upload?filePath=${filePath}`)
+      // For receipt type, use different endpoint without datetime
+      if (type === "receipt") {
+        const filePath = `img/receipt/${id}${fileExtension}`
+        const response = await axiosInstance.get(`/public/presigned-url/upload?filePath=${filePath}`)
 
-      if (response.data) {
-        setPresignedUrl(response.data)
+        if (response.data) {
+          setPresignedUrl(response.data)
+        }
+      } else {
+        const filePath = `img/${type}/${id}${fileExtension}`
+        const response = await axiosInstance.get(`/public/presigned-url/upload?filePath=${filePath}`)
+
+        if (response.data) {
+          setPresignedUrl(response.data)
+        }
       }
     } catch {
       toast({
@@ -74,10 +81,8 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
     const lastDot = fileName.lastIndexOf(".")
     const fileExtension = lastDot !== -1 ? fileName.substring(lastDot) : ""
 
-    // Set file first
     setSelectedFile(file)
 
-    // Then fetch presigned URL with correct file extension
     await fetchPresignedUrl(fileExtension)
   }
 
@@ -93,7 +98,6 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
 
     setIsUploading(true)
     try {
-      // Upload file to S3 using presigned URL with PUT method and binary body
       await axios.put(presignedUrl, selectedFile, {
         headers: {
           "Content-Type": selectedFile.type || "application/octet-stream",
@@ -102,7 +106,7 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
 
       // If contract type, update contract status
       if (type === "contracts") {
-        await axios.put(`${API_BASE_URL}/api/contracts/status/${id}`)
+        await axiosInstance.put(`/contracts/status/${id}`)
       }
 
       setUploadSuccess(true)
@@ -130,7 +134,13 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
     fileInputRef.current?.click()
   }
 
-  const typeLabel = type === "contracts" ? "Contract" : "Maintenance"
+  const typeLabelMap = {
+    contracts: "Contract",
+    maintenance: "Maintenance",
+    receipt: "Payment Proof",
+  }
+
+  const typeLabel = typeLabelMap[type]
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
