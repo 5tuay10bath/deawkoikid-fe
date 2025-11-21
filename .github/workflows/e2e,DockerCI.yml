@@ -52,30 +52,104 @@ jobs:
       - name: Pull & run backend container
         run: |
           docker pull "$BE_IMAGE"
-          NET=$(docker network ls --format '{{.Name}}' | grep "github_network" || docker network ls --format '{{.Name}}' | head -n 1)
-          echo "Detected network: $NET"
-          docker run -d --name be \
-            --network $NET \
-            -p ${BE_PORT}:8080 \
-            --env SPRING_PROFILES_ACTIVE=test \
-            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
-            --env SPRING_DATASOURCE_USERNAME=app \
-            --env SPRING_DATASOURCE_PASSWORD=password \
-            --env JWT_SECRET_BASE64=${{ env.JWT_SECRET_BASE64 }} \
-            "$BE_IMAGE"
+          
+          # Find the network that postgres service is running on
+          POSTGRES_CONTAINER_ID=$(docker ps --filter "ancestor=postgres:17" --format "{{.ID}}")
+          echo "PostgreSQL container ID: $POSTGRES_CONTAINER_ID"
+          
+          if [ -n "$POSTGRES_CONTAINER_ID" ]; then
+            POSTGRES_NETWORK=$(docker inspect $POSTGRES_CONTAINER_ID --format='{{range $net,$v := .NetworkSettings.Networks}}{{$net}}{{end}}')
+            echo "PostgreSQL network: $POSTGRES_NETWORK"
+            
+            # Run backend in the same network as postgres
+            docker run -d --name be \
+              --network "$POSTGRES_NETWORK" \
+              -p ${BE_PORT}:8080 \
+              --env SPRING_PROFILES_ACTIVE=test \
+              --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
+              --env SPRING_DATASOURCE_USERNAME=app \
+              --env SPRING_DATASOURCE_PASSWORD=password \
+              --env JWT_SECRET_BASE64=${{ env.JWT_SECRET_BASE64 }} \
+              --env LOGGING_LEVEL_ROOT=INFO \
+              --env LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=INFO \
+              "$BE_IMAGE"
+          else
+            echo "❌ PostgreSQL container not found!"
+            exit 1
+          fi
+          
+          # Wait a bit for container to start
+          sleep 3
+          
+          # Check if backend container is running
+          if ! docker ps | grep -q "be"; then
+            echo "❌ Backend container failed to start!"
+            docker logs be
+            exit 1
+          fi
+          
+          echo "✅ Backend container started"
 
-      - name: Wait for backend health
+      - name: Wait for backend to be ready
         run: |
-          echo "Waiting for backend health..."
-          for i in {1..30}; do
-            if curl -fsS http://localhost:8080/health > /dev/null; then
-              echo "✅ Backend is ready"
+          echo "Waiting for backend to be ready..."
+          SUCCESS=false
+          
+          for i in {1..60}; do
+            echo "Attempt $i/60..."
+            
+            # Check if container is still running
+            if ! docker ps | grep -q "be"; then
+              echo "❌ Backend container stopped!"
+              echo "=== Backend logs ==="
+              docker logs be
+              exit 1
+            fi
+            
+            # Check if backend port is responding (any response = backend is up)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/auth/login \
+              -X POST \
+              -H "Content-Type: application/json" \
+              -d '{"email":"test","password":"test"}' 2>&1 || echo "000")
+            
+            echo "HTTP response code: $HTTP_CODE"
+            
+            # Any HTTP response (even 401/404/500) means backend is running
+            if [ "$HTTP_CODE" != "000" ] && [ "$HTTP_CODE" != "Connection refused" ]; then
+              echo "✅ Backend is responding! (HTTP $HTTP_CODE)"
+              SUCCESS=true
               break
             fi
-            echo "Waiting... ($i/30)"
-            docker logs be | tail -n 20
+            
+            # Show logs every 10 attempts
+            if [ $((i % 10)) -eq 0 ]; then
+              echo "Backend logs (last 20 lines):"
+              docker logs be --tail 20
+            fi
+            
             sleep 2
           done
+          
+          if [ "$SUCCESS" = false ]; then
+            echo "❌ Backend failed to respond after 120 seconds"
+            echo ""
+            echo "=== Full backend logs ==="
+            docker logs be
+            echo ""
+            echo "=== Container status ==="
+            docker ps -a | grep be
+            echo ""
+            echo "=== Network info ==="
+            docker inspect be --format='{{range $net,$v := .NetworkSettings.Networks}}{{$net}} {{end}}'
+            exit 1
+          fi
+          
+          # Test actual API endpoint
+          echo ""
+          echo "Testing API endpoint with valid credentials..."
+          curl -v http://localhost:8080/api/auth/login -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"email":"admin@apt.com","password":"admin"}' || echo "API test completed"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -105,13 +179,6 @@ jobs:
 
       - name: Wait for frontend
         run: npx wait-on http://localhost:3000 --timeout 60000
-        
-      - name: Verify backend is accessible
-        run: |
-          echo "Checking backend health..."
-          curl -v http://localhost:8080/health || echo "Backend health check failed"
-          echo "Checking if backend API is responding..."
-          curl -v http://localhost:8080/api/auth/login -X POST -H "Content-Type: application/json" -d '{"email":"test","password":"test"}' || echo "Backend API not responding"
 
       - name: Cache Cypress binary
         uses: actions/cache@v4
