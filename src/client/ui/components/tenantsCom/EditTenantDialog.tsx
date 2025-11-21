@@ -3,7 +3,7 @@ import { format } from "date-fns"
 
 import type { UpdateTenantDto } from "@infrastructure/inbound/dtos/updateTenant.dto"
 import type { TenantsPageModel } from "@domain/models/tenantsPage.model"
-import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
+import { useTenantStore } from "@infrastructure/libs/store/tenants.store"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
@@ -25,12 +25,15 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
   const { updateTenant } = useTenantStore()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined)
   const [editTenant, setEditTenant] = useState<Omit<UpdateTenantDto, "id">>({
     firstName: "",
     lastName: "",
     phone: "",
-    birthDate: new Date(),
-    active: true,
+    email: "",
+    role: "TENANT",
+    identificationNumber: "",
+    birthDate: undefined,
     emergencyContactName: "",
     emergencyContactPhone: "",
   })
@@ -43,11 +46,14 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
         firstName,
         lastName,
         phone: tenant.phone,
-        birthDate: new Date(tenant.birthDate),
-        active: tenant.active,
+        email: tenant.email,
+        role: (tenant.role as "USER" | "ADMIN" | "TENANT" | "STAFF") || "TENANT",
+        identificationNumber: tenant.identificationNumber,
+        birthDate: tenant.birthDate ? format(new Date(tenant.birthDate), "yyyy-MM-dd") : undefined,
         emergencyContactName: tenant.emergencyContactName || "",
         emergencyContactPhone: tenant.emergencyContactPhone || "",
       })
+      setBirthDate(tenant.birthDate ? new Date(tenant.birthDate) : undefined)
     }
   }, [tenant])
 
@@ -61,7 +67,13 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
       return
     }
 
-    if (!editTenant.firstName || !editTenant.lastName || !editTenant.phone) {
+    if (
+      !editTenant.firstName ||
+      !editTenant.lastName ||
+      !editTenant.phone ||
+      !editTenant.email ||
+      !editTenant.identificationNumber
+    ) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -75,6 +87,7 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
       const dto: UpdateTenantDto = {
         id: tenant.id,
         ...editTenant,
+        birthDate: birthDate ? format(birthDate, "yyyy-MM-dd") : undefined,
       }
 
       const result = await updateTenant(dto)
@@ -128,6 +141,17 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
+              <Label>Email *</Label>
+              <Input
+                type="email"
+                value={editTenant.email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEditTenant((prev) => ({ ...prev, email: e.target.value }))
+                }
+                placeholder="john.doe@example.com"
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Phone *</Label>
               <Input
                 value={editTenant.phone}
@@ -137,25 +161,53 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
                 placeholder="0801234567"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Birth Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {editTenant.birthDate ? format(editTenant.birthDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={editTenant.birthDate}
-                    onSelect={(date) => date && setEditTenant((prev) => ({ ...prev, birthDate: date }))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <Label>Role</Label>
+              <Select
+                value={editTenant.role}
+                onValueChange={(value: "USER" | "ADMIN" | "TENANT" | "STAFF") =>
+                  setEditTenant((prev) => ({ ...prev, role: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="TENANT">Tenant</SelectItem>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="STAFF">Staff</SelectItem>
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Identification Number *</Label>
+              <Input
+                value={editTenant.identificationNumber}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEditTenant((prev) => ({ ...prev, identificationNumber: e.target.value }))
+                }
+                placeholder="1234567890123"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Birth Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {birthDate ? format(birthDate, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-white" align="start">
+                <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} initialFocus />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -179,22 +231,6 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
                 placeholder="0809876543"
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={editTenant.active ? "active" : "inactive"}
-              onValueChange={(value: string) => setEditTenant((prev) => ({ ...prev, active: value === "active" }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="flex gap-3 pt-4">

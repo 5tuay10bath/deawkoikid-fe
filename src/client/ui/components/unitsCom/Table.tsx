@@ -1,7 +1,7 @@
 import { Edit } from "lucide-react"
 import { useState } from "react"
 
-import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { useUnitStore } from "@infrastructure/libs/store/units.store"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
 
 import { Badge } from "../common/Badge"
@@ -26,16 +26,15 @@ const TableUnits = () => {
   )
 
   const statusConfig = {
-    available: { color: "bg-green-500 text-white", label: "Available" },
-    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
-    pending: { color: "bg-blue-500 text-white", label: "Pending" },
+    AVAILABLE: { color: "bg-green-500 text-white", label: "Available" },
+    OCCUPIED: { color: "bg-red-500 text-white", label: "Occupied" },
+    RESERVED: { color: "bg-orange-500 text-white", label: "Reserved" },
+    PENDING: { color: "bg-blue-500 text-white", label: "Pending" },
   }
 
   const getStatusConfig = (status: string) => {
-    const normalizedStatus = status.toLowerCase()
     return (
-      statusConfig[normalizedStatus as keyof typeof statusConfig] || {
+      statusConfig[status as keyof typeof statusConfig] || {
         color: "bg-gray-500 text-white",
         label: status,
       }
@@ -65,8 +64,8 @@ const TableUnits = () => {
               <TableCell data-cy="unit-type">{unit.unitType}</TableCell>
               <TableCell data-cy="unit-size">{unit.unitSize} sq ft</TableCell>
               <TableCell>
-                <Badge className={getStatusConfig(unit.status).color} data-cy={`unit-status-${unit.status}`}>
-                  {getStatusConfig(unit.status).label}
+                <Badge className={getStatusConfig(unit.unitStatus).color} data-cy={`unit-status-${unit.unitStatus}`}>
+                  {getStatusConfig(unit.unitStatus).label}
                 </Badge>
               </TableCell>
               <TableCell>

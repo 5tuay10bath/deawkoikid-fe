@@ -4,9 +4,9 @@ export interface CreateTenantDto {
   phone: string
   email: string
   password: string
-  active: boolean
-  birthDate: Date
+  role?: "USER" | "ADMIN" | "TENANT" | "STAFF"
   identificationNumber: string
-  emergencyContactName: string
-  emergencyContactPhone: string
+  birthDate?: string // ISO date string
+  emergencyContactName?: string
+  emergencyContactPhone?: string
 }

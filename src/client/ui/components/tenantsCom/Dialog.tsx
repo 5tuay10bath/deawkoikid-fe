@@ -19,15 +19,16 @@ const DialogTenants = () => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined)
   const [newTenant, setNewTenant] = useState<CreateTenantDto>({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
     password: "",
-    active: true,
-    birthDate: new Date(),
+    role: "TENANT",
     identificationNumber: "",
+    birthDate: undefined,
     emergencyContactName: "",
     emergencyContactPhone: "",
   })
@@ -51,13 +52,13 @@ const DialogTenants = () => {
 
     setIsSubmitting(true)
     try {
-      // Format birthDate to YYYY-MM-DD
-      const formattedTenant = {
+      // Format birthDate to ISO string if exists
+      const payload: CreateTenantDto = {
         ...newTenant,
-        birthDate: format(newTenant.birthDate, "yyyy-MM-dd") as unknown as Date,
+        birthDate: birthDate ? format(birthDate, "yyyy-MM-dd") : undefined,
       }
 
-      const result = await createTenant(formattedTenant)
+      const result = await createTenant(payload)
       if (result.success) {
         // Reset form
         setNewTenant({
@@ -66,12 +67,13 @@ const DialogTenants = () => {
           phone: "",
           email: "",
           password: "",
-          active: true,
-          birthDate: new Date(),
+          role: "TENANT",
           identificationNumber: "",
+          birthDate: undefined,
           emergencyContactName: "",
           emergencyContactPhone: "",
         })
+        setBirthDate(undefined)
         setIsOpen(false)
         toast({
           title: "Success",
@@ -97,127 +99,127 @@ const DialogTenants = () => {
           Add Tenant
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-white max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add New Tenant</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>First Name *</Label>
-              <Input
-                value={newTenant.firstName}
-                onChange={(e) => setNewTenant((prev) => ({ ...prev, firstName: e.target.value }))}
-                placeholder="John"
-              />
+      <DialogContent className="bg-white max-w-3xl p-0">
+        <div className="flex max-h-[85vh] flex-col">
+          <DialogHeader className="px-6 pt-6 pb-4">
+            <DialogTitle>Add New Tenant</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 space-y-4 overflow-y-auto px-6 pb-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>First Name *</Label>
+                <Input
+                  value={newTenant.firstName}
+                  onChange={(e) => setNewTenant((prev) => ({ ...prev, firstName: e.target.value }))}
+                  placeholder="John"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Last Name *</Label>
+                <Input
+                  value={newTenant.lastName}
+                  onChange={(e) => setNewTenant((prev) => ({ ...prev, lastName: e.target.value }))}
+                  placeholder="Doe"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Last Name *</Label>
-              <Input
-                value={newTenant.lastName}
-                onChange={(e) => setNewTenant((prev) => ({ ...prev, lastName: e.target.value }))}
-                placeholder="Doe"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Email *</Label>
+                <Input
+                  type="email"
+                  value={newTenant.email}
+                  onChange={(e) => setNewTenant((prev) => ({ ...prev, email: e.target.value }))}
+                  placeholder="john.doe@example.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone *</Label>
+                <Input
+                  type="tel"
+                  value={newTenant.phone}
+                  onChange={(e) => setNewTenant((prev) => ({ ...prev, phone: e.target.value }))}
+                  placeholder="0812345678"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label>Email *</Label>
+              <Label>Password *</Label>
               <Input
-                type="email"
-                value={newTenant.email}
-                onChange={(e) => setNewTenant((prev) => ({ ...prev, email: e.target.value }))}
-                placeholder="john.doe@example.com"
+                type="password"
+                value={newTenant.password}
+                onChange={(e) => setNewTenant((prev) => ({ ...prev, password: e.target.value }))}
+                placeholder="••••••••"
               />
             </div>
+
             <div className="space-y-2">
-              <Label>Phone *</Label>
+              <Label>Role</Label>
+              <Select
+                value={newTenant.role}
+                onValueChange={(value: "USER" | "ADMIN" | "TENANT" | "STAFF") =>
+                  setNewTenant((prev) => ({ ...prev, role: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="TENANT">Tenant</SelectItem>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="STAFF">Staff</SelectItem>
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Birth Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {birthDate ? format(birthDate, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="bg-white w-auto p-0">
+                    <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label>Identification Number *</Label>
+                <Input
+                  value={newTenant.identificationNumber}
+                  onChange={(e) => setNewTenant((prev) => ({ ...prev, identificationNumber: e.target.value }))}
+                  placeholder="1234567890123"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Emergency Contact Name</Label>
+              <Input
+                value={newTenant.emergencyContactName}
+                onChange={(e) => setNewTenant((prev) => ({ ...prev, emergencyContactName: e.target.value }))}
+                placeholder="Jane Doe"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Emergency Contact Phone</Label>
               <Input
                 type="tel"
-                value={newTenant.phone}
-                onChange={(e) => setNewTenant((prev) => ({ ...prev, phone: e.target.value }))}
-                placeholder="0812345678"
+                value={newTenant.emergencyContactPhone}
+                onChange={(e) => setNewTenant((prev) => ({ ...prev, emergencyContactPhone: e.target.value }))}
+                placeholder="0898765432"
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label>Password *</Label>
-            <Input
-              type="password"
-              value={newTenant.password}
-              onChange={(e) => setNewTenant((prev) => ({ ...prev, password: e.target.value }))}
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={newTenant.active ? "active" : "inactive"}
-              onValueChange={(value: string) => setNewTenant((prev) => ({ ...prev, active: value === "active" }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Birth Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newTenant.birthDate ? format(newTenant.birthDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="bg-white w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={newTenant.birthDate}
-                    onSelect={(date) => setNewTenant((prev) => ({ ...prev, birthDate: date || new Date() }))}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="space-y-2">
-              <Label>Identification Number *</Label>
-              <Input
-                value={newTenant.identificationNumber}
-                onChange={(e) => setNewTenant((prev) => ({ ...prev, identificationNumber: e.target.value }))}
-                placeholder="1234567890123"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Emergency Contact Name</Label>
-            <Input
-              value={newTenant.emergencyContactName}
-              onChange={(e) => setNewTenant((prev) => ({ ...prev, emergencyContactName: e.target.value }))}
-              placeholder="Jane Doe"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Emergency Contact Phone</Label>
-            <Input
-              type="tel"
-              value={newTenant.emergencyContactPhone}
-              onChange={(e) => setNewTenant((prev) => ({ ...prev, emergencyContactPhone: e.target.value }))}
-              placeholder="0898765432"
-            />
-          </div>
-
-          <div className="flex gap-3">
+          <div className="flex gap-3 border-t border-gray-100 px-6 py-4">
             <Button variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>

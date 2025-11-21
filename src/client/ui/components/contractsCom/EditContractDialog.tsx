@@ -94,7 +94,7 @@ const EditContractDialog = ({ isOpen, onClose, contract }: EditContractDialogPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white max-w-2xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Contract</DialogTitle>
         </DialogHeader>

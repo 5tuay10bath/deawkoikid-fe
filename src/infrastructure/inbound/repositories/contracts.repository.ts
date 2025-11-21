@@ -82,12 +82,12 @@ export class ContractsRepository implements IContractsRepository {
 
       const result: CreateUnitModel[] = data.data.map((item: any) => ({
         id: item.id,
-        address: item.address,
+        address: item.unitNumber || item.address || item.id,
       }))
 
       return right(result)
     } catch (error) {
-      console.error(error)
+      console.error("getCreateUnits error:", error)
       return left(error)
     }
   }

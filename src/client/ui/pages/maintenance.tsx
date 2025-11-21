@@ -77,11 +77,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="Pending"
-              value={
-                filteredTasks.filter(
-                  (t) => t.status.toUpperCase() === "REPORTED" || t.status.toUpperCase() === "SCHEDULED",
-                ).length
-              }
+              value={filteredTasks.filter((t) => t.status === "REPORTED" || t.status === "SCHEDULED").length}
               icon={Clock}
               color={{
                 valueColor: "text-amber-500",
@@ -91,11 +87,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="High Priority"
-              value={
-                filteredTasks.filter(
-                  (t) => t.priority.toUpperCase() === "HIGH" || t.priority.toUpperCase() === "URGENT",
-                ).length
-              }
+              value={filteredTasks.filter((t) => t.priority === "HIGH" || t.priority === "URGENT").length}
               icon={AlertTriangle}
               color={{
                 valueColor: "text-red-500",
@@ -105,7 +97,7 @@ export default function Maintenance() {
 
             <StatsCard
               label="Completed"
-              value={filteredTasks.filter((t) => t.status.toUpperCase() === "COMPLETED").length}
+              value={filteredTasks.filter((t) => t.status === "COMPLETED").length}
               icon={Wrench}
               color={{
                 valueColor: "text-emerald-500",

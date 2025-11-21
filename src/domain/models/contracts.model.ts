@@ -1,17 +1,19 @@
 import type { TenantsPageModel } from "./tenantsPage.model"
 import type { UnitPageModel } from "./unitPage.model"
+import type { ContractStatus } from "../types/status.types"
+import type { RentType, WaterBillingType } from "../types/enums.types"
 
 export interface ContractsModel {
   id: string
   user: TenantsPageModel
   unit: UnitPageModel
-  rentType: "MONTHLY" | "YEARLY"
+  rentType: RentType
   rentAmount: number
-  waterBillingType: "PER_UNIT" | "FLAT_RATE" | "TIERED"
+  waterBillingType: WaterBillingType
   internet: boolean
   startDate: Date
   endDate: Date
-  status: "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED"
+  status: ContractStatus
 }
 
 export interface CreateUnitModel {

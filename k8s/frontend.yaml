@@ -26,7 +26,7 @@ spec:
       containers:
         - name: app
           image: iamyasuomain/deawkoikid_frontend:latest
-          imagePullPolicy: Always   
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
@@ -50,7 +50,7 @@ spec:
     app: deawkoikid-fe
   ports:
     - name: http
-      port: 3000          
-      targetPort: 3000   
+      port: 3000
+      targetPort: 3000
       nodePort: 30000
   type: NodePort

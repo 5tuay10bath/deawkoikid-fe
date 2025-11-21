@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail } from "lucide-react"
+import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail, History } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "../components/common/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
@@ -17,7 +17,7 @@ export default function RoomDetails() {
   const [isReceiptOpen, setIsReceiptOpen] = useState(false)
   const [isContractOpen, setIsContractOpen] = useState(false)
 
-  const { dashboard, getDashboard } = useDashboardStore()
+  const { dashboard, getDashboard, extraCharges, getExtraCharges } = useDashboardStore()
   const { setRoom } = useRoomDetailStore()
 
   const BACK_TO_DASHBOARD = "flex items-center gap-2"
@@ -28,6 +28,13 @@ export default function RoomDetails() {
       getDashboard()
     }
   }, [dashboard, getDashboard])
+
+  // Fetch extra charges when roomId is available
+  useEffect(() => {
+    if (roomId) {
+      getExtraCharges({ id: roomId })
+    }
+  }, [roomId, getExtraCharges])
 
   // Find the unit from dashboard array by roomId
   const unit = dashboard.find((item) => item.id === roomId)
@@ -40,16 +47,14 @@ export default function RoomDetails() {
   }, [unit, setRoom])
 
   const statusConfig = {
-    available: { color: "bg-green-500 text-white", label: "Available" },
-    occupied: { color: "bg-red-500 text-white", label: "Occupied" },
-    reserved: { color: "bg-orange-500 text-white", label: "Reserved" },
-    maintenance: { color: "bg-yellow-500 text-white", label: "Maintenance" },
-    "checkout-pending": { color: "bg-blue-500 text-white", label: "Check-out Pending" },
+    AVAILABLE: { color: "bg-green-500 text-white", label: "Available" },
+    OCCUPIED: { color: "bg-red-500 text-white", label: "Occupied" },
+    RESERVED: { color: "bg-orange-500 text-white", label: "Reserved" },
+    PENDING: { color: "bg-blue-500 text-white", label: "Pending" },
   } as const
 
   const getStatusConfig = (status: string) => {
-    const normalizedStatus = status.toLowerCase()
-    return statusConfig[normalizedStatus as keyof typeof statusConfig] || statusConfig.available
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig.AVAILABLE
   }
 
   if (!unit) {
@@ -179,6 +184,104 @@ export default function RoomDetails() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Contract History Section */}
+          {unit.contracts && unit.contracts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Contract History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {unit.contracts.map((contract, index) => (
+                    <div
+                      key={contract.id || index}
+                      className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-600" />
+                          <span className="font-medium text-gray-900">
+                            {contract.user?.fullName || "Unknown Tenant"}
+                          </span>
+                        </div>
+                        <Badge
+                          className={
+                            contract.status === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : contract.status === "EXPIRED"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-orange-100 text-orange-800"
+                          }
+                        >
+                          {contract.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>
+                            {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "N/A"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-900 font-medium col-span-2">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          <span>
+                            ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Extra Charges Section */}
+          {extraCharges && extraCharges.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Extra Charges
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {extraCharges.map((charge, index) => (
+                    <div
+                      key={charge.id || index}
+                      className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{charge.topic}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{charge.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-lg text-gray-900">${charge.price}</p>
+                          {charge.createdAt && (
+                            <p className="text-xs text-gray-500">
+                              {format(new Date(charge.createdAt), "MMM dd, yyyy")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Actions Panel - Only show if unit has a contract */}

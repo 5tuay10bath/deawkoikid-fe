@@ -12,8 +12,8 @@ export class ContractsMapper {
       .rentAmount(contractsEntity.rentAmount)
       .waterBillingType(contractsEntity.waterBillingType as "PER_UNIT" | "FLAT_RATE" | "TIERED")
       .internet(contractsEntity.internet)
-      .startDate(contractsEntity.startDate)
-      .endDate(contractsEntity.endDate)
+      .startDate(new Date(contractsEntity.startDate))
+      .endDate(new Date(contractsEntity.endDate))
       .status(contractsEntity.status as "DRAFT" | "SIGNED" | "ACTIVE" | "EXPIRED")
       .build()
   }
