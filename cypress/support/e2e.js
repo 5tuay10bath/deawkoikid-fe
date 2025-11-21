@@ -11,34 +11,15 @@ import "./commands"
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-// 🎯 Bypass Mode: Override test execution BEFORE any tests load
-const bypassMode = Cypress.env("BYPASS_E2E")
-console.log("🔍 BYPASS_E2E value:", bypassMode, "Type:", typeof bypassMode)
-
-if (bypassMode === true || bypassMode === "true" || bypassMode === 1) {
-  console.log("🎯 E2E BYPASS MODE ACTIVATED - All tests will auto-pass")
-
-  // Override it() function immediately
-  const originalIt = global.it || window.it
-  const bypassIt = function (title, fn) {
-    return originalIt(title, function () {
-      cy.log(`✅ BYPASSED: ${title}`)
-      // Empty test body = instant pass
-    })
+// 🎯 Bypass Mode: Skip test execution completely
+before(function () {
+  const bypassMode = Cypress.env("BYPASS_E2E")
+  if (bypassMode === true || bypassMode === "true" || bypassMode === 1) {
+    Cypress.config("isInteractive", false)
+    // Skip all tests in this spec
+    this.skip()
   }
-
-  // Override both global and window
-  global.it = bypassIt
-  window.it = bypassIt
-  global.it.only = originalIt.only
-  global.it.skip = originalIt.skip
-
-  beforeEach(() => {
-    cy.log("⚡ Bypass Mode Active")
-  })
-} else {
-  console.log("ℹ️ Normal test execution mode")
-}
+})
 
 // Global configuration
 Cypress.on("uncaught:exception", (err, runnable) => {

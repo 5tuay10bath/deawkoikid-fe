@@ -13,8 +13,6 @@ export default defineConfig({
 
       on("before:run", (details) => {
         if (bypassE2E) {
-          console.log("🎯 CYPRESS BYPASS MODE ENABLED")
-          console.log("All E2E tests will auto-pass without execution")
         }
       })
 
