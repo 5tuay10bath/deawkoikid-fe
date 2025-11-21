@@ -21,6 +21,7 @@ import SignUp from "@client/ui/pages/signUp"
 import UserDashboard from "@client/ui/pages/userDashboard"
 import TenantDashboard from "@client/ui/pages/tenantDashboard"
 import Buildings from "@client/ui/pages/building"
+import TenantInvoices from "@client/ui/pages/tenantInvoices"
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -92,11 +93,31 @@ export default function App() {
           }
         />
         <Route
+          path="/tenant/invoices"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <TenantInvoices />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
+        <Route
           path="/tenant/dashboard"
           element={
             <ClientLayout>
               <ProtectedRoute requiredRole="TENANT">
                 <TenantDashboard />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
+        <Route
+          path="/tenant/payments"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <Payments />
               </ProtectedRoute>
             </ClientLayout>
           }
@@ -139,16 +160,6 @@ export default function App() {
             <ProtectedRoute requiredRole="ADMIN">
               <AdminLayout>
                 <Tenants />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/payments"
-          element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <AdminLayout>
-                <Payments />
               </AdminLayout>
             </ProtectedRoute>
           }

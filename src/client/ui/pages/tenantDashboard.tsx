@@ -16,6 +16,7 @@ import type { MaintenanceType } from "@domain/types/enums.types"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import { cookieUtils } from "@shared/utils/cookie.utils"
 import { jwtUtils } from "@shared/utils/jwt.utils"
+import UploadPaymentDialog from "../components/userDashboardCom/UploadPaymentDialog"
 
 function formatDate(date?: Date | string | null, fallback = "—") {
   if (!date) return fallback
@@ -40,6 +41,7 @@ export default function TenantDashboard() {
   const { toast } = useToast()
 
   const [isMaintenanceOpen, setIsMaintenanceOpen] = useState(false)
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [maintenanceForm, setMaintenanceForm] = useState<{
     title: string
@@ -125,13 +127,13 @@ export default function TenantDashboard() {
       title: "Upload payment proof",
       description: "Share your transfer slip or confirmation",
       icon: CreditCard,
-      action: () => navigate("/payments"),
+      action: () => setIsUploadOpen(true),
     },
     {
       title: "View invoices & receipts",
       description: "See your bills and download receipts",
       icon: FileText,
-      action: () => navigate("/payments"),
+      action: () => navigate("/tenant/invoices"),
     },
   ]
 
@@ -175,8 +177,8 @@ export default function TenantDashboard() {
                     </div>
                   )}
                   <div className="flex flex-wrap gap-3">
-                    <Button className="bg-white text-blue-700 hover:bg-blue-50" onClick={() => navigate("/payments")}>
-                      View invoices
+                    <Button className="bg-white text-blue-700 hover:bg-blue-50" onClick={() => setIsUploadOpen(true)}>
+                      Upload payment proof
                     </Button>
                     <Button
                       variant="outline"
@@ -276,7 +278,7 @@ export default function TenantDashboard() {
                   <Button
                     variant="outline"
                     className="border-blue-200 text-blue-700"
-                    onClick={() => navigate("/payments")}
+                    onClick={() => navigate("/tenant/invoices")}
                   >
                     View all
                   </Button>
@@ -339,6 +341,8 @@ export default function TenantDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <UploadPaymentDialog isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
     </div>
   )
 }
