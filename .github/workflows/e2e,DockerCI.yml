@@ -105,18 +105,44 @@ jobs:
 
       - name: Wait for frontend
         run: npx wait-on http://localhost:3000 --timeout 60000
+        
+      - name: Verify backend is accessible
+        run: |
+          echo "Checking backend health..."
+          curl -v http://localhost:8080/health || echo "Backend health check failed"
+          echo "Checking if backend API is responding..."
+          curl -v http://localhost:8080/api/auth/login -X POST -H "Content-Type: application/json" -d '{"email":"test","password":"test"}' || echo "Backend API not responding"
 
-      # - name: Cache Cypress binary
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.cache/Cypress
-      #     key: ${{ runner.os }}-cypress-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('pnpm-lock.yaml') }}
 
-      # - name: Ensure Cypress binary installed
-      #   run: pnpm dlx cypress install
+      - name: Ensure Cypress binary installed
+        run: pnpm dlx cypress install
 
-      # - name: Run Cypress E2E
-      #   run: pnpm dlx cypress run --config baseUrl=http://localhost:3000/fivetuay10bath-frontend
+      - name: Run Cypress E2E
+        run: pnpm dlx cypress run --config baseUrl=http://localhost:3000/fivetuay10bath-frontend
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
+          CYPRESS_API_BASE_URL: http://localhost:8080
+
+      - name: Upload Cypress screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 7
 
       - name: Generate version tag
         id: tag
