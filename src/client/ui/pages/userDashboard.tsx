@@ -1,10 +1,14 @@
 import { useAuthStore } from "../stores/auth.store"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../components/common/Button"
+import { Upload } from "lucide-react"
+import { useState } from "react"
+import UploadPaymentDialog from "../components/userDashboardCom/UploadPaymentDialog"
 
 export default function UserDashboard() {
   const { fullName, userEmail, logout } = useAuthStore()
   const navigate = useNavigate()
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -30,15 +34,18 @@ export default function UserDashboard() {
             <p className="text-blue-700">
               <strong>Email:</strong> {userEmail}
             </p>
-            <p className="mt-4 text-sm text-blue-600">This is the user dashboard. More features coming soon...</p>
+            <p className="mt-4 text-sm text-blue-600"></p>
           </div>
 
           <div className="rounded-lg border border-gray-200 p-6">
             <h3 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Button variant="outline" className="w-full">
-                View My Contracts
-              </Button>
+              <div>
+                <Button variant="outline" className="w-full" onClick={() => setIsUploadOpen(true)}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Payment Proof
+                </Button>
+              </div>
               <Button variant="outline" className="w-full">
                 Payment History
               </Button>
@@ -52,6 +59,8 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+
+      <UploadPaymentDialog isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
     </div>
   )
 }
