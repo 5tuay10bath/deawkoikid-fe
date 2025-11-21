@@ -2,7 +2,7 @@ import { format } from "date-fns"
 import { Eye, Edit, Trash2 } from "lucide-react"
 import { useState } from "react"
 
-import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
+import { useTenantStore } from "@infrastructure/libs/store/tenants.store"
 import type { TenantsPageModel } from "@domain/models/tenantsPage.model"
 
 import { Avatar, AvatarFallback } from "../common/Avatar"

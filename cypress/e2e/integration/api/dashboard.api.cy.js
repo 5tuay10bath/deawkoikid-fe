@@ -1,5 +1,5 @@
 describe("Dashboard API Integration Tests", () => {
-  const baseUrl = Cypress.env("apiUrl") || "http://localhost:8080"
+  const baseUrl = Cypress.env("apiUrl") || "http://localhost:8080/api"
 
   describe("GET /dashboard - Retrieve Dashboard Data", () => {
     it("should retrieve dashboard overview", () => {

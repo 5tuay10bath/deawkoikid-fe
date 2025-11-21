@@ -1,7 +1,7 @@
 import { Edit } from "lucide-react"
 import { useState } from "react"
 
-import { useUnitStore } from "src/infrastructure/libs/store/units.store"
+import { useUnitStore } from "@infrastructure/libs/store/units.store"
 import type { UnitPageModel } from "@domain/models/unitPage.model"
 
 import { Badge } from "../common/Badge"

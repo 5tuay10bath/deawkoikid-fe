@@ -8,7 +8,7 @@ import App from "./App.tsx"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/fivetuay10bath-frontend">
       <App />
     </BrowserRouter>
   </StrictMode>,

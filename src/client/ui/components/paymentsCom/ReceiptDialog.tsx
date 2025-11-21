@@ -4,7 +4,7 @@ import { useRef } from "react"
 import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
-import { usePaymentStore } from "src/infrastructure/libs/store/payments.store"
+import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"

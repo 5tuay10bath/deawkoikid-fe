@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail } from "lucide-react"
+import { ArrowLeft, User, Calendar, DollarSign, Phone, Mail, History } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "../components/common/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/common/card"
@@ -177,6 +177,67 @@ export default function RoomDetails() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Contract History Section */}
+          {unit.contracts && unit.contracts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  Contract History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {unit.contracts.map((contract, index) => (
+                    <div
+                      key={contract.id || index}
+                      className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-gray-600" />
+                          <span className="font-medium text-gray-900">
+                            {contract.user?.fullName || "Unknown Tenant"}
+                          </span>
+                        </div>
+                        <Badge
+                          className={
+                            contract.status === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : contract.status === "EXPIRED"
+                                ? "bg-gray-100 text-gray-800"
+                                : "bg-orange-100 text-orange-800"
+                          }
+                        >
+                          {contract.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>
+                            {contract.startDate ? format(new Date(contract.startDate), "MMM dd, yyyy") : "N/A"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Calendar className="h-3.5 w-3.5" />
+                          <span>{contract.endDate ? format(new Date(contract.endDate), "MMM dd, yyyy") : "N/A"}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-900 font-medium col-span-2">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          <span>
+                            ${contract.rentAmount}/{contract.rentType === "MONTHLY" ? "mo" : "yr"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Actions Panel - Only show if unit has a contract */}

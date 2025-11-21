@@ -3,7 +3,7 @@ import { format } from "date-fns"
 
 import type { UpdateTenantDto } from "@infrastructure/inbound/dtos/updateTenant.dto"
 import type { TenantsPageModel } from "@domain/models/tenantsPage.model"
-import { useTenantStore } from "src/infrastructure/libs/store/tenants.store"
+import { useTenantStore } from "@infrastructure/libs/store/tenants.store"
 
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"

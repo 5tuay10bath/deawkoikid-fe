@@ -1,4 +1,4 @@
-import { Building, Users, DollarSign } from "lucide-react"
+import { Building, DollarSign } from "lucide-react"
 import { DashboardStatCard } from "../central/StatsCard"
 
 interface DashboardStatsProps {
@@ -19,7 +19,7 @@ export function DashboardStats({
   totalRevenue,
 }: DashboardStatsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <DashboardStatCard
         title="Total Units"
         value={totalRooms.toString()}
@@ -29,21 +29,19 @@ export function DashboardStats({
       />
 
       <DashboardStatCard
-        title="Occupied"
-        value={occupiedRooms}
+        title="Available"
+        value={availableRooms}
         description={`${availableRooms} available`}
-        icon={Users}
-        valueColor="text-red-500"
-        data-cy="occupied-units-stat"
+        valueColor="text-green-500"
+        data-cy="available-units-stat"
       />
 
       <DashboardStatCard
-        title="Monthly Revenue"
-        value={`$${totalRevenue.toLocaleString()}`}
-        description="From occupied units"
-        icon={DollarSign}
-        valueColor="text-green-500"
-        data-cy="revenue-stat"
+        title="Occupied"
+        value={occupiedRooms}
+        description={`${occupiedRooms} occupied`}
+        valueColor="text-red-500"
+        data-cy="occupied-units-stat"
       />
 
       <DashboardStatCard
@@ -60,6 +58,15 @@ export function DashboardStats({
         description="Pending"
         valueColor="text-blue-500"
         data-cy="maintenance-stat"
+      />
+
+      <DashboardStatCard
+        title="Monthly Revenue"
+        value={`$${totalRevenue.toLocaleString()}`}
+        description="From occupied units"
+        icon={DollarSign}
+        valueColor="text-green-500"
+        data-cy="revenue-stat"
       />
     </div>
   )

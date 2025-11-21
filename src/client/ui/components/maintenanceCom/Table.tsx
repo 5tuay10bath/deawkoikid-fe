@@ -1,9 +1,14 @@
 import { useMaintenanceStore } from "@infrastructure/libs/store/maintenance.store"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 import { Badge } from "../common/Badge"
+import { Button } from "../common/Button"
+import { Upload } from "lucide-react"
+import { useState } from "react"
+import UploadFileDialog from "../common/UploadFileDialog"
 
 const MaintainTable = () => {
   const { tasks, searchTerm } = useMaintenanceStore()
+  const [uploadTaskId, setUploadTaskId] = useState<string | null>(null)
 
   const statusConfig = {
     REPORTED: { color: "bg-yellow-500 text-white", label: "Reported" },
@@ -48,39 +53,59 @@ const MaintainTable = () => {
     )
   })
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Task</TableHead>
-          <TableHead>Unit</TableHead>
-          <TableHead>Priority</TableHead>
-          <TableHead>Assigned To</TableHead>
-          <TableHead>Reported By</TableHead>
-          <TableHead>Status</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {filteredTasks.map((task) => (
-          <TableRow key={task.id}>
-            <TableCell>
-              <div>
-                <p className="font-medium">{task.title}</p>
-                <p className="text-sm text-muted-foreground">{task.description}</p>
-              </div>
-            </TableCell>
-            <TableCell>{task.unit.unitNumber}</TableCell>
-            <TableCell>
-              <Badge className={getPriorityConfig(task.priority).color}>{getPriorityConfig(task.priority).label}</Badge>
-            </TableCell>
-            <TableCell>{task.assignedTo ? task.assignedTo.fullName : "Unassigned"}</TableCell>
-            <TableCell>{task.reportedBy.fullName}</TableCell>
-            <TableCell>
-              <Badge className={getStatusConfig(task.status).color}>{getStatusConfig(task.status).label}</Badge>
-            </TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Task</TableHead>
+            <TableHead>Unit</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Assigned To</TableHead>
+            <TableHead>Reported By</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {filteredTasks.map((task) => (
+            <TableRow key={task.id}>
+              <TableCell>
+                <div>
+                  <p className="font-medium">{task.title}</p>
+                  <p className="text-sm text-muted-foreground">{task.description}</p>
+                </div>
+              </TableCell>
+              <TableCell>{task.unit.unitNumber}</TableCell>
+              <TableCell>
+                <Badge className={getPriorityConfig(task.priority).color}>
+                  {getPriorityConfig(task.priority).label}
+                </Badge>
+              </TableCell>
+              <TableCell>{task.assignedTo ? task.assignedTo.fullName : "Unassigned"}</TableCell>
+              <TableCell>{task.reportedBy.fullName}</TableCell>
+              <TableCell>
+                <Badge className={getStatusConfig(task.status).color}>{getStatusConfig(task.status).label}</Badge>
+              </TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" onClick={() => setUploadTaskId(task.id)}>
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Upload File Dialog */}
+      {uploadTaskId && (
+        <UploadFileDialog
+          isOpen={!!uploadTaskId}
+          onClose={() => setUploadTaskId(null)}
+          type="maintenance"
+          id={uploadTaskId}
+        />
+      )}
+    </>
   )
 }
 
