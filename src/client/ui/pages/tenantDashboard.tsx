@@ -132,7 +132,7 @@ export default function TenantDashboard() {
 
     try {
       // Get invoices for this user
-      const response = await axiosInstance.get(`/public/invoices/${userId}`)
+      const response = await axiosInstance.get(`/public/invoices?userId=${userId}`)
       const invoices = response.data.data
 
       if (!invoices || invoices.length === 0) {
