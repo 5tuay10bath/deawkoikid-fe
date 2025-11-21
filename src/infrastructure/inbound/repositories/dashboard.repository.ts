@@ -2,6 +2,7 @@ import type { IDashboardRepository } from "@application/ports/dashboard.reposito
 import type { CheckInDto } from "../dtos/checkIn.dto"
 import type { CheckOutDto } from "../dtos/checkOut.dto"
 import type { DefaultDto } from "../dtos/default.dto"
+import type { UploadMeterCsvDto } from "../dtos/uploadMeterCsv.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { DashboardModel } from "@domain/models/dashboard.model"
 import type { ApiResponse } from "@domain/models/apiResponse.model"
@@ -63,6 +64,32 @@ export class DashboardRepository implements IDashboardRepository {
         status: data.status,
         message: data.message,
         timestamp: data.timestamp,
+      }
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async uploadMeterCsv(dto: UploadMeterCsvDto): Promise<IDashboardRepository.uploadMeterCsv> {
+    try {
+      const url = `/units/meter/csv`
+
+      const formData = new FormData()
+      formData.append("file", dto.file)
+
+      const { data } = await axiosInstance.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      const result: ApiResponse = {
+        status: data.status || "success",
+        message: data.message || "CSV meter update completed",
+        timestamp: data.timestamp || new Date().toISOString(),
       }
 
       return right(result)

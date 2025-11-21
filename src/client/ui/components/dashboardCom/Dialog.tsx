@@ -3,6 +3,7 @@ import { useState, useRef, type ChangeEvent } from "react"
 import Papa from "papaparse"
 import type { ParseResult } from "papaparse"
 
+import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
@@ -18,14 +19,18 @@ const DialogCSV = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [csvData, setCsvData] = useState<CsvRow[]>([])
   const [fileName, setFileName] = useState<string>("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+  const { uploadMeterCsv } = useDashboardStore()
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     setFileName(file.name)
+    setSelectedFile(file)
 
     Papa.parse<CsvRow>(file, {
       header: true,
@@ -34,8 +39,8 @@ const DialogCSV = () => {
         if (results.data) {
           setCsvData(results.data)
           toast({
-            title: "Success",
-            description: `Successfully imported ${results.data.length} rows`,
+            title: "File loaded",
+            description: `${results.data.length} rows ready to import`,
           })
         }
       },
@@ -56,6 +61,7 @@ const DialogCSV = () => {
   const handleChangeFile = () => {
     setCsvData([])
     setFileName("")
+    setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -65,8 +71,49 @@ const DialogCSV = () => {
   const handleClearData = () => {
     setCsvData([])
     setFileName("")
+    setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!selectedFile) {
+      toast({
+        title: "Error",
+        description: "No file selected",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const result = await uploadMeterCsv({ file: selectedFile })
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message || "CSV meter update completed",
+        })
+        setIsOpen(false)
+        handleClearData()
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to upload CSV",
+          variant: "destructive",
+        })
+      }
+    } catch {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -159,7 +206,9 @@ const DialogCSV = () => {
             >
               Cancel
             </Button>
-            <Button>Submit</Button>
+            <Button onClick={handleSubmit} disabled={!selectedFile || isSubmitting}>
+              {isSubmitting ? "Uploading..." : "Submit"}
+            </Button>
           </div>
         </div>
       </DialogContent>
