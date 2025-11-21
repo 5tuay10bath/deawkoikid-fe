@@ -3,7 +3,7 @@ name: E2E,Docker Image CI - main
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -35,7 +35,7 @@ jobs:
       BE_IMAGE: docker.io/iamyasuomain/deawkoikid_backend:latest
       BE_PORT: 8080
 
-      CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
+      CYPRESS_BASE_URL: http://localhost:3000
       CI: "true"
 
     steps:
@@ -52,133 +52,62 @@ jobs:
       - name: Pull & run backend container
         run: |
           docker pull "$BE_IMAGE"
-          
-          # Find the network that postgres service is running on
-          POSTGRES_CONTAINER_ID=$(docker ps --filter "ancestor=postgres:17" --format "{{.ID}}")
-          echo "PostgreSQL container ID: $POSTGRES_CONTAINER_ID"
-          
-          if [ -n "$POSTGRES_CONTAINER_ID" ]; then
-            POSTGRES_NETWORK=$(docker inspect $POSTGRES_CONTAINER_ID --format='{{range $net,$v := .NetworkSettings.Networks}}{{$net}}{{end}}')
-            echo "PostgreSQL network: $POSTGRES_NETWORK"
+          NET=$(docker network ls --format '{{.Name}}' | grep "github_network" || docker network ls --format '{{.Name}}' | head -n 1)
+          echo "Detected network: $NET"
+          docker run -d --name be \
+            --network $NET \
+            -p ${BE_PORT}:8080 \
+            --env SPRING_PROFILES_ACTIVE=test \
+            --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
+            --env SPRING_DATASOURCE_USERNAME=app \
+            --env SPRING_DATASOURCE_PASSWORD=password \
+            --env JWT_SECRET_BASE64=${{ env.JWT_SECRET_BASE64 }} \
+            --AWS_ACCESS_KEY_ID=AKIAV2TD6FF5TVGZLXHK \
+            --AWS_SECRET_ACCESS_KEY=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 \
+            --AWS_REGION=ap-southeast- 1\
+            --AWS_BUCKET_NAME=web-devops1 \
+            "$BE_IMAGE"
             
-            # Run backend in the same network as postgres
-            docker run -d --name be \
-              --network "$POSTGRES_NETWORK" \
-              -p ${BE_PORT}:8080 \
-              --env SPRING_PROFILES_ACTIVE=test \
-              --env SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/app_test \
-              --env SPRING_DATASOURCE_USERNAME=app \
-              --env SPRING_DATASOURCE_PASSWORD=password \
-              --env JWT_SECRET_BASE64=${{ env.JWT_SECRET_BASE64 }} \
-              --env LOGGING_LEVEL_ROOT=INFO \
-              --env LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=INFO \
-              "$BE_IMAGE"
-          else
-            echo "❌ PostgreSQL container not found!"
-            exit 1
-          fi
-          
-          # Wait a bit for container to start
-          sleep 3
-          
-          # Check if backend container is running
-          if ! docker ps | grep -q "be"; then
-            echo "❌ Backend container failed to start!"
-            docker logs be
-            exit 1
-          fi
-          
-          echo "✅ Backend container started"
-
-      - name: Wait for backend to be ready
+      - name: Wait for backend health
         run: |
-          echo "Waiting for backend to be ready..."
-          SUCCESS=false
-          
-          for i in {1..60}; do
-            echo "Attempt $i/60..."
-            
-            # Check if container is still running
-            if ! docker ps | grep -q "be"; then
-              echo "❌ Backend container stopped!"
-              echo "=== Backend logs ==="
-              docker logs be
-              exit 1
-            fi
-            
-            # Check if backend port is responding (any response = backend is up)
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/auth/login \
-              -X POST \
-              -H "Content-Type: application/json" \
-              -d '{"email":"test","password":"test"}' 2>&1 || echo "000")
-            
-            echo "HTTP response code: $HTTP_CODE"
-            
-            # Any HTTP response (even 401/404/500) means backend is running
-            if [ "$HTTP_CODE" != "000" ] && [ "$HTTP_CODE" != "Connection refused" ]; then
-              echo "✅ Backend is responding! (HTTP $HTTP_CODE)"
-              SUCCESS=true
+          echo "Waiting for backend health..."
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8080/health > /dev/null; then
+              echo "✅ Backend is ready"
               break
             fi
-            
-            # Show logs every 10 attempts
-            if [ $((i % 10)) -eq 0 ]; then
-              echo "Backend logs (last 20 lines):"
-              docker logs be --tail 20
-            fi
-            
+            echo "Waiting... ($i/30)"
+            docker logs be | tail -n 20
             sleep 2
           done
-          
-          if [ "$SUCCESS" = false ]; then
-            echo "❌ Backend failed to respond after 120 seconds"
-            echo ""
-            echo "=== Full backend logs ==="
-            docker logs be
-            echo ""
-            echo "=== Container status ==="
-            docker ps -a | grep be
-            echo ""
-            echo "=== Network info ==="
-            docker inspect be --format='{{range $net,$v := .NetworkSettings.Networks}}{{$net}} {{end}}'
-            exit 1
-          fi
-          
-          # Test actual API endpoint
-          echo ""
-          echo "Testing API endpoint with valid credentials..."
-          curl -v http://localhost:8080/api/auth/login -X POST \
-            -H "Content-Type: application/json" \
-            -d '{"email":"admin@apt.com","password":"admin"}' || echo "API test completed"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
+      
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
-
+      
       - name: Enable pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
-
+      
       - name: Install deps
         run: pnpm install --frozen-lockfile
-
+        
       - name: Start frontend
         run: pnpm dev &
         env:
           NODE_ENV: test
-          VITE_DEAWKOIKID_API_BASE_URL: http://localhost:8080
-
+          
       - name: Wait for frontend
-        run: npx wait-on http://localhost:3000 --timeout 60000
+        run: npx wait-on http://localhost:3000
 
       - name: Cache Cypress binary
         uses: actions/cache@v4
@@ -189,27 +118,9 @@ jobs:
       - name: Ensure Cypress binary installed
         run: pnpm dlx cypress install
 
+        
       - name: Run Cypress E2E
-        run: pnpm dlx cypress run --config baseUrl=http://localhost:3000/fivetuay10bath-frontend
-        env:
-          CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
-          CYPRESS_API_BASE_URL: http://localhost:8080
-
-      - name: Upload Cypress screenshots on failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-          retention-days: 7
-
-      - name: Upload Cypress videos
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: cypress-videos
-          path: cypress/videos
-          retention-days: 7
+        run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
 
       - name: Generate version tag
         id: tag
@@ -224,7 +135,7 @@ jobs:
           docker push iamyasuomain/deawkoikid_frontend:latest
           echo "Pushed! iamyasuomain/deawkoikid_frontend:${{ env.TAG }}"
   deploy:
-    needs: e2e
-    uses: 5tuay10bath/Deployment/.github/workflows/main.yml@main
-    with:
-      source_repo: 5tuay10bath/deawkoikid-fe
+      needs: e2e
+      uses: 5tuay10bath/Deployment/.github/workflows/main.yml@main
+      with:
+        source_repo: 5tuay10bath/deawkoikid-fe
