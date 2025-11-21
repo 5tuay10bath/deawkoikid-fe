@@ -200,7 +200,7 @@ const DialogBuildings = () => {
                   : "Review & Confirm"}
             </DialogTitle>
           </DialogHeader>
-          <div className="mt-4 flex-1 min-h-0 overflow-y-auto px-4">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 mb-11">
             {step === 1 ? (
               <div className="space-y-4">
                 <div className="space-y-2">
