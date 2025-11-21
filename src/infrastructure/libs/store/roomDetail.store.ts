@@ -2,9 +2,10 @@ import type { DashboardModel } from "@domain/models/dashboard.model"
 import { create } from "zustand"
 
 interface AddonForm {
-  type: string
-  amount: string
+  topic: string
+  price: string
   description: string
+  status: "UNPAID" | "PAID"
 }
 
 interface RoomDetailState {
@@ -25,9 +26,10 @@ interface RoomDetailState {
 }
 
 const initialAddonForm: AddonForm = {
-  type: "",
-  amount: "",
+  topic: "",
+  price: "",
   description: "",
+  status: "UNPAID",
 }
 
 export const useRoomDetailStore = create<RoomDetailState>((set) => ({
