@@ -2,7 +2,7 @@ import { defineConfig } from "cypress"
 
 export default defineConfig({
   e2e: {
-    baseUrl: "http://localhost:3000",
+    baseUrl: "http://localhost:3000/fivetuay10bath-frontend",
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
@@ -12,7 +12,7 @@ export default defineConfig({
     },
     env: {
       // Add any environment variables your tests need
-      api_base_url: "http://localhost:8088",
+      api_base_url: process.env.CYPRESS_API_BASE_URL || "http://localhost:8088",
     },
     // Retry configuration
     retries: {

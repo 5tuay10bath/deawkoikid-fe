@@ -3,7 +3,7 @@ import { Button } from "../components/common/Button"
 
 export default function Home() {
   const handleLogin = () => {
-    window.location.href = "/login"
+    window.location.href = "/fivetuay10bath-frontend/login"
   }
 
   return (

@@ -42,11 +42,10 @@ export default function Login() {
     const result = await login(formData)
 
     if (result.success) {
-      // Redirect based on role
+      // Navigate immediately before showing toast
       if (result.role === "ADMIN") {
         navigate("/dashboard")
       } else {
-        // Navigate to user page (not created yet)
         navigate("/user/dashboard")
       }
     }
@@ -66,12 +65,14 @@ export default function Login() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
               placeholder="Email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
               className="w-full"
+              data-cy="email-input"
             />
           </div>
 
@@ -79,16 +80,23 @@ export default function Login() {
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
+              name="password"
               type="password"
               placeholder="Password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
               className="w-full"
+              data-cy="password-input"
             />
           </div>
 
-          <Button type="submit" disabled={isLoading} className="w-full bg-blue-600 hover:bg-blue-700">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            data-cy="login-button"
+          >
             {isLoading ? "Logging in..." : "Log In"}
           </Button>
         </form>

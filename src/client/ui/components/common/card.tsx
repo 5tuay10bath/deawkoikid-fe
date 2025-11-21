@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "src/infrastructure/libs/cn/cn"
+import { cn } from "@infrastructure/libs/cn/cn"
 
 // import styled from 'styled-components'
 function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

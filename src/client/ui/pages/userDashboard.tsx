@@ -2,54 +2,17 @@ import { useAuthStore } from "../stores/auth.store"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../components/common/Button"
 import { Upload } from "lucide-react"
-import { useRef, useState } from "react"
-import { useToast } from "../components/hooks/useToast"
+import { useState } from "react"
+import UploadPaymentDialog from "../components/userDashboardCom/UploadPaymentDialog"
 
 export default function UserDashboard() {
   const { fullName, userEmail, logout } = useAuthStore()
   const navigate = useNavigate()
-  const { toast } = useToast()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
     navigate("/login")
-  }
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select an image file (PNG, JPG, etc.)",
-          variant: "destructive",
-        })
-        return
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select an image smaller than 5MB",
-          variant: "destructive",
-        })
-        return
-      }
-
-      setSelectedFile(file)
-      toast({
-        title: "File selected",
-        description: `${file.name} is ready to upload`,
-      })
-
-      // Logic Upload hub P
-    }
-  }
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click()
   }
 
   return (
@@ -78,12 +41,10 @@ export default function UserDashboard() {
             <h3 className="mb-4 text-lg font-semibold text-gray-900">Quick Actions</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-                <Button variant="outline" className="w-full" onClick={handleUploadClick}>
+                <Button variant="outline" className="w-full" onClick={() => setIsUploadOpen(true)}>
                   <Upload className="mr-2 h-4 w-4" />
                   Upload Payment Proof
                 </Button>
-                {selectedFile && <p className="mt-2 text-xs text-gray-600 truncate">Selected: {selectedFile.name}</p>}
               </div>
               <Button variant="outline" className="w-full">
                 Payment History
@@ -98,6 +59,8 @@ export default function UserDashboard() {
           </div>
         </div>
       </div>
+
+      <UploadPaymentDialog isOpen={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
     </div>
   )
 }
