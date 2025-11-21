@@ -44,7 +44,7 @@ export default function Dashboard() {
   const [viewBy, setViewBy] = useState<"floor" | "room">("floor")
   const [timeFrame, setTimeFrame] = useState<"month" | "year">("month")
 
-  const debounceTimeoutRef = useRef<number | null>(null)
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleViewByChange = useCallback((value: string) => {
     if (debounceTimeoutRef.current) {

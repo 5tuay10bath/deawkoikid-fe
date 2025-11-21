@@ -8,6 +8,7 @@ import NewTaskDialog, { NewSupplyDialog } from "../components/maintenanceCom/Dia
 import MaintainTable, { SupplyTable } from "../components/maintenanceCom/Table"
 import { TableLoading } from "../components/common/TableLoading"
 import { useEffect } from "react"
+import MaintenanceSchedule from "../components/maintenanceCom/Schedule"
 
 export default function Maintenance() {
   const { tasks, supplies, searchTerm, isLoading, setSearchTerm, getMaintenanceTasks, getSupplies } =
@@ -145,14 +146,7 @@ export default function Maintenance() {
         </TabsContent>
 
         <TabsContent value="schedule" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Scheduled Maintenance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Feature coming soon - Schedule recurring maintenance reminders</p>
-            </CardContent>
-          </Card>
+          <MaintenanceSchedule />
         </TabsContent>
       </Tabs>
     </div>

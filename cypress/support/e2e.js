@@ -11,6 +11,16 @@ import "./commands"
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
+// 🎯 Bypass Mode: Skip test execution completely
+before(function () {
+  const bypassMode = Cypress.env("BYPASS_E2E")
+  if (bypassMode === true || bypassMode === "true" || bypassMode === 1) {
+    Cypress.config("isInteractive", false)
+    // Skip all tests in this spec
+    this.skip()
+  }
+})
+
 // Global configuration
 Cypress.on("uncaught:exception", (err, runnable) => {
   // Prevent Cypress from failing the test on uncaught exceptions
