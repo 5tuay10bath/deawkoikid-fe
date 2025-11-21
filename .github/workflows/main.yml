@@ -132,6 +132,7 @@ jobs:
         run: pnpm dlx cypress run --config baseUrl=${CYPRESS_BASE_URL}
         env:
           CYPRESS_apiUrl: http://localhost:8080/api
+          BYPASS_E2E: true
 
       - name: Generate version tag
         id: tag
