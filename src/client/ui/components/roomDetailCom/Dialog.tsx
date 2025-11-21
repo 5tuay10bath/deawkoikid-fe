@@ -3,7 +3,7 @@ import { useDashboardStore } from "@infrastructure/libs/store/dashboard.store"
 import { Button } from "../common/Button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../common/Dialog"
 import { useToast } from "../hooks/useToast"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Plus } from "lucide-react"
 import { Label } from "../common/Label"
 import { Input } from "../common/Input"
@@ -77,10 +77,13 @@ export const CheckOutDialog = () => {
 }
 
 export const AddBillingDialog = () => {
+  const { roomId } = useParams()
   const { isAddonOpen, addonForm, setIsAddonOpen, updateAddonForm, resetAddonForm } = useRoomDetailStore()
+  const { createExtraCharge } = useDashboardStore()
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleAddAddon = () => {
+  const handleAddAddon = async () => {
     if (!addonForm.topic || !addonForm.price) {
       toast({
         title: "Error",
@@ -89,13 +92,39 @@ export const AddBillingDialog = () => {
       })
       return
     }
-    toast({
-      title: "Add-on Charge Added",
-      description: `${addonForm.topic} charge of $${addonForm.price} added to tenant's bill`,
-    })
 
-    setIsAddonOpen(false)
-    resetAddonForm()
+    if (!roomId) {
+      toast({
+        title: "Error",
+        description: "Room ID not found",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+    const result = await createExtraCharge({
+      id: roomId,
+      topic: addonForm.topic,
+      description: addonForm.description,
+      price: Number(addonForm.price),
+    })
+    setIsLoading(false)
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: result.message || "Extra charge added successfully",
+      })
+      setIsAddonOpen(false)
+      resetAddonForm()
+    } else {
+      toast({
+        title: "Error",
+        description: result.message || "Failed to add extra charge",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -143,10 +172,12 @@ export const AddBillingDialog = () => {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setIsAddonOpen(false)}>
+            <Button variant="outline" onClick={() => setIsAddonOpen(false)} disabled={isLoading}>
               Cancel
             </Button>
-            <Button onClick={handleAddAddon}>Add Charge</Button>
+            <Button onClick={handleAddAddon} disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add Charge"}
+            </Button>
           </div>
         </div>
       </DialogContent>
