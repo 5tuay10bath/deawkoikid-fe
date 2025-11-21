@@ -1,5 +1,8 @@
 describe("Dashboard - Room Availability Overview", () => {
   it("should login and test all dashboard room availability functionality", () => {
+    // Intercept login API call to debug
+    cy.intercept("POST", "**/api/auth/login").as("loginRequest")
+
     // Login once at the beginning
     cy.visit("/login")
     cy.wait(500)
@@ -13,17 +16,14 @@ describe("Dashboard - Room Availability Overview", () => {
 
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    cy.wait(2000) // Wait for API call to complete
-    cy.url({ timeout: 30000 }).should("not.include", "/login")
-
-    // Alternative: force navigate if still on login page
-    cy.url().then((url) => {
-      if (url.includes("/login")) {
-        cy.log("Still on login page, forcing navigation to dashboard")
-        cy.visit("/dashboard")
-      }
+    // Wait for login API call to complete
+    cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
+      cy.log("Login API Response:", interception.response.statusCode)
+      expect(interception.response.statusCode).to.eq(200)
     })
 
+    // Wait for redirect
+    cy.url({ timeout: 30000 }).should("not.include", "/login")
     cy.getCookie("auth_token").should("exist")
 
     // Test 1: Display all 24 rooms with availability status across 2 floors

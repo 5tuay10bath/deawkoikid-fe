@@ -23,22 +23,20 @@ describe("Authentication", () => {
     // Submit login
     cy.get('[data-cy="login-button"]').click({ force: true })
 
+    // Wait for login API call to complete
+    cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
+      cy.log("Login API Response:", interception.response.statusCode)
+      expect(interception.response.statusCode).to.eq(200)
+    })
+
     // Wait for redirect with longer timeout for CI
     cy.url({ timeout: 30000 }).should("not.include", "/login")
-
-    // Alternative: force navigate if still on login page
-    cy.url().then((url) => {
-      if (url.includes("/login")) {
-        cy.log("Still on login page, forcing navigation to dashboard")
-        cy.visit("/dashboard")
-      }
-    })
 
     // Verify auth token exists
     cy.getCookie("auth_token").should("exist")
 
     // Verify we're on dashboard
-    cy.visit("/dashboard")
-    cy.contains("Property Dashboard").should("be.visible")
+    cy.url().should("include", "/dashboard")
+    cy.contains("Property Dashboard", { timeout: 10000 }).should("be.visible")
   })
 })
