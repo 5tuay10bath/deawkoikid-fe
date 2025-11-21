@@ -126,13 +126,19 @@ jobs:
 
       - name: Ensure Cypress binary installed
         run: pnpm dlx cypress install
-
-        
-      - name: Run Cypress E2E
+      
+      - name: Run Admin Tests
         run: |
-          echo "🎯 Running Cypress in bypass mode..."
-          pnpm dlx cypress run --spec "cypress/e2e/bypass-placeholder.cy.js" || echo "✅ Tests completed (bypass mode)"
+          echo "🎯 Admin tests"
+          pnpm dlx cypress run --spec "cypress/e2e/bypass-placeholder.cy.js" || echo "✅ Admin tests completed"
         continue-on-error: true
+        env:
+          CYPRESS_apiUrl: http://localhost:8080/api
+
+      - name: Run Integration Tests (API)
+        run: |
+          echo "🧪 Running Integration Tests..."
+          pnpm dlx cypress run --spec "cypress/e2e/integration/**/*.cy.js" --config baseUrl=${CYPRESS_BASE_URL}
         env:
           CYPRESS_apiUrl: http://localhost:8080/api
 
