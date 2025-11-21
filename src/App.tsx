@@ -19,6 +19,7 @@ import Home from "@client/ui/pages/home"
 import Login from "@client/ui/pages/login"
 import SignUp from "@client/ui/pages/signUp"
 import UserDashboard from "@client/ui/pages/userDashboard"
+import TenantDashboard from "@client/ui/pages/tenantDashboard"
 import Buildings from "@client/ui/pages/building"
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -86,6 +87,16 @@ export default function App() {
             <ClientLayout>
               <ProtectedRoute requiredRole="USER">
                 <UserDashboard />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
+        <Route
+          path="/tenant/dashboard"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <TenantDashboard />
               </ProtectedRoute>
             </ClientLayout>
           }

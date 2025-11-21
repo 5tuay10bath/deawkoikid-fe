@@ -6,7 +6,7 @@ import { jwtUtils } from "@shared/utils/jwt.utils"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  requiredRole?: "ADMIN" | "USER"
+  requiredRole?: "ADMIN" | "USER" | "TENANT"
 }
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
@@ -54,15 +54,21 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
 
     // Check role if required
     if (requiredRole && roleFromToken !== requiredRole) {
-      // If user is not admin but trying to access admin route
-      if (requiredRole === "ADMIN" && roleFromToken === "USER") {
-        return <Navigate to="/user/dashboard" replace />
+      // Admin-only route hit by non-admin
+      if (requiredRole === "ADMIN" && roleFromToken && roleFromToken !== "ADMIN") {
+        if (roleFromToken === "USER") return <Navigate to="/user/dashboard" replace />
+        if (roleFromToken === "TENANT") return <Navigate to="/tenant/dashboard" replace />
       }
-      // If admin trying to access user route
-      if (requiredRole === "USER" && roleFromToken === "ADMIN") {
-        return <Navigate to="/dashboard" replace />
+      // User-only route hit by other roles
+      if (requiredRole === "USER") {
+        if (roleFromToken === "ADMIN") return <Navigate to="/dashboard" replace />
+        if (roleFromToken === "TENANT") return <Navigate to="/tenant/dashboard" replace />
       }
-      // Unknown role - redirect to login
+      // Tenant-only route hit by other roles
+      if (requiredRole === "TENANT") {
+        if (roleFromToken === "ADMIN") return <Navigate to="/dashboard" replace />
+        if (roleFromToken === "USER") return <Navigate to="/user/dashboard" replace />
+      }
       return <Navigate to="/login" replace />
     }
   } else {
