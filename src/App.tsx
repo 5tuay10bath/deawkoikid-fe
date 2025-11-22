@@ -185,6 +185,16 @@ export default function App() {
           }
         />
         <Route
+          path="/payments"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminLayout>
+                <Payments />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/check-in/:roomId"
           element={
             <ProtectedRoute requiredRole="ADMIN">
