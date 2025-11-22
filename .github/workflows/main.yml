@@ -120,9 +120,7 @@ jobs:
         env:
           CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
           CYPRESS_apiUrl: http://localhost:8080/api
-          USE_MOCK_API: true
-          CYPRESS_BYPASS_E2E: true
-        run: pnpm dlx cypress run --spec "cypress/e2e/admin/**/*.cy.*"
+        run: pnpm dlx cypress run --spec "cypress/e2e/admin/**/.cy." --env USE_MOCK_API=true
 
       # - name: Run Cypress API integration 
       #   if: ${{ vars.RUN_API_TESTS == 'true' || env.RUN_API_TESTS == 'true' }}
