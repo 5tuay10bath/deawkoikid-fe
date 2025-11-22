@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { Upload, Check, Loader2, AlertCircle, RefreshCcw } from "lucide-react"
 import { format } from "date-fns"
-import axios from "axios"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../common/Dialog"
 import { Button } from "../common/Button"
 import { useToast } from "../hooks/useToast"
@@ -53,8 +52,6 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
   const [invoiceError, setInvoiceError] = useState<string | null>(null)
   const [unpaidInvoices, setUnpaidInvoices] = useState<TenantInvoice[]>([])
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
-
-  const API_BASE_URL = import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || "http://localhost:8080"
 
   useEffect(() => {
     if (!isOpen) {
@@ -130,15 +127,16 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
     }
   }
 
-  const fetchPresignedUrl = async (fileExtension: string) => {
+  const fetchPresignedUrl = async (fileExtension: string, invoiceId: string) => {
     setIsLoadingUrl(true)
     try {
-      const datetime = format(new Date(), "yyyyMMddHHmmss")
-      const filePath = `img/receipt/${datetime}${fileExtension}`
-      const response = await axios.get(`${API_BASE_URL}/api/public/presigned-url/upload?filePath=${filePath}`)
+      const filePath = `img/receipt/${invoiceId}${fileExtension}`
+      const { data } = await axiosInstance.get("/public/presigned-url/upload", {
+        params: { filePath },
+      })
 
-      if (response.data) {
-        setPresignedUrl(response.data)
+      if (data) {
+        setPresignedUrl(data)
       }
     } catch {
       toast({
@@ -155,6 +153,16 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
+
+    if (!selectedInvoiceId) {
+      toast({
+        title: "No invoice selected",
+        description: "Please select an invoice before uploading a payment proof.",
+        variant: "destructive",
+      })
+      event.target.value = ""
+      return
+    }
 
     if (!file.type.startsWith("image/")) {
       toast({
@@ -180,7 +188,7 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
 
     setSelectedFile(file)
 
-    await fetchPresignedUrl(fileExtension)
+    await fetchPresignedUrl(fileExtension, selectedInvoiceId)
   }
 
   const handleUpload = async () => {
@@ -195,7 +203,7 @@ export default function UploadPaymentDialog({ isOpen, onClose }: UploadPaymentDi
 
     setIsUploading(true)
     try {
-      await axios.put(presignedUrl, selectedFile, {
+      await axiosInstance.put(presignedUrl, selectedFile, {
         headers: {
           "Content-Type": selectedFile.type || "application/octet-stream",
         },

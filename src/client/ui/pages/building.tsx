@@ -1,4 +1,3 @@
-import React from "react"
 import DialogBuildings from "../components/buildingsCom/Dialog"
 
 export default function Buildings() {

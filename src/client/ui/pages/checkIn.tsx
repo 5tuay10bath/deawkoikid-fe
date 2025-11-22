@@ -1,3 +1,4 @@
+import type React from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { CalendarIcon, ArrowLeft } from "lucide-react"
 import { format } from "date-fns"
@@ -155,7 +156,8 @@ export default function CheckIn() {
                         mode="single"
                         selected={formData.checkOutDate}
                         onSelect={(date) => date && handleInputChange("checkOutDate", date)}
-                        disabled={(date) => date < formData.checkInDate}
+                        disabled={!formData.checkInDate}
+                        min={formData.checkInDate ? format(formData.checkInDate, "yyyy-MM-dd") : undefined}
                         initialFocus
                       />
                     </PopoverContent>

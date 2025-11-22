@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { Upload, Check, Loader2 } from "lucide-react"
-import { format } from "date-fns"
-import axios from "axios"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog"
 import { Button } from "./Button"
 import { useToast } from "../hooks/useToast"
@@ -22,8 +21,6 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
-  const API_BASE_URL = import.meta.env.VITE_DEAWKOIKID_API_BASE_URL || "http://localhost:8080"
-
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
@@ -36,9 +33,10 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
   const fetchPresignedUrl = async (fileExtension: string) => {
     setIsLoadingUrl(true)
     try {
-      const datetime = format(new Date(), "yyyyMMddHHmmss")
-      const filePath = `img/${type}/${datetime}_${id}${fileExtension}`
-      const response = await axios.get(`${API_BASE_URL}/api/public/presigned-url/upload?filePath=${filePath}`)
+      const filePath = `img/${type}/${id}${fileExtension}`
+      const response = await axiosInstance.get("/public/presigned-url/upload", {
+        params: { filePath },
+      })
 
       if (response.data) {
         setPresignedUrl(response.data)
@@ -94,7 +92,7 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
     setIsUploading(true)
     try {
       // Upload file to S3 using presigned URL with PUT method and binary body
-      await axios.put(presignedUrl, selectedFile, {
+      await axiosInstance.put(presignedUrl, selectedFile, {
         headers: {
           "Content-Type": selectedFile.type || "application/octet-stream",
         },
@@ -102,7 +100,7 @@ export default function UploadFileDialog({ isOpen, onClose, type, id }: UploadFi
 
       // If contract type, update contract status
       if (type === "contracts") {
-        await axios.put(`${API_BASE_URL}/api/contracts/status/${id}`)
+        await axiosInstance.put(`/contracts/status/${id}`)
       }
 
       setUploadSuccess(true)
