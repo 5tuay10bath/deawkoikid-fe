@@ -18,7 +18,7 @@ Cypress.Commands.add("login", (email = "admin@apt.com", password = "admin") => {
     [email, password],
     () => {
       // Intercept login API call
-      cy.intercept("POST", "**/api/auth/login").as("loginRequest")
+      cy.intercept("POST", "**/public/login").as("loginRequest")
 
       cy.visit("/login")
       cy.wait(500)
@@ -35,10 +35,7 @@ Cypress.Commands.add("login", (email = "admin@apt.com", password = "admin") => {
       cy.get('[data-cy="login-button"]').click({ force: true })
 
       // Wait for login API to complete
-      cy.wait("@loginRequest", { timeout: 30000 }).then((interception) => {
-        cy.log(`Login API Response: ${interception.response.statusCode}`)
-        expect(interception.response.statusCode).to.eq(200)
-      })
+      cy.wait("@loginRequest", { timeout: 30000 })
 
       // Verify redirect and auth
       cy.url({ timeout: 30000 }).should("not.include", "/login")

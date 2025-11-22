@@ -52,7 +52,6 @@ export default defineConfig({
     pageLoadTimeout: 60000,
     // Browser settings
     chromeWebSecurity: false,
-    experimentalStudio: true,
   },
   component: {
     devServer: {

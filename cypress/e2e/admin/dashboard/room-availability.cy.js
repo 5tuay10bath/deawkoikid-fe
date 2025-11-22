@@ -1,8 +1,6 @@
 describe("Dashboard - Room Availability Overview", () => {
   it("should login and test all dashboard room availability functionality", () => {
     // Intercept login API call to debug
-    cy.intercept("POST", "**/api/auth/login").as("loginRequest")
-
     // Login once at the beginning
     cy.visit("/login")
     cy.wait(500)
@@ -16,7 +14,6 @@ describe("Dashboard - Room Availability Overview", () => {
 
     cy.get('[data-cy="login-button"]').click({ force: true })
 
-    // Wait for redirect
     cy.url({ timeout: 30000 }).should("not.include", "/login")
     cy.getCookie("auth_token").should("exist")
 

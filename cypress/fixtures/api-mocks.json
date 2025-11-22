@@ -1,0 +1,427 @@
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhcHQuY29tIiwicm9sZSI6IkFETUlOIiwidXNlcklkIjoiYWRtaW4tMTIzIiwiZXhwIjoxODkzNDU2MDAwfQ.signature",
+  "loginResponse": {
+    "status": "success",
+    "message": "Login successful",
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBhcHQuY29tIiwicm9sZSI6IkFETUlOIiwidXNlcklkIjoiYWRtaW4tMTIzIiwiZXhwIjoxODkzNDU2MDAwfQ.signature",
+      "email": "admin@apt.com",
+      "fullName": "Admin User",
+      "role": "ADMIN",
+      "message": "Login successful"
+    },
+    "timestamp": "2025-01-01T00:00:00Z"
+  },
+  "tenants": [
+    {
+      "id": "tenant-1",
+      "fullName": "John Smith",
+      "phone": "+1 (555) 0101",
+      "email": "john.smith@email.com",
+      "identificationNumber": "ID-001",
+      "profileImageUrl": null,
+      "role": "TENANT",
+      "birthDate": "1990-01-15T00:00:00Z",
+      "active": true,
+      "emergencyContactName": "Jane Smith",
+      "emergencyContactPhone": "+1 (555) 0102"
+    },
+    {
+      "id": "tenant-2",
+      "fullName": "Alice Johnson",
+      "phone": "+1 (555) 0202",
+      "email": "alice.johnson@email.com",
+      "identificationNumber": "ID-002",
+      "profileImageUrl": null,
+      "role": "TENANT",
+      "birthDate": "1988-03-22T00:00:00Z",
+      "active": false,
+      "emergencyContactName": "Bob Johnson",
+      "emergencyContactPhone": "+1 (555) 0203"
+    },
+    {
+      "id": "tenant-3",
+      "fullName": "Carlos Diaz",
+      "phone": "+1 (555) 0303",
+      "email": "carlos.diaz@email.com",
+      "identificationNumber": "ID-003",
+      "profileImageUrl": null,
+      "role": "TENANT",
+      "birthDate": "1992-07-08T00:00:00Z",
+      "active": true,
+      "emergencyContactName": "Maria Diaz",
+      "emergencyContactPhone": "+1 (555) 0304"
+    }
+  ],
+  "units": [
+    {
+      "id": "unit-101",
+      "address": "123 Main St",
+      "unitNumber": "A101",
+      "unitType": "A",
+      "unitSize": 34,
+      "unitStatus": "AVAILABLE",
+      "floor": 1,
+      "latestAirconService": "2024-09-01T00:00:00Z"
+    },
+    {
+      "id": "unit-102",
+      "address": "123 Main St",
+      "unitNumber": "A102",
+      "unitType": "B",
+      "unitSize": 40,
+      "unitStatus": "OCCUPIED",
+      "floor": 1,
+      "latestAirconService": "2024-09-15T00:00:00Z"
+    },
+    {
+      "id": "unit-201",
+      "address": "123 Main St",
+      "unitNumber": "B201",
+      "unitType": "C",
+      "unitSize": 32,
+      "unitStatus": "RESERVED",
+      "floor": 2,
+      "latestAirconService": "2024-09-10T00:00:00Z"
+    },
+    {
+      "id": "unit-202",
+      "address": "123 Main St",
+      "unitNumber": "B202",
+      "unitType": "A",
+      "unitSize": 28,
+      "unitStatus": "PENDING",
+      "floor": 2,
+      "latestAirconService": "2024-09-12T00:00:00Z"
+    }
+  ],
+  "dashboard": [
+    {
+      "id": "unit-101",
+      "address": "123 Main St",
+      "unitNumber": "A101",
+      "unitType": "A",
+      "unitSize": 34,
+      "unitStatus": "AVAILABLE",
+      "floor": 1,
+      "latestAirconService": "2024-09-01T00:00:00Z",
+      "contracts": []
+    },
+    {
+      "id": "unit-102",
+      "address": "123 Main St",
+      "unitNumber": "A102",
+      "unitType": "B",
+      "unitSize": 40,
+      "unitStatus": "OCCUPIED",
+      "floor": 1,
+      "latestAirconService": "2024-09-15T00:00:00Z",
+      "contract": {
+        "id": "contract-102",
+        "user": {
+          "id": "tenant-1",
+          "fullName": "John Smith",
+          "phone": "+1 (555) 0101",
+          "email": "john.smith@email.com",
+          "identificationNumber": "ID-001",
+          "profileImageUrl": null,
+          "role": "TENANT",
+          "birthDate": "1990-01-15T00:00:00Z",
+          "active": true,
+          "emergencyContactName": "Jane Smith",
+          "emergencyContactPhone": "+1 (555) 0102"
+        },
+        "unit": {
+          "id": "unit-102",
+          "address": "123 Main St",
+          "unitNumber": "A102",
+          "unitType": "B",
+          "unitSize": 40,
+          "unitStatus": "OCCUPIED",
+          "floor": 1,
+          "latestAirconService": "2024-09-15T00:00:00Z"
+        },
+        "rentType": "MONTHLY",
+        "rentAmount": 1200,
+        "waterBillingType": "PER_UNIT",
+        "internet": true,
+        "startDate": "2024-09-01T00:00:00Z",
+        "endDate": "2025-08-31T00:00:00Z",
+        "status": "ACTIVE"
+      },
+      "contracts": [
+        {
+          "id": "contract-102",
+          "user": {
+            "id": "tenant-1",
+            "fullName": "John Smith",
+            "phone": "+1 (555) 0101",
+            "email": "john.smith@email.com",
+            "identificationNumber": "ID-001",
+            "profileImageUrl": null,
+            "role": "TENANT",
+            "birthDate": "1990-01-15T00:00:00Z",
+            "active": true,
+            "emergencyContactName": "Jane Smith",
+            "emergencyContactPhone": "+1 (555) 0102"
+          },
+          "unit": {
+            "id": "unit-102",
+            "address": "123 Main St",
+            "unitNumber": "A102",
+            "unitType": "B",
+            "unitSize": 40,
+            "unitStatus": "OCCUPIED",
+            "floor": 1,
+            "latestAirconService": "2024-09-15T00:00:00Z"
+          },
+          "rentType": "MONTHLY",
+          "rentAmount": 1200,
+          "waterBillingType": "PER_UNIT",
+          "internet": true,
+          "startDate": "2024-09-01T00:00:00Z",
+          "endDate": "2025-08-31T00:00:00Z",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "id": "unit-201",
+      "address": "123 Main St",
+      "unitNumber": "B201",
+      "unitType": "C",
+      "unitSize": 32,
+      "unitStatus": "RESERVED",
+      "floor": 2,
+      "latestAirconService": "2024-09-10T00:00:00Z",
+      "contract": {
+        "id": "contract-201",
+        "user": {
+          "id": "tenant-3",
+          "fullName": "Carlos Diaz",
+          "phone": "+1 (555) 0303",
+          "email": "carlos.diaz@email.com",
+          "identificationNumber": "ID-003",
+          "profileImageUrl": null,
+          "role": "TENANT",
+          "birthDate": "1992-07-08T00:00:00Z",
+          "active": true,
+          "emergencyContactName": "Maria Diaz",
+          "emergencyContactPhone": "+1 (555) 0304"
+        },
+        "unit": {
+          "id": "unit-201",
+          "address": "123 Main St",
+          "unitNumber": "B201",
+          "unitType": "C",
+          "unitSize": 32,
+          "unitStatus": "RESERVED",
+          "floor": 2,
+          "latestAirconService": "2024-09-10T00:00:00Z"
+        },
+        "rentType": "YEARLY",
+        "rentAmount": 14500,
+        "waterBillingType": "PER_UNIT",
+        "internet": true,
+        "startDate": "2025-01-01T00:00:00Z",
+        "endDate": "2025-12-31T00:00:00Z",
+        "status": "SIGNED"
+      },
+      "contracts": []
+    },
+    {
+      "id": "unit-202",
+      "address": "123 Main St",
+      "unitNumber": "B202",
+      "unitType": "A",
+      "unitSize": 28,
+      "unitStatus": "PENDING",
+      "floor": 2,
+      "latestAirconService": "2024-09-12T00:00:00Z",
+      "contracts": []
+    }
+  ],
+  "payments": [
+    {
+      "id": "payment-1",
+      "contract": {
+        "id": "contract-102",
+        "user": {
+          "id": "tenant-1",
+          "fullName": "John Smith",
+          "phone": "+1 (555) 0101",
+          "email": "john.smith@email.com",
+          "identificationNumber": "ID-001",
+          "profileImageUrl": null,
+          "role": "TENANT",
+          "birthDate": "1990-01-15T00:00:00Z",
+          "active": true,
+          "emergencyContactName": "Jane Smith",
+          "emergencyContactPhone": "+1 (555) 0102"
+        },
+        "unit": {
+          "id": "unit-102",
+          "address": "123 Main St",
+          "unitNumber": "A102",
+          "unitType": "B",
+          "unitSize": 40,
+          "unitStatus": "OCCUPIED",
+          "floor": 1,
+          "latestAirconService": "2024-09-15T00:00:00Z"
+        },
+        "rentType": "MONTHLY",
+        "rentAmount": 1200,
+        "waterBillingType": "PER_UNIT",
+        "internet": true,
+        "startDate": "2024-09-01T00:00:00Z",
+        "endDate": "2025-08-31T00:00:00Z",
+        "status": "ACTIVE"
+      },
+      "apartmentConfig": {
+        "id": "apt-1",
+        "electricPricePerUnit": 7.5,
+        "waterPricePerUnit": 4.2,
+        "commonFee": 75,
+        "internetPrice": 45,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-01T00:00:00Z"
+      },
+      "billingMonth": "2024-12-01T00:00:00Z",
+      "electricUsage": 85,
+      "waterUsage": 45,
+      "status": "PAID",
+      "dueDate": "2024-12-10T00:00:00Z",
+      "totalAmount": 1350,
+      "paidDate": "2024-12-05T00:00:00Z"
+    },
+    {
+      "id": "payment-2",
+      "contract": {
+        "id": "contract-201",
+        "user": {
+          "id": "tenant-3",
+          "fullName": "Carlos Diaz",
+          "phone": "+1 (555) 0303",
+          "email": "carlos.diaz@email.com",
+          "identificationNumber": "ID-003",
+          "profileImageUrl": null,
+          "role": "TENANT",
+          "birthDate": "1992-07-08T00:00:00Z",
+          "active": true,
+          "emergencyContactName": "Maria Diaz",
+          "emergencyContactPhone": "+1 (555) 0304"
+        },
+        "unit": {
+          "id": "unit-201",
+          "address": "123 Main St",
+          "unitNumber": "B201",
+          "unitType": "C",
+          "unitSize": 32,
+          "unitStatus": "RESERVED",
+          "floor": 2,
+          "latestAirconService": "2024-09-10T00:00:00Z"
+        },
+        "rentType": "YEARLY",
+        "rentAmount": 14500,
+        "waterBillingType": "PER_UNIT",
+        "internet": true,
+        "startDate": "2025-01-01T00:00:00Z",
+        "endDate": "2025-12-31T00:00:00Z",
+        "status": "SIGNED"
+      },
+      "apartmentConfig": {
+        "id": "apt-1",
+        "electricPricePerUnit": 7.5,
+        "waterPricePerUnit": 4.2,
+        "commonFee": 75,
+        "internetPrice": 45,
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-01T00:00:00Z"
+      },
+      "billingMonth": "2025-01-01T00:00:00Z",
+      "electricUsage": 90,
+      "waterUsage": 50,
+      "status": "OVERDUE",
+      "dueDate": "2025-01-10T00:00:00Z",
+      "totalAmount": 15200,
+      "paidDate": null
+    }
+  ],
+  "contracts": [
+    {
+      "id": "contract-102",
+      "user": {
+        "id": "tenant-1",
+        "fullName": "John Smith",
+        "phone": "+1 (555) 0101",
+        "email": "john.smith@email.com",
+        "identificationNumber": "ID-001",
+        "profileImageUrl": null,
+        "role": "TENANT",
+        "birthDate": "1990-01-15T00:00:00Z",
+        "active": true,
+        "emergencyContactName": "Jane Smith",
+        "emergencyContactPhone": "+1 (555) 0102"
+      },
+      "unit": {
+        "id": "unit-102",
+        "address": "123 Main St",
+        "unitNumber": "A102",
+        "unitType": "B",
+        "unitSize": 40,
+        "unitStatus": "OCCUPIED",
+        "floor": 1,
+        "latestAirconService": "2024-09-15T00:00:00Z"
+      },
+      "rentType": "MONTHLY",
+      "rentAmount": 1200,
+      "waterBillingType": "PER_UNIT",
+      "internet": true,
+      "startDate": "2024-09-01T00:00:00Z",
+      "endDate": "2025-08-31T00:00:00Z",
+      "status": "ACTIVE"
+    }
+  ],
+  "maintenances": [
+    {
+      "id": "maint-1",
+      "title": "AC check",
+      "description": "Routine AC maintenance",
+      "priority": "MEDIUM",
+      "maintenanceType": "AIR_CONDITIONAL",
+      "status": "SCHEDULED",
+      "unit": {
+        "id": "unit-101",
+        "unitNumber": "A101"
+      },
+      "createdAt": "2024-10-01T00:00:00Z"
+    }
+  ],
+  "supplies": [
+    {
+      "id": "supply-1",
+      "name": "Air filters",
+      "category": "Maintenance",
+      "quantity": 12,
+      "unit": "pieces",
+      "status": "IN_STOCK"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "building-1",
+      "name": "Main Building",
+      "address": "123 Main St",
+      "floors": 2
+    }
+  ],
+  "extraCharges": [
+    {
+      "id": "extra-1",
+      "topic": "Late fee",
+      "description": "Late payment for November",
+      "price": 25,
+      "createdAt": "2024-11-15T00:00:00Z"
+    }
+  ]
+}

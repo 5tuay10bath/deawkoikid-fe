@@ -84,39 +84,34 @@ jobs:
           echo "Testing auth endpoint..."
           curl -v http://localhost:8080/api/auth/login -X POST -H "Content-Type: application/json" -d '{"email":"test","password":"test"}' || echo "Auth endpoint check (expected to fail with 401/400)"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Enable pnpm cache
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
+          cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
       - name: Start frontend
-        run: pnpm dev &
+        run: pnpm dev -- --host --port 3000 >/tmp/devserver.log 2>&1 &
         env:
           NODE_ENV: test
           VITE_DEAWKOIKID_API_BASE_URL: http://localhost:8080
 
       - name: Wait for frontend
         run: |
-          npx wait-on http://localhost:3000
+          npx wait-on http://localhost:3000/fivetuay10bath-frontend
           echo "✅ Frontend is ready"
           echo "Testing frontend connectivity..."
-          curl -I http://localhost:3000/fivetuay10bath-frontend/ || echo "Frontend check"
-          sleep 3
+          curl -I http://localhost:3000/fivetuay10bath-frontend/ || true
+          sleep 2
 
       - name: Cache Cypress binary
         uses: actions/cache@v4
@@ -127,20 +122,20 @@ jobs:
       - name: Ensure Cypress binary installed
         run: pnpm dlx cypress install
       
-      - name: Run Admin Tests
-        run: |
-          echo "🎯 Admin tests"
-          pnpm dlx cypress run --spec "cypress/e2e/bypass-placeholder.cy.js" || echo "✅ Admin tests completed"
-        continue-on-error: true
+      - name: Run Cypress UI E2E (mocked backend)
         env:
+          CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
           CYPRESS_apiUrl: http://localhost:8080/api
+          USE_MOCK_API: true
+        run: pnpm dlx cypress run --spec "cypress/e2e/admin/**/*.cy.*"
 
-      # - name: Run Integration Tests (API)
-      #   run: |
-      #     echo "🧪 Running Integration Tests..."
-      #     pnpm dlx cypress run --spec "cypress/e2e/integration/**/*.cy.js" --config baseUrl=${CYPRESS_BASE_URL}
-      #   env:
-      #     CYPRESS_apiUrl: http://localhost:8080/api
+      - name: Run Cypress API integration (optional)
+        if: ${{ vars.RUN_API_TESTS == 'true' || env.RUN_API_TESTS == 'true' }}
+        env:
+          RUN_API_TESTS: true
+          apiUrl: http://localhost:8080/api
+          apiToken: ${{ secrets.API_TOKEN || '' }}
+        run: pnpm dlx cypress run --spec "cypress/e2e/integration/api/*.cy.js"
 
       - name: Generate version tag
         id: tag

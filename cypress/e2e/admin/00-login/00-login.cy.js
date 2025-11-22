@@ -5,9 +5,6 @@
 
 describe("Authentication", () => {
   it("should login successfully and verify dashboard access", () => {
-    // Intercept login API call to debug
-    cy.intercept("POST", "**/api/auth/login").as("loginRequest")
-
     // Visit login page
     cy.visit("/login")
     cy.wait(500)

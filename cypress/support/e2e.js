@@ -1,58 +1,139 @@
 // ***********************************************************
-// This example support/e2e.js is processed and
-// loaded automatically before your test files.
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
+// This support file is loaded automatically before test files.
+// It sets global config, mocks the backend by default (USE_MOCK_API),
+// and provides stable aliases for network calls.
 // ***********************************************************
 
-// Import commands.js using ES2015 syntax:
 import "./commands"
-
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
 
 // 🎯 Bypass Mode: Skip test execution completely
 before(function () {
   const bypassMode = Cypress.env("BYPASS_E2E")
   if (bypassMode === true || bypassMode === "true" || bypassMode === 1) {
     Cypress.config("isInteractive", false)
-    // Skip all tests in this spec
     this.skip()
   }
 })
 
+let apiMocks
+before(() => {
+  cy.fixture("api-mocks").then((data) => {
+    apiMocks = data
+  })
+})
+
+const successBody = (data) => ({
+  status: "success",
+  message: "ok",
+  data,
+})
+
 // Global configuration
-Cypress.on("uncaught:exception", (err, runnable) => {
-  // Prevent Cypress from failing the test on uncaught exceptions
-  // You can customize this based on your needs
-  if (err.message.includes("ResizeObserver loop limit exceeded")) {
-    return false
-  }
-  if (err.message.includes("Non-Error promise rejection captured")) {
-    return false
-  }
-  // Don't fail on these common React development errors
-  if (err.message.includes("ChunkLoadError")) {
-    return false
-  }
+Cypress.on("uncaught:exception", (err) => {
+  if (err.message.includes("ResizeObserver loop limit exceeded")) return false
+  if (err.message.includes("Non-Error promise rejection captured")) return false
+  if (err.message.includes("ChunkLoadError")) return false
   return true
 })
 
 // Set up global hooks
 beforeEach(() => {
-  // Mock common API endpoints that might be called by default
+  // Health endpoint
   cy.intercept("GET", "/api/health", { statusCode: 200, body: { status: "ok" } })
 
-  // Set up viewport consistently
+  // Consistent viewport
   cy.viewport(1280, 720)
 
-  // Clear localStorage and sessionStorage before each test
   cy.clearLocalStorage()
   cy.clearCookies()
 
-  // Mock authentication for tests that need it
+  // Mock or spy backend APIs
+  const useMockApi = Cypress.env("USE_MOCK_API") !== false && !!apiMocks
+
+  if (useMockApi) {
+    // Generic fallbacks first (specific stubs below will override)
+    cy.intercept("GET", "**/api/**", { statusCode: 200, body: successBody([]) })
+    cy.intercept(["POST", "PUT", "DELETE"], "**/api/**", {
+      statusCode: 200,
+      body: { status: "success", message: "ok", timestamp: new Date().toISOString() },
+    })
+
+    cy.intercept("POST", "**/public/login", {
+      statusCode: 200,
+      body: apiMocks.loginResponse,
+    }).as("mockLogin")
+    cy.intercept("POST", "**/public/login", {
+      statusCode: 200,
+      body: apiMocks.loginResponse,
+    }).as("loginRequest")
+
+    cy.intercept("GET", "**/dashboard", {
+      statusCode: 200,
+      body: successBody(apiMocks.dashboard),
+    }).as("mockDashboard")
+
+    cy.intercept("GET", "**/dashboard/*/extra-charges", {
+      statusCode: 200,
+      body: successBody(apiMocks.extraCharges),
+    }).as("mockExtraCharges")
+
+    cy.intercept("PUT", "**/dashboard/check-in/*", {
+      statusCode: 200,
+      body: { status: "success", message: "Check-in completed", timestamp: new Date().toISOString() },
+    })
+    cy.intercept("PUT", "**/dashboard/check-out/*", {
+      statusCode: 200,
+      body: { status: "success", message: "Check-out completed", timestamp: new Date().toISOString() },
+    })
+
+    cy.intercept("GET", "**/units", {
+      statusCode: 200,
+      body: successBody(apiMocks.units),
+    }).as("mockUnits")
+
+    cy.intercept("GET", "**/users", {
+      statusCode: 200,
+      body: successBody(apiMocks.tenants),
+    }).as("mockUsers")
+
+    cy.intercept("GET", "**/contracts*", {
+      statusCode: 200,
+      body: successBody(apiMocks.contracts || []),
+    }).as("mockContracts")
+
+    cy.intercept("GET", "**/maintenances*", {
+      statusCode: 200,
+      body: successBody(apiMocks.maintenances || []),
+    }).as("mockMaintenances")
+
+    cy.intercept("GET", "**/supplies*", {
+      statusCode: 200,
+      body: successBody(apiMocks.supplies || []),
+    }).as("mockSupplies")
+
+    cy.intercept("GET", "**/buildings*", {
+      statusCode: 200,
+      body: successBody(apiMocks.buildings || []),
+    }).as("mockBuildings")
+
+    cy.intercept("GET", "**/invoices*", {
+      statusCode: 200,
+      body: successBody(apiMocks.payments),
+    }).as("mockInvoices")
+    cy.intercept("GET", "**/public/invoices*", {
+      statusCode: 200,
+      body: successBody(apiMocks.payments),
+    }).as("mockPublicInvoices")
+  } else {
+    // Still create aliases so cy.wait works when hitting real backend
+    cy.intercept("POST", "**/public/login").as("mockLogin")
+    cy.intercept("POST", "**/public/login").as("loginRequest")
+  }
+
+  // Default auth context for pages that read localStorage and cookies
+  const token = (apiMocks && apiMocks.token) || "mock-jwt-token"
   cy.window().then((win) => {
-    win.localStorage.setItem("authToken", "mock-jwt-token")
+    win.localStorage.setItem("authToken", token)
     win.localStorage.setItem(
       "user",
       JSON.stringify({
@@ -63,16 +144,17 @@ beforeEach(() => {
       }),
     )
   })
+  cy.setCookie("auth_token", token)
+  cy.setCookie("full_name", (apiMocks && apiMocks.loginResponse?.data?.fullName) || "Admin User")
 })
 
 afterEach(() => {
-  // Clean up after each test
   cy.clearLocalStorage()
   cy.clearCookies()
 })
 
 // Custom assertions
-chai.use((chai, utils) => {
+chai.use((chai) => {
   chai.Assertion.addMethod("visible", function () {
     const obj = this._obj
     this.assert(obj.is(":visible"), "expected #{this} to be visible", "expected #{this} to not be visible")
@@ -99,11 +181,9 @@ Cypress.Commands.add("getByTestId", (testId) => {
 })
 
 // Global error handling for network requests
-cy.on("fail", (err, runnable) => {
-  // Handle specific test failures
+cy.on("fail", (err) => {
   if (err.message.includes("Timed out waiting for element")) {
     console.log("Element timeout - this might be expected behavior")
-    // You can add custom logic here
   }
   throw err
 })

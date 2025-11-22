@@ -1,8 +1,5 @@
 describe("Basic App Functionality", () => {
   it("should login and test all basic functionality", () => {
-    // Intercept login API call to debug
-    cy.intercept("POST", "**/api/auth/login").as("loginRequest")
-
     // Login once at the beginning
     cy.visit("/login")
     cy.wait(500)
