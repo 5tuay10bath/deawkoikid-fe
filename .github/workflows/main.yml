@@ -81,9 +81,6 @@ jobs:
             docker logs be | tail -n 20
             sleep 2
           done
-          echo "Testing auth endpoint..."
-          curl -v http://localhost:8080/api/auth/login -X POST -H "Content-Type: application/json" -d '{"email":"test","password":"test"}' || echo "Auth endpoint check (expected to fail with 401/400)"
-
       
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
