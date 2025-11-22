@@ -6,6 +6,8 @@ import type { PaymentsModel } from "@domain/models/payments.model"
 import type { ApiResponse } from "@domain/models/apiResponse.model"
 import { PaymentsMapper } from "../port/payments.mapper"
 import { left, right } from "@shared/either"
+import { cookieUtils } from "@shared/utils/cookie.utils"
+import { jwtUtils } from "@shared/utils/jwt.utils"
 
 export class PaymentsRepository implements IPaymentsRepository {
   private static instance: PaymentsRepository
@@ -20,9 +22,17 @@ export class PaymentsRepository implements IPaymentsRepository {
     const {} = dto
 
     try {
-      const url = `/invoices`
+      const token = cookieUtils.getAuthToken()
+      const role = token ? jwtUtils.getRoleFromToken(token) : null
+      const userId = token ? jwtUtils.getIdFromToken(token) : null
 
-      const { data } = await axiosInstance.get(url)
+      // Tenants/users fetch only their invoices via public endpoint
+      const isTenant = role === "TENANT" || role === "USER"
+      const url = isTenant ? `/public/invoices` : `/invoices`
+
+      const { data } = await axiosInstance.get(url, {
+        params: isTenant && userId ? { userId, userid: userId } : undefined,
+      })
 
       const result: PaymentsModel[] = PaymentsMapper.toDomainArray(data.data)
 
