@@ -205,7 +205,12 @@ const EditTenantDialog = ({ isOpen, onClose, tenant }: EditTenantDialogProps) =>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-white" align="start">
-                <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} initialFocus />
+                <Calendar
+                  mode="single"
+                  selected={birthDate}
+                  onSelect={(date) => setBirthDate(date ?? undefined)}
+                  initialFocus
+                />
               </PopoverContent>
             </Popover>
           </div>

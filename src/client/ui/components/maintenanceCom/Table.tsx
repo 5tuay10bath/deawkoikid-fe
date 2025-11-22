@@ -52,13 +52,22 @@ const MaintainTable = () => {
     URGENT: { color: "bg-red-500 text-white", label: "Urgent" },
   }
 
-  const formatDateTimeLocal = (date: Date | null) => {
+  const formatDateTimeLocal = (date: Date | string | null | undefined) => {
     if (!date) return ""
     try {
-      return format(date, "yyyy-MM-dd'T'HH:mm")
+      const parsed = typeof date === "string" ? new Date(date) : date
+      return format(parsed, "yyyy-MM-dd'T'HH:mm")
     } catch {
       return ""
     }
+  }
+
+  const getErrorMessage = (error: unknown) => {
+    if (typeof error === "object" && error !== null) {
+      const maybeErr = error as any
+      return maybeErr?.response?.data?.message || maybeErr?.message
+    }
+    return "Something went wrong. Please try again."
   }
 
   const fetchAssignableStaff = async () => {
@@ -78,7 +87,7 @@ const MaintainTable = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response.data.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       })
     } finally {
@@ -104,7 +113,7 @@ const MaintainTable = () => {
     setPriorityValue((task.priority as "LOW" | "MEDIUM" | "HIGH" | "URGENT") ?? "MEDIUM")
     setStatusValue((task.status as "REPORTED" | "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED") ?? "REPORTED")
     setScheduledAt(formatDateTimeLocal(task.scheduledAt))
-    setEstimatedFinishTime(formatDateTimeLocal(task.estimatedFinishTime))
+    setEstimatedFinishTime(formatDateTimeLocal((task as any).estimatedFinishTime))
     setIsEditOpen(true)
 
     if (!assignableStaff.length) {
@@ -155,7 +164,7 @@ const MaintainTable = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response.data.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       })
     } finally {
