@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash"
 import { cookieUtils } from "@shared/utils/cookie.utils"
 import type { AxiosRequestHeaders } from "./types"
 
-const apiBaseUrl = `https://muict.app/fivetuay10bath-backend`
+const apiBaseUrl = ${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}
 
 const isPresignedUrl = (url?: string) => {
   if (!url) return false
