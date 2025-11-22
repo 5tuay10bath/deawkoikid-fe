@@ -4,15 +4,13 @@ import { cloneDeep } from "lodash"
 import { cookieUtils } from "@shared/utils/cookie.utils"
 import type { AxiosRequestHeaders } from "./types"
 
-const apiBaseUrl = ${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}
-
 const isPresignedUrl = (url?: string) => {
   if (!url) return false
   return /amazonaws\.com/i.test(url) || /[?&]X-Amz-Signature=/i.test(url)
 }
 
 const axiosInstance = axios.create({
-  baseURL: `${apiBaseUrl}/api`,
+  baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}/api`,
 })
 
 axiosInstance.interceptors.request.use(
