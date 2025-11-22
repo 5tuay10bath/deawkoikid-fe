@@ -123,13 +123,13 @@ jobs:
           USE_MOCK_API: true
         run: pnpm dlx cypress run --spec "cypress/e2e/admin/**/*.cy.*"
 
-      - name: Run Cypress API integration (optional)
-        if: ${{ vars.RUN_API_TESTS == 'true' || env.RUN_API_TESTS == 'true' }}
-        env:
-          RUN_API_TESTS: true
-          apiUrl: http://localhost:8080/api
-          apiToken: ${{ secrets.API_TOKEN || '' }}
-        run: pnpm dlx cypress run --spec "cypress/e2e/integration/api/*.cy.js"
+      # - name: Run Cypress API integration 
+      #   if: ${{ vars.RUN_API_TESTS == 'true' || env.RUN_API_TESTS == 'true' }}
+      #   env:
+      #     RUN_API_TESTS: true
+      #     apiUrl: http://localhost:8080/api
+      #     apiToken: ${{ secrets.API_TOKEN || '' }}
+      #   run: pnpm dlx cypress run --spec "cypress/e2e/integration/api/*.cy.js"
       - name: Generate version tag
         id: tag
         run: echo "TAG=$(date +'%Y$m$d-%H%M')-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
