@@ -116,7 +116,7 @@ jobs:
       - name: Ensure Cypress binary installed
         run: pnpm dlx cypress install
       
-      - name: Run Cypress UI E2E (mocked backend)
+      - name: Run Cypress UI E2E
         env:
           CYPRESS_BASE_URL: http://localhost:3000/fivetuay10bath-frontend
           CYPRESS_apiUrl: http://localhost:8080/api
