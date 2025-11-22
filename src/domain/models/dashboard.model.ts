@@ -10,6 +10,8 @@ export interface DashboardModel {
   unitSize: number
   unitStatus: UnitStatus
   floor: number
+  floorId?: string
+  buildingId?: string
   latestAirconService: Date
   contract?: ContractsModel | null
   contracts?: ContractsModel[] | null

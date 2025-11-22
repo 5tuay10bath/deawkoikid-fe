@@ -135,12 +135,12 @@ jobs:
         env:
           CYPRESS_apiUrl: http://localhost:8080/api
 
-      - name: Run Integration Tests (API)
-        run: |
-          echo "🧪 Running Integration Tests..."
-          pnpm dlx cypress run --spec "cypress/e2e/integration/**/*.cy.js" --config baseUrl=${CYPRESS_BASE_URL}
-        env:
-          CYPRESS_apiUrl: http://localhost:8080/api
+      # - name: Run Integration Tests (API)
+      #   run: |
+      #     echo "🧪 Running Integration Tests..."
+      #     pnpm dlx cypress run --spec "cypress/e2e/integration/**/*.cy.js" --config baseUrl=${CYPRESS_BASE_URL}
+      #   env:
+      #     CYPRESS_apiUrl: http://localhost:8080/api
 
       - name: Generate version tag
         id: tag

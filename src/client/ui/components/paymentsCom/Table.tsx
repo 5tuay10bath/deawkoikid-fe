@@ -1,9 +1,12 @@
 import { format } from "date-fns"
-import { Download, Receipt, Send } from "lucide-react"
+import { Download, Receipt, Send, FileText } from "lucide-react"
+import { useState } from "react"
 
 import type { PaymentsModel } from "@domain/models/payments.model"
 
 import { usePaymentStore } from "@infrastructure/libs/store/payments.store"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
+import { useToast } from "../hooks/useToast"
 
 import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
@@ -11,6 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 
 const TablePayments = () => {
   const { payments, searchTerm, setSelectedPayment, setIsReceiptOpen } = usePaymentStore()
+  const { toast } = useToast()
+  const [loadingInvoiceId, setLoadingInvoiceId] = useState<string | null>(null)
 
   const filteredPayments = payments.filter(
     (payment) =>
@@ -32,6 +37,28 @@ const TablePayments = () => {
   const handleGenerateReceipt = (payment: PaymentsModel) => {
     setSelectedPayment(payment)
     setIsReceiptOpen(true)
+  }
+
+  const handleCreateInvoice = async (payment: PaymentsModel) => {
+    const contractId = payment.contract.id
+    setLoadingInvoiceId(payment.id)
+
+    try {
+      await axiosInstance.post(`/invoices/contract/${contractId}`)
+      toast({
+        title: "Success",
+        description: "Invoice created successfully",
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create invoice"
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoadingInvoiceId(null)
+    }
   }
 
   return (
@@ -68,6 +95,18 @@ const TablePayments = () => {
                 </Button>
                 <Button variant="ghost" size="sm">
                   <Send className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCreateInvoice(payment)}
+                  disabled={loadingInvoiceId === payment.id}
+                >
+                  {loadingInvoiceId === payment.id ? (
+                    <FileText className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <FileText className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </TableCell>

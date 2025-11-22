@@ -1,6 +1,7 @@
 import type { IContractsRepository } from "@application/ports/contracts.repository.port"
 import type { CreateContractDto } from "../dtos/createContract.dto"
 import type { UpdateContractDto } from "../dtos/updateContract.dto"
+import type { ActivateContractDto } from "../dtos/activateContract.dto"
 import type { DefaultDto } from "../dtos/default.dto"
 import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 import type { ContractsModel, CreateUnitModel, CreateUserModel } from "@domain/models/contracts.model"
@@ -63,6 +64,26 @@ export class ContractsRepository implements IContractsRepository {
         status: data.status,
         message: data.message,
         timestamp: data.timestamp,
+      }
+
+      return right(result)
+    } catch (error) {
+      console.error(error)
+      return left(error)
+    }
+  }
+
+  async activateContract(dto: ActivateContractDto): Promise<IContractsRepository.activateContract> {
+    try {
+      const { id } = dto
+      const url = `/contracts/active/${id}`
+
+      const { data } = await axiosInstance.put(url)
+
+      const result: ApiResponse = {
+        status: data.status || "success",
+        message: data.message || "Contract activated successfully",
+        timestamp: data.timestamp || new Date().toISOString(),
       }
 
       return right(result)
