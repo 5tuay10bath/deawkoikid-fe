@@ -10,6 +10,8 @@ import { Badge } from "../common/Badge"
 import { Button } from "../common/Button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../common/Table"
 import EditTenantDialog from "./EditTenantDialog"
+import Swal from "sweetalert2"
+import { axiosInstance } from "@infrastructure/libs/axios/axiosInstance"
 
 const TableTenants = () => {
   const { tenants, searchTerm, statusFilter } = useTenantStore()
@@ -39,7 +41,43 @@ const TableTenants = () => {
     active: { color: "bg-green-500 text-white", label: "Active" },
     inactive: { color: "bg-slate-500 text-white", label: "Inactive" },
   }
-
+  const showdialog = (tenant: TenantsPageModel) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `You want to delete "${tenant.fullName}"?`,
+      icon: "error",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      // eslint-disable-next-line promise/always-return
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading()
+          },
+        })
+        try {
+          await axiosInstance.delete(`/users/${tenant.id}`)
+          Swal.fire({
+            title: "Deleted!",
+            text: tenant.fullName + " has been deleted.",
+            icon: "success",
+          })
+        } catch (error: any) {
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to delete: " + error.response.data.message,
+            icon: "error",
+          })
+        }
+      }
+    })
+  }
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -113,7 +151,7 @@ const TableTenants = () => {
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" data-cy="delete-tenant-button">
+                  <Button variant="ghost" size="sm" data-cy="delete-tenant-button" onClick={() => showdialog(tenant)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

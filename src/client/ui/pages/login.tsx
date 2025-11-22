@@ -27,6 +27,10 @@ export default function Login() {
         navigate("/user/dashboard", { replace: true })
         return
       }
+      if (role === "TENANT") {
+        navigate("/tenant/dashboard", { replace: true })
+        return
+      }
       if (role === "ADMIN") {
         navigate("/dashboard", { replace: true })
         return
@@ -59,6 +63,8 @@ export default function Login() {
       // Navigate immediately before showing toast
       if (result.role === "ADMIN") {
         navigate("/dashboard")
+      } else if (result.role === "TENANT") {
+        navigate("/tenant/dashboard")
       } else {
         navigate("/user/dashboard")
       }

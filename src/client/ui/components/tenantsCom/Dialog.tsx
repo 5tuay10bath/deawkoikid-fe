@@ -186,7 +186,12 @@ const DialogTenants = () => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="bg-white w-auto p-0">
-                    <Calendar mode="single" selected={birthDate} onSelect={setBirthDate} initialFocus />
+                    <Calendar
+                      mode="single"
+                      selected={birthDate}
+                      onSelect={(date) => setBirthDate(date ?? undefined)}
+                      initialFocus
+                    />
                   </PopoverContent>
                 </Popover>
               </div>

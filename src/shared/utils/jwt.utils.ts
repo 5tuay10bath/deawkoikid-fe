@@ -1,8 +1,11 @@
 import { jwtDecode } from "jwt-decode"
 
+type JWTRole = "ADMIN" | "USER" | "TENANT" | "STAFF"
+type JWTId = string
 interface JWTPayload {
   sub: string
-  role: "ADMIN" | "USER"
+  role: JWTRole
+  userId: JWTId
   iat: number
   exp: number
 }
@@ -27,7 +30,7 @@ export const jwtUtils = {
     }
   },
 
-  getRoleFromToken: (token: string): "ADMIN" | "USER" | null => {
+  getRoleFromToken: (token: string): JWTRole | null => {
     try {
       const decoded = jwtDecode<JWTPayload>(token)
       return decoded.role
@@ -35,7 +38,14 @@ export const jwtUtils = {
       return null
     }
   },
-
+  getIdFromToken: (token: string): string | null => {
+    try {
+      const decoded = jwtDecode<JWTPayload>(token)
+      return decoded.userId
+    } catch {
+      return null
+    }
+  },
   getEmailFromToken: (token: string): string | null => {
     try {
       const decoded = jwtDecode<JWTPayload>(token)

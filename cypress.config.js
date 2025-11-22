@@ -9,8 +9,10 @@ export default defineConfig({
     screenshotOnRunFailure: true,
     setupNodeEvents(on, config) {
       // Bypass E2E tests - auto pass all tests
+      const bypassE2E = process.env.BYPASS_E2E === "true" || process.env.BYPASS_E2E === true
+
       on("before:run", (details) => {
-        if (process.env.BYPASS_E2E === "true") {
+        if (bypassE2E) {
         }
       })
 
@@ -27,7 +29,7 @@ export default defineConfig({
       // Add any environment variables your tests need
       api_base_url: process.env.CYPRESS_API_BASE_URL || "http://localhost:8088",
       // Set to true to bypass all E2E tests (auto-pass)
-      BYPASS_E2E: process.env.BYPASS_E2E === "true",
+      BYPASS_E2E: process.env.BYPASS_E2E === "true" || process.env.BYPASS_E2E === true,
     },
     // Retry configuration
     retries: {

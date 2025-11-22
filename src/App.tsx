@@ -19,7 +19,9 @@ import Home from "@client/ui/pages/home"
 import Login from "@client/ui/pages/login"
 import SignUp from "@client/ui/pages/signUp"
 import UserDashboard from "@client/ui/pages/userDashboard"
+import TenantDashboard from "@client/ui/pages/tenantDashboard"
 import Buildings from "@client/ui/pages/building"
+import TenantInvoices from "@client/ui/pages/tenantInvoices"
 
 function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -90,6 +92,36 @@ export default function App() {
             </ClientLayout>
           }
         />
+        <Route
+          path="/tenant/invoices"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <TenantInvoices />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
+        <Route
+          path="/tenant/dashboard"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <TenantDashboard />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
+        <Route
+          path="/tenant/payments"
+          element={
+            <ClientLayout>
+              <ProtectedRoute requiredRole="TENANT">
+                <Payments />
+              </ProtectedRoute>
+            </ClientLayout>
+          }
+        />
 
         {/* Admin Routes - With Sidebar - Protected */}
         <Route
@@ -133,16 +165,6 @@ export default function App() {
           }
         />
         <Route
-          path="/payments"
-          element={
-            <ProtectedRoute requiredRole="ADMIN">
-              <AdminLayout>
-                <Payments />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/contracts"
           element={
             <ProtectedRoute requiredRole="ADMIN">
@@ -158,6 +180,16 @@ export default function App() {
             <ProtectedRoute requiredRole="ADMIN">
               <AdminLayout>
                 <Maintenance />
+              </AdminLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payments"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminLayout>
+                <Payments />
               </AdminLayout>
             </ProtectedRoute>
           }
