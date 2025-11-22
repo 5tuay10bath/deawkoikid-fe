@@ -34,9 +34,6 @@ Cypress.Commands.add("login", (email = "admin@apt.com", password = "admin") => {
       // Submit login
       cy.get('[data-cy="login-button"]').click({ force: true })
 
-      // Wait for login API to complete
-      cy.wait("@loginRequest", { timeout: 30000 })
-
       // Verify redirect and auth
       cy.url({ timeout: 30000 }).should("not.include", "/login")
       cy.getCookie("auth_token").should("exist")

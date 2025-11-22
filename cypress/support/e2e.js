@@ -129,23 +129,6 @@ beforeEach(() => {
     cy.intercept("POST", "**/public/login").as("mockLogin")
     cy.intercept("POST", "**/public/login").as("loginRequest")
   }
-
-  // Default auth context for pages that read localStorage and cookies
-  const token = (apiMocks && apiMocks.token) || "mock-jwt-token"
-  cy.window().then((win) => {
-    win.localStorage.setItem("authToken", token)
-    win.localStorage.setItem(
-      "user",
-      JSON.stringify({
-        id: 1,
-        username: "testuser",
-        role: "admin",
-        permissions: ["read", "write", "delete"],
-      }),
-    )
-  })
-  cy.setCookie("auth_token", token)
-  cy.setCookie("full_name", (apiMocks && apiMocks.loginResponse?.data?.fullName) || "Admin User")
 })
 
 afterEach(() => {
