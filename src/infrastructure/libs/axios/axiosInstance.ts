@@ -5,7 +5,7 @@ import { cookieUtils } from "@shared/utils/cookie.utils"
 import type { AxiosRequestHeaders } from "./types"
 
 const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_DEAWKOIKID_API_BASE_URL}/api`,
+  baseURL: `https://muict.app/fivetuay10bath-backend/api`,
 })
 
 axiosInstance.interceptors.request.use(
